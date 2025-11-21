@@ -3,6 +3,7 @@ import {
   TBaseRectType,
   TImageSizeInfo,
   TImgMimeType,
+  TPrintAreaShapeType,
   TSurfaceType,
   TTemplateType,
 } from './types/global'
@@ -226,20 +227,44 @@ export const diffPrintedImageOnRectType = (
   printedImageSize: TImageSizeInfo
 ): number => {
   const imgRatio = printedImageSize.width / printedImageSize.height
-  console.log('>>> imgRatio:', { imgRatio, rectType })
+  const upSquareDiff = 1 + getInitialContants<number>('MAX_DIFF_RATIO_VALUE')
+  const downSquareDiff = 1 - getInitialContants<number>('MAX_DIFF_RATIO_VALUE')
   switch (rectType) {
     case 'horizontal':
-      if (imgRatio >= 1) return 0
+      if (imgRatio > upSquareDiff) return 0
       return imgRatio - 1
     case 'vertical':
-      if (imgRatio <= 1) return 0
+      if (imgRatio < downSquareDiff) return 0
       return 1 - imgRatio
     case 'square':
-      if (imgRatio >= 0.9 && imgRatio <= 1.1) return 0
+      if (imgRatio >= downSquareDiff && imgRatio <= upSquareDiff) return 0
       return Math.abs(1 - imgRatio)
     default:
       return -1
   }
+}
+
+export const matchPrintedImageToRectType = (
+  rectType: TBaseRectType,
+  printedImageSize: TImageSizeInfo
+): boolean => {
+  const imgRatio = printedImageSize.width / printedImageSize.height
+  switch (rectType) {
+    case 'horizontal':
+      return imgRatio >= 1
+    case 'vertical':
+      return imgRatio <= 1
+    case 'square':
+      return imgRatio === 1
+    default:
+      return false
+  }
+}
+
+export const detectShapeType = (width: number, height: number): TPrintAreaShapeType => {
+  if (width === height) return 'square'
+  if (width > height) return 'landscape'
+  return 'portrait'
 }
 
 /**
@@ -247,31 +272,17 @@ export const diffPrintedImageOnRectType = (
  * @param templateType - Loại template
  * @returns Object chứa các CSS properties cho grid layout
  */
-export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSProperties => {
+export const styleToFramesDisplayerByTemplateType = (
+  templateType: TTemplateType
+): React.CSSProperties => {
   switch (templateType) {
     // 1 frame templates
-    case '1-horizon':
-      return {
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        gridTemplateRows: '1fr',
-        aspectRatio: '16/9',
-        width: '100%',
-      }
-    case '1-vertical':
-      return {
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        gridTemplateRows: '1fr',
-        aspectRatio: '9/16',
-        height: '100%',
-      }
     case '1-square':
       return {
         display: 'grid',
         gridTemplateColumns: '1fr',
         gridTemplateRows: '1fr',
-        aspectRatio: '1/1',
+        height: '100%',
         width: '100%',
       }
 
@@ -281,7 +292,7 @@ export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSP
         display: 'grid',
         gridTemplateColumns: '1fr',
         gridTemplateRows: 'repeat(2, 1fr)',
-        aspectRatio: '16/9',
+        height: '100%',
         width: '100%',
       }
     case '2-vertical':
@@ -289,7 +300,7 @@ export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSP
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
         gridTemplateRows: '1fr',
-        aspectRatio: '9/16',
+        width: '100%',
         height: '100%',
       }
 
@@ -299,7 +310,7 @@ export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSP
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
         gridTemplateRows: 'repeat(2, 1fr)',
-        aspectRatio: '1/1',
+        height: '100%',
         width: '100%',
       }
     case '3-right':
@@ -307,7 +318,7 @@ export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSP
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
         gridTemplateRows: 'repeat(2, 1fr)',
-        aspectRatio: '1/1',
+        height: '100%',
         width: '100%',
       }
     case '3-top':
@@ -315,7 +326,7 @@ export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSP
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
         gridTemplateRows: 'repeat(2, 1fr)',
-        aspectRatio: '1/1',
+        height: '100%',
         width: '100%',
       }
     case '3-bottom':
@@ -323,7 +334,7 @@ export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSP
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
         gridTemplateRows: 'repeat(2, 1fr)',
-        aspectRatio: '1/1',
+        height: '100%',
         width: '100%',
       }
 
@@ -333,7 +344,7 @@ export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSP
         display: 'grid',
         gridTemplateColumns: 'repeat(2, 1fr)',
         gridTemplateRows: 'repeat(2, 1fr)',
-        aspectRatio: '1/1',
+        height: '100%',
         width: '100%',
       }
     case '4-horizon':
@@ -341,7 +352,7 @@ export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSP
         display: 'grid',
         gridTemplateColumns: '1fr',
         gridTemplateRows: 'repeat(4, 1fr)',
-        aspectRatio: '9/16',
+        height: '100%',
         width: '100%',
       }
 
@@ -350,20 +361,21 @@ export const templateTypeToCssStyles = (templateType: TTemplateType): React.CSSP
         display: 'grid',
         gridTemplateColumns: '1fr',
         gridTemplateRows: '1fr',
+        height: '100%',
         width: '100%',
       }
   }
 }
 
-export const templateTypeToFrameStyle = (
+export const styleFrameByTemplateType = (
   templateType: TTemplateType,
   frameIndex: number
 ): React.CSSProperties => {
   switch (templateType) {
     case '2-horizon':
-      return { minHeight: '50px' }
+      return { minHeight: '15px' }
     case '2-vertical':
-      return { minWidth: '50px' }
+      return { minWidth: '15px' }
     case '3-left':
       if (frameIndex === 2) return { gridRow: 'span 2 / span 2' }
       return {}

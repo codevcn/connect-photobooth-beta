@@ -1,89 +1,82 @@
 import {
+  TBaseProduct,
   TPrintAreaInfo,
   TPrintAreaShapeType,
   TPrintedImage,
   TPrintTemplate,
   TSizeInfo,
 } from '@/utils/types/global'
-import { PrintAreaOverlay, PrintAreaOverlayPreview } from './live-preview/PrintAreaOverlay'
+import { PrintAreaOverlay } from './live-preview/PrintAreaOverlay'
 import { usePrintArea } from '@/hooks/use-print-area'
 import { hardCodedPrintTemplates } from '@/configs/data/print-template'
-import { diffPrintedImageOnRectType } from '@/utils/helpers'
+import { diffPrintedImageOnRectType, matchPrintedImageToRectType } from '@/utils/helpers'
 import { getInitialContants } from '@/utils/contants'
 import { usePrintedImageStore } from '@/stores/printed-image/printed-image.store'
 import { useEffect } from 'react'
 
-const assignTemplatesToPrintArea = (printAreaSize: TSizeInfo) => {
-  const { width, height } = printAreaSize
-  if (width === height) {
-    const templates = [
-      hardCodedPrintTemplates('2-vertical'), // ưu tiên: ảnh dọc, ảnh vuông
-      hardCodedPrintTemplates('2-horizon'), // ưu tiên: ảnh ngang, ảnh vuông
-      hardCodedPrintTemplates('1-square'), // cái nào cũng được
-    ]
-    return templates
-  }
+const assignFallbackTemplateToPrintArea = (): TPrintTemplate => {
+  return hardCodedPrintTemplates('1-square')
 }
 
-const detectPrintAreaShape = (width: number, height: number): TPrintAreaShapeType => {
-  if (width === height) return 'square'
-  if (width > height) return 'landscape'
-  return 'portrait'
-}
-
-const initTemplatesByAreaShapeType = (shapeType: TPrintAreaShapeType): TPrintTemplate[] => {
-  switch (shapeType) {
-    case 'square':
-      return [
-        hardCodedPrintTemplates('2-vertical'), // ưu tiên: ảnh dọc, ảnh vuông
-        hardCodedPrintTemplates('2-horizon'), // ưu tiên: ảnh ngang, ảnh vuông
-        hardCodedPrintTemplates('1-square'), // cái nào cũng được
-      ]
-    case 'landscape':
-      return [
-        hardCodedPrintTemplates('1-square'), // ưu tiên: ảnh ngang, ảnh vuông
-        hardCodedPrintTemplates('2-vertical'), // ưu tiên: ảnh vuông
-        hardCodedPrintTemplates('4-vertical'), // ưu tiên: ảnh vuông
-      ]
-    case 'portrait':
-      return [
-        hardCodedPrintTemplates('1-square'), // ưu tiên: ảnh dọc, ảnh vuông
-        hardCodedPrintTemplates('2-horizon'), // ưu tiên: ảnh vuông
-        hardCodedPrintTemplates('4-horizon'),
-      ]
-  }
-}
-
-const displayProductImageByTemplate = (
-  printAreaInfo: TPrintAreaInfo,
-  printedImages: TPrintedImage[],
-  productImageURL?: string
+const handleFallbackTemplate = (
+  templates: TPrintTemplate,
+  printedImage: TPrintedImage
 ): TPrintTemplate => {
-  const { area } = printAreaInfo
-  const templates = initTemplatesByAreaShapeType(detectPrintAreaShape(area.printW, area.printH))
-  let found = false
-  let arrayIndexOfFrame = -1,
-    arrayIndexOfTemplate = -1
-  const imgHolder = {
-    img: printedImages[0],
-    diff: Infinity,
-    frameIndexInArray: -1,
-    templateIndexInArray: -1,
+  for (const frame of templates.frames) {
+    frame.placedImage = {
+      id: printedImage.id,
+      imgURL: printedImage.url,
+      placementState: {
+        frameIndex: frame.index,
+        objectFit: getInitialContants('PLACED_IMG_OBJECT_FIT'),
+        squareRotation: getInitialContants('PLACED_IMG_SQUARE_ROTATION'),
+        zoom: getInitialContants('PLACED_IMG_ZOOM'),
+      },
+    }
   }
-  for (const template of templates) {
-    arrayIndexOfTemplate++
-    for (const frame of template.frames) {
-      arrayIndexOfFrame++
-      for (const img of printedImages) {
-        const diff = diffPrintedImageOnRectType(frame.rectType, {
-          height: img.height,
-          width: img.width,
+  return templates
+}
+
+const assignTemplatesToPrintArea = (printAreaSize: TSizeInfo): TPrintTemplate[] => {
+  const { width, height } = printAreaSize
+  const template2Vertical = hardCodedPrintTemplates('2-vertical') // ưu tiên: ảnh vuông, ảnh dọc
+  for (const frame of template2Vertical.frames) {
+    frame.width = width / 2
+    frame.height = height
+  }
+  const template2Horizon = hardCodedPrintTemplates('2-horizon') // ưu tiên: ảnh vuông
+  for (const frame of template2Horizon.frames) {
+    frame.width = width
+    frame.height = height / 2
+  }
+  const template1Square = hardCodedPrintTemplates('1-square') // ưu tiên: ảnh dọc, ảnh vuông
+  for (const frame of template1Square.frames) {
+    frame.width = width
+    frame.height = height
+  }
+  return [template2Vertical, template2Horizon, template1Square]
+}
+
+const getTheBestTemplateForPrintedImages = (
+  printAreaSize: TSizeInfo,
+  printedImages: TPrintedImage[]
+): TPrintTemplate => {
+  const templates = assignTemplatesToPrintArea(printAreaSize)
+  let foundTemplate: TPrintTemplate | null = null
+  for (const image of printedImages) {
+    // ảnh bự nhất đặt ở đầu
+    let frameDimensionPoint: number = 0
+    for (const template of templates) {
+      let point = 0
+      for (const frame of template.frames) {
+        const match = matchPrintedImageToRectType(frame.frameRectType, {
+          height: image.height,
+          width: image.width,
         })
-        console.log('>>> diff:', diff)
-        if (diff === 0) {
+        if (match) {
           frame.placedImage = {
-            id: img.id,
-            imgURL: img.url,
+            id: image.id,
+            imgURL: image.url,
             placementState: {
               frameIndex: frame.index,
               objectFit: getInitialContants('PLACED_IMG_OBJECT_FIT'),
@@ -91,51 +84,31 @@ const displayProductImageByTemplate = (
               zoom: getInitialContants('PLACED_IMG_ZOOM'),
             },
           }
-          found = true
-          break // Chỉ lấy 1 hình phù hợp nhất
-        } else {
-          if (imgHolder.diff > diff) {
-            imgHolder.img = img
-            imgHolder.diff = diff
-            imgHolder.frameIndexInArray = arrayIndexOfFrame
-            imgHolder.templateIndexInArray = arrayIndexOfTemplate
-          }
+          point += frame.frameRectType === 'horizontal' ? frame.width : frame.height
         }
       }
+      if (point > frameDimensionPoint) {
+        frameDimensionPoint = point
+        foundTemplate = template
+      }
     }
-    if (found) {
-      console.log('>>> found template:', template)
-      return template
-    }
-  }
-  // Nếu không tìm thấy hình phù hợp hoàn hảo, lấy hình gần đúng nhất
-  const frame = templates[imgHolder.templateIndexInArray]?.frames[imgHolder.frameIndexInArray]
-  if (frame) {
-    frame.placedImage = {
-      id: imgHolder.img.id,
-      imgURL: imgHolder.img.url,
-      placementState: {
-        frameIndex: imgHolder.frameIndexInArray + 1,
-        objectFit: getInitialContants('PLACED_IMG_OBJECT_FIT'),
-        squareRotation: getInitialContants('PLACED_IMG_SQUARE_ROTATION'),
-        zoom: getInitialContants('PLACED_IMG_ZOOM'),
-      },
+    if (foundTemplate) {
+      return foundTemplate
     }
   }
-  console.log('>>> return first template:', templates[0])
-  return templates[0] // Trả về template đầu tiên nếu không tìm thấy hình phù hợp
+  // trả về template đầu tiên nếu không tìm thấy cái nào phù hợp
+  return handleFallbackTemplate(assignFallbackTemplateToPrintArea(), printedImages[0])
 }
 
 type TProductProps = {
-  product: {
-    id: number // productId
-    url: string // productAvatarURL
-  }
+  product: TBaseProduct
   printAreaInfo: TPrintAreaInfo
   printedImages: TPrintedImage[]
+  onPickProduct: (product: TBaseProduct) => void
 }
 
-const Product = ({ product, printAreaInfo, printedImages }: TProductProps) => {
+const Product = ({ product, printAreaInfo, printedImages, onPickProduct }: TProductProps) => {
+  const printArea = printAreaInfo.area
   const {
     printAreaRef,
     containerElementRef: printAreaContainerRef,
@@ -203,14 +176,21 @@ const Product = ({ product, printAreaInfo, printedImages }: TProductProps) => {
       ref={printAreaContainerRef}
       className={`NAME-product w-full aspect-square relative rounded-xl transition duration-200 border border-gray-200`}
       data-url={product.url}
+      onClick={() => onPickProduct(product)}
     >
       <img
         src={product.url || '/placeholder.svg'}
         alt="Overlay"
-        className="NAME-product-image w-full aspect-square rounded-xl"
+        className="NAME-product-image min-h-full max-h-full w-full h-full object-contain rounded-xl"
       />
       <PrintAreaOverlay
-        printTemplate={displayProductImageByTemplate(printAreaInfo, printedImages, product.url)}
+        printTemplate={getTheBestTemplateForPrintedImages(
+          {
+            height: printArea.printH,
+            width: printArea.printW,
+          },
+          printedImages
+        )}
         printAreaRef={printAreaRef}
         isOutOfBounds={false}
       />
@@ -218,18 +198,13 @@ const Product = ({ product, printAreaInfo, printedImages }: TProductProps) => {
   )
 }
 
-type TGalleryProduct = {
-  id: number // productId
-  url: string // productAvatarURL
-  printAreaList: TPrintAreaInfo[] // productPrintAreaInfo
-}
-
 type TProductGalleryProps = {
-  products: TGalleryProduct[]
+  products: TBaseProduct[]
   printedImages: TPrintedImage[]
+  onPickProduct: (product: TBaseProduct) => void
 }
 
-export const ProductGallery = ({ products }: TProductGalleryProps) => {
+export const ProductGallery = ({ products, onPickProduct }: TProductGalleryProps) => {
   const { printedImages } = usePrintedImageStore()
 
   return (
@@ -248,6 +223,7 @@ export const ProductGallery = ({ products }: TProductGalleryProps) => {
                   product={product}
                   printAreaInfo={product.printAreaList[0]}
                   printedImages={printedImages}
+                  onPickProduct={onPickProduct}
                 />
               )
             })}

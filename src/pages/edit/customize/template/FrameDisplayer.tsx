@@ -2,7 +2,7 @@ import { TFrameRectType, TPrintTemplate } from '@/utils/types/global'
 import { TemplateFrame } from './TemplateFrame'
 import type React from 'react'
 import { cn } from '@/configs/ui/tailwind-utils'
-import { templateTypeToCssStyles } from '@/utils/helpers'
+import { styleToFramesDisplayerByTemplateType } from '@/utils/helpers'
 
 type TFramesDisplayerProps = {
   template: TPrintTemplate
@@ -42,10 +42,10 @@ export const FramesDisplayer = ({
   return (
     <div
       className={cn(
-        'NAME-frames-displayer bg-gray-600/30 p-0.5 gap-1 max-h-full max-w-full',
+        'NAME-frames-displayer bg-gray-600/30 p-0.5 max-h-full max-w-full',
         displayerClassNames?.container
       )}
-      style={{ ...templateTypeToCssStyles(type) }}
+      style={{ ...styleToFramesDisplayerByTemplateType(type) }}
     >
       {frames.map((frame) => (
         <TemplateFrame

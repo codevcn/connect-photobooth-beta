@@ -305,7 +305,9 @@ export type TTemplateFrame = {
   id: string
   index: number
   placedImage?: TPlacedImage
-  rectType: TFrameRectType
+  frameRectType: TFrameRectType
+  height: number
+  width: number
 }
 
 export type TPlacedImage = {

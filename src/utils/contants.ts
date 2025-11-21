@@ -19,6 +19,7 @@ type TInitialContentsType =
   | 'PLACED_IMG_OBJECT_FIT'
   | 'PLACED_IMG_ZOOM'
   | 'PLACED_IMG_SQUARE_ROTATION'
+  | 'MAX_DIFF_RATIO_VALUE'
 
 export const getInitialContants = <R>(type: TInitialContentsType): R => {
   switch (type) {
@@ -62,6 +63,8 @@ export const getInitialContants = <R>(type: TInitialContentsType): R => {
       return 1 as R
     case 'PLACED_IMG_SQUARE_ROTATION':
       return 0 as R
+    case 'MAX_DIFF_RATIO_VALUE':
+      return 0.1 as R
     default:
       return null as R
   }

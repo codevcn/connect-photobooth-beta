@@ -15,10 +15,18 @@ type TEditPageProps = {
 export default function EditPage({ products, printedImages }: TEditPageProps) {
   const { initializeTemplates, addImageToFrame } = useTemplateStore()
   const [pickedProduct, setPickedProduct] = useState<TBaseProduct>(products[8])
-  const [pickedVariant, setPickedVariant] = useState<TClientProductVariant>(products[8].variants[0])
-  const [pickedSurface, setPickedSurface] = useState<TBaseProduct['printAreaList']>(
-    products[8].printAreaList
+  const [pickedVariant, setPickedVariant] = useState<TClientProductVariant>(
+    pickedProduct.variants[0]
   )
+  const [pickedSurface, setPickedSurface] = useState<TBaseProduct['printAreaList']>(
+    pickedProduct.printAreaList
+  )
+
+  const handlePickProduct = (prod: TBaseProduct) => {
+    setPickedProduct(prod)
+    setPickedVariant(prod.variants[0])
+    setPickedSurface(prod.printAreaList)
+  }
 
   useEffect(() => {
     initializeTemplates(hardCodedPrintTemplates())
@@ -29,7 +37,11 @@ export default function EditPage({ products, printedImages }: TEditPageProps) {
 
   return (
     <div className="font-sans grid grid-cols-[1fr_6fr] h-screen gap-4">
-      <ProductGallery products={products} printedImages={printedImages} />
+      <ProductGallery
+        products={products}
+        printedImages={printedImages}
+        onPickProduct={handlePickProduct}
+      />
       <div className="NAME-main-parent grid grid-cols-[3fr_2fr] gap-4 h-screen">
         <LivePreview
           pickedProduct={pickedProduct}

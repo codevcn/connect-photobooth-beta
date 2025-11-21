@@ -2,7 +2,7 @@ import { TFrameRectType, TTemplateFrame, TTemplateType } from '@/utils/types/glo
 import { PlacedImage } from './PlacedImage'
 import type React from 'react'
 import { cn } from '@/configs/ui/tailwind-utils'
-import { templateTypeToFrameStyle } from '@/utils/helpers'
+import { styleFrameByTemplateType } from '@/utils/helpers'
 
 type TemplateFrameProps = {
   templateFrame: TTemplateFrame
@@ -38,14 +38,16 @@ export const TemplateFrame = ({
     <div
       style={{
         ...styles?.container,
-        ...templateTypeToFrameStyle(templateType, templateFrame.index),
+        ...styleFrameByTemplateType(templateType, templateFrame.index),
       }}
       className={cn(
         'NAME-template-frame flex justify-center items-center overflow-hidden h-full w-full border border-gray-600 border-dashed',
         classNames?.container
       )}
       onClick={
-        onClickFrame ? (e) => onClickFrame(e, templateFrame.id, templateFrame.rectType) : undefined
+        onClickFrame
+          ? (e) => onClickFrame(e, templateFrame.id, templateFrame.frameRectType)
+          : undefined
       }
     >
       {templateFrame.placedImage ? (
