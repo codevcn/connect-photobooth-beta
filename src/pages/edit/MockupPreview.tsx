@@ -184,6 +184,7 @@ export const MockupPreview = ({ onClose }: TMockupPreviewProps) => {
               src={undefined}
               alt="Mockup preview"
               className="w-full max-h-[calc(98vh-88px)] max-w-[98vw] min-h-[280px] min-w-[280px] object-contain"
+              crossOrigin="anonymous"
             />
           </div>
         </div>

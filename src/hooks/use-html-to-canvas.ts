@@ -63,7 +63,7 @@ export const useHtmlToCanvas = (): TUseHtlmToCanvasReturn => {
     onSaved: (imgData: Blob, canvas: HTMLCanvasElement) => void,
     onError: (error: Error) => void
   ) => {
-    window.requestIdleCallback(async () => {
+    requestIdleCallback(async () => {
       try {
         await document.fonts.ready
         const scale: number = upScale || 8
@@ -97,7 +97,7 @@ export const useHtmlToCanvas = (): TUseHtlmToCanvasReturn => {
     ) => void,
     onError: (error: Error) => void
   ) => {
-    window.requestIdleCallback(async () => {
+    requestIdleCallback(async () => {
       console.log('>>> print Area:', htmlContainer)
       console.log('>>> print Area bounding rect:', htmlContainer.getBoundingClientRect())
       try {
