@@ -65,7 +65,7 @@ export const PrintedImagesModal = ({ printedImages }: PrintedImagesProps) => {
   const addImageToFrame = useTemplateStore((s) => s.addImageToFrame)
 
   const handleAddPrintedImageToFrame = (printedImg: TPrintedImage) => {
-    requestIdleCallback(() => {
+    window.requestIdleCallback(() => {
       const pickedPrintSurface = useProductUIDataStore.getState().pickedSurface
       if (!pickedPrintSurface) return
       const printAreaSize = {

@@ -212,7 +212,7 @@ const PaymentPage = () => {
   }, [showModal])
 
   useEffect(() => {
-    requestIdleCallback(() => {
+    window.requestIdleCallback(() => {
       loadCartItems()
     })
   }, [])
