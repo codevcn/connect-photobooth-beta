@@ -369,3 +369,9 @@ export type TBoxBoundingInfo = {
 export type TProductWithTemplate = TBaseProduct & {
   template: TPrintTemplate
 }
+
+export type TPlacedImageMetaData = {
+  placedImageId: string
+  templateType: TTemplateType
+  frameIndex: TTemplateFrame['index']
+}

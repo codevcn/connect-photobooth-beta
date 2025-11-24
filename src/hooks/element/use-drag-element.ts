@@ -9,7 +9,7 @@ interface UseDraggableOptions {
 }
 
 interface UseDraggableReturn {
-  ref: React.MutableRefObject<HTMLDivElement | null>
+  ref: React.RefObject<HTMLDivElement | null>
 }
 
 export const useDragElement = (options: UseDraggableOptions): UseDraggableReturn => {

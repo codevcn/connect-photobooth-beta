@@ -7,7 +7,8 @@ import {
 } from '@/utils/types/global'
 
 export const usePrintAreaPreview = (
-  setPrintAreaBounds?: React.Dispatch<React.SetStateAction<TBoxBoundingInfo | null>>
+  setPrintAreaBounds?: React.Dispatch<React.SetStateAction<TBoxBoundingInfo | null>>,
+  callbackOnEnd?: (printAreaContainer: HTMLElement) => void
 ) => {
   const printAreaRef = useRef<HTMLDivElement | null>(null)
   const containerSizeRef = useRef<TSizeInfo | null>(null)
@@ -98,6 +99,7 @@ export const usePrintAreaPreview = (
           printAreaRef.current.style.height = `${height}px`
         }
 
+        callbackOnEnd?.(containerElement)
         return newBounds
       } else {
         setPrintAreaBounds?.(null)
@@ -132,12 +134,15 @@ type TUsePrintAreaReturn = {
   checkIfAnyElementOutOfBounds: () => boolean
 }
 
-export const usePrintArea = (printAreaInfo: TPrintAreaInfo): TUsePrintAreaReturn => {
+export const usePrintArea = (
+  printAreaInfo: TPrintAreaInfo,
+  callbackOnEnd?: (printAreaContainer: HTMLElement) => void
+): TUsePrintAreaReturn => {
   const warningOverlayRef = useRef<HTMLDivElement | null>(null)
   const [isOutOfBounds, setIsOutOfBounds] = useState(false)
   const [printAreaBounds, setPrintAreaBounds] = useState<TPrintAreaBounds | null>(null)
   const { printAreaRef, printAreaContainerRef, calculatePrintAreaFromContainer } =
-    usePrintAreaPreview(setPrintAreaBounds)
+    usePrintAreaPreview(setPrintAreaBounds, callbackOnEnd)
 
   const checkElementBounds = useCallback(
     (elementRect: DOMRect | TPlacementDirection): boolean => {

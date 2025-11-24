@@ -324,7 +324,7 @@ export const TemplateFrameMenu = ({ frameId, onClose, printedImageURL }: Printed
   return (
     <div
       ref={menuRef}
-      className="NAME-menu-section NAME-menu-template-frame STYLE-hide-scrollbar smd:text-base text-sm w-full mt-2"
+      className="NAME-menu-section NAME-menu-template-frame STYLE-hide-scrollbar smd:text-sm text-sm w-full mt-2"
     >
       <h3 className="text-xs smd:text-sm mt-3 mb-1 font-bold">Tùy chỉnh</h3>
       <div className="2xl:grid-cols-3 spmd:gap-2 smd:grid-cols-2 sm:grid-rows-1 grid-rows-2 grid-flow-col gap-1 grid rounded-md">

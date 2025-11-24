@@ -139,45 +139,52 @@ export const stylePlacedImageByTemplateType = (
     if (frameIndex === 1) {
       return {
         objectPosition: 'bottom',
+        bottom: '0',
       }
     } else {
       return {
         objectPosition: 'top',
+        top: '0',
       }
     }
   } else if (templateType === '2-vertical') {
     if (frameIndex === 1) {
-      return { objectPosition: 'right' }
+      return { objectPosition: 'right', right: '0' }
     } else {
-      return { objectPosition: 'left' }
+      return { objectPosition: 'left', left: '0' }
     }
   } else if (templateType === '3-left') {
     if (frameIndex === 1) {
-      return { objectPosition: 'right bottom' }
+      return { objectPosition: 'right bottom', right: '0', bottom: '0' }
     } else if (frameIndex === 2) {
-      return { objectPosition: 'left center' }
+      return { objectPosition: 'left center', left: '0', top: '50%', transform: 'translateY(-50%)' }
     } else {
-      return { objectPosition: 'right top' }
+      return { objectPosition: 'right top', right: '0', top: '0' }
     }
   } else if (templateType === '3-right') {
     if (frameIndex === 1) {
-      return { objectPosition: 'right center' }
+      return {
+        objectPosition: 'right center',
+        right: '0',
+        top: '50%',
+        transform: 'translateY(-50%)',
+      }
     } else if (frameIndex === 2) {
-      return { objectPosition: 'left bottom' }
+      return { objectPosition: 'left bottom', left: '0', bottom: '0' }
     } else {
-      return { objectPosition: 'left top' }
+      return { objectPosition: 'left top', left: '0', top: '0' }
     }
   } else if (templateType === '3-top') {
     if (frameIndex === 1) {
-      return { objectPosition: 'right bottom' }
+      return { objectPosition: 'right bottom', right: '0', bottom: '0' }
     } else if (frameIndex === 2) {
-      return { objectPosition: 'left bottom' }
+      return { objectPosition: 'left bottom', left: '0', bottom: '0' }
     } else {
-      return { objectPosition: 'top center' }
+      return { objectPosition: 'top center', top: '0', left: '50%', transform: 'translateX(-50%)' }
     }
   } else if (templateType === '3-bottom') {
     if (frameIndex === 1) {
-      return { objectPosition: 'bottom center' }
+      return { objectPosition: 'bottom center', }
     } else if (frameIndex === 2) {
       return { objectPosition: 'right top' }
     } else {

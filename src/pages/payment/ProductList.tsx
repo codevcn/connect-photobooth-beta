@@ -124,7 +124,6 @@ export const ProductList: React.FC<ProductListProps> = ({
                           onUpdateQuantity(productId, productVariantId, mockupData.id, -1)
                         }
                         className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm active:scale-75 transition-transform"
-                        aria-label="Giảm số lượng"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -147,7 +146,6 @@ export const ProductList: React.FC<ProductListProps> = ({
                           onUpdateQuantity(productId, productVariantId, mockupData.id, 1)
                         }
                         className="w-8 h-8 flex items-center justify-center rounded-full bg-white shadow-sm active:scale-75 transition-transform"
-                        aria-label="Tăng số lượng"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

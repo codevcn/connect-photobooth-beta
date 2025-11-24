@@ -66,7 +66,7 @@ const PaymentPage = () => {
   const navigate = useNavigate()
   const [selectedImage, setSelectedImage] = useState<string>()
   const products = useProductStore((s) => s.products)
-
+  console.log('>>> cart items:', cartItems)
   // Hàm tính subtotal (tổng tiền trước giảm giá voucher)
   const calculateSubtotal = (): number => {
     return cartItems.reduce(
@@ -88,6 +88,13 @@ const PaymentPage = () => {
     amount: number
   ) => {
     if (!sessionId) return
+    console.log('>>> esss:', {
+      sessionId,
+      productId,
+      productVariantId,
+      mockupId,
+      amount,
+    })
     setCartItems((items) =>
       items.map((item) =>
         item.mockupData.id === mockupId
