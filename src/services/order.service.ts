@@ -1,6 +1,6 @@
 import { postCreateOrder } from './api/order.api'
 import { TOrderResponse } from '@/utils/types/api'
-import { TPaymentProductItem, TShippingInfo } from '@/utils/types/global'
+import { TProductInCart, TShippingInfo } from '@/utils/types/global'
 import { OrderAdapter } from './adapter/order.adapter'
 
 class OrderService {
@@ -8,7 +8,7 @@ class OrderService {
    * Create order - Convert cart items to API format and submit
    */
   async createOrder(
-    cartItems: TPaymentProductItem[],
+    cartItems: TProductInCart[],
     shippingInfo: TShippingInfo,
     voucherCode?: string
   ): Promise<TOrderResponse> {

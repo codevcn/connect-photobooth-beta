@@ -11,7 +11,6 @@ import { SectionLoading } from '@/components/custom/Loading'
 import { EndOfPayment } from './EndOfPayment'
 
 interface PaymentModalProps {
-  show: boolean
   paymentInfo: {
     total: number
   }
@@ -20,7 +19,7 @@ interface PaymentModalProps {
   cartItems: TPaymentProductItem[]
 }
 
-export const PaymentModal = ({ show, onHideShow, voucherCode, cartItems }: PaymentModalProps) => {
+export const PaymentModal = ({ onHideShow, voucherCode, cartItems }: PaymentModalProps) => {
   const [paymentMethod, setPaymentMethod] = useState<TPaymentType>('momo')
   const [confirming, setConfirming] = useState<boolean>(false)
   const [confirmingMessage, setConfirmingMessage] = useState<string>('Đang xử lý...')
@@ -66,27 +65,6 @@ export const PaymentModal = ({ show, onHideShow, voucherCode, cartItems }: Payme
     return isValid
   }
 
-  const mapProductsInCartToOrderItems = (): TPaymentProductItem[] | null => {
-    // Get cart items from LocalStorage
-    const savedData = LocalStorageHelper.getSavedMockupData()
-    if (!savedData || savedData.productsInCart.length === 0) {
-      toast.error('Giỏ hàng trống')
-      return null
-    }
-    const paymentProductItems = [...cartItems]
-    for (const productInCart of savedData.productsInCart) {
-      for (const mockup of productInCart.mockupDataList) {
-        for (const item of paymentProductItems) {
-          if (mockup.id === item.mockupData.id) {
-            item.preSentImageLink = mockup.preSentImageLink
-            break
-          }
-        }
-      }
-    }
-    return paymentProductItems
-  }
-
   const handleConfirmPayment = async () => {
     const form = formRef.current
     if (!form) return
@@ -113,14 +91,22 @@ export const PaymentModal = ({ show, onHideShow, voucherCode, cartItems }: Payme
     // Step 1: Create order
     setConfirmingMessage('Đang tạo đơn hàng...')
 
-    const productsInCart = mapProductsInCartToOrderItems()
-    if (!productsInCart || productsInCart.length === 0) return
+    const productsInCart = LocalStorageHelper.getSavedMockupData()?.productsInCart || []
+    if (productsInCart.length === 0) {
+      toast.error('Giỏ hàng của bạn đang trống')
+      setConfirming(false)
+      return
+    }
     try {
-      const orderResponse = await orderService.createOrder(cartItems, shippingInfo, voucherCode)
+      const orderResponse = await orderService.createOrder(
+        productsInCart,
+        shippingInfo,
+        voucherCode
+      )
 
       const { order, payment_instructions } = orderResponse
 
-      toast.success(`Đơn hàng đã được tạo`)
+      toast.success('Đơn hàng đã được tạo')
 
       // Extract payment details from order
       const paymentDetails = {
@@ -172,10 +158,7 @@ export const PaymentModal = ({ show, onHideShow, voucherCode, cartItems }: Payme
   }
 
   return (
-    <div
-      style={{ display: show ? 'flex' : 'none' }}
-      className="fixed inset-0 flex items-center justify-center z-50 animate-pop-in p-4"
-    >
+    <div className="fixed inset-0 flex items-center justify-center z-50 animate-pop-in p-4">
       <div onClick={() => onHideShow(false)} className="bg-black/50 absolute inset-0 z-10"></div>
       <div className="flex flex-col pt-12 bg-white rounded-2xl z-20 overflow-hidden relative shadow-2xl w-fit max-w-[95vw] max-h-[95vh] animate-in slide-in-from-bottom duration-200">
         {confirming && (

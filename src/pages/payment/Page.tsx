@@ -24,10 +24,14 @@ interface IPaymentModalProps {
 const ProductImageModal = ({ imgSrc, onClose }: IPaymentModalProps) => {
   if (!imgSrc) return null
   return (
-    <div className="flex fixed inset-0">
+    <div className="flex fixed inset-0 animate-pop-in z-99">
       <div onClick={onClose} className="absolute w-full h-full bg-black/50 z-10"></div>
-      <div className="relative z-20 flex items-center justify-center m-auto">
-        <img src={imgSrc} alt="Product image" className="max-h-[90vh] max-w-[90vw] object-contai" />
+      <div className="relative z-20 flex items-center justify-center m-auto rounded-lg overflow-hidden">
+        <img
+          src={imgSrc}
+          alt="Product image"
+          className="max-h-[90vh] max-w-[90vw] object-contain"
+        />
       </div>
       <button
         onClick={onClose}
@@ -77,22 +81,29 @@ const PaymentPage = () => {
     setVoucherDiscount(discount)
   }
 
-  const updateQuantity = (mockupId: string, delta: number, productImageId: number) => {
-    let productStock: number = 0
-    for (const product of products) {
-      for (const image of product.variants) {
-        if (image.id === productImageId) {
-          productStock = image.stock
-          break
-        }
-      }
-    }
+  const updateQuantity = (
+    productId: TBaseProduct['id'],
+    productVariantId: TClientProductVariant['id'],
+    mockupId: TMockupData['id'],
+    amount: number
+  ) => {
+    if (!sessionId) return
     setCartItems((items) =>
       items.map((item) =>
         item.mockupData.id === mockupId
-          ? { ...item, quantity: Math.min(productStock, Math.max(1, item.quantity + delta)) }
+          ? {
+              ...item,
+              quantity: Math.min(item.productStock, Math.max(1, item.quantity + amount)),
+            }
           : item
       )
+    )
+    LocalStorageHelper.updateMockupQuantity(
+      sessionId,
+      productId,
+      productVariantId,
+      mockupId,
+      amount
     )
   }
 
@@ -134,6 +145,7 @@ const PaymentPage = () => {
               },
               elementsVisualState: mockupData.elementsVisualState,
               surface: mockupData.surfaceInfo,
+              productStock: productVariant.stock,
             })
           }
         }
@@ -424,16 +436,16 @@ const PaymentPage = () => {
       )}
 
       {/* Payment Modal */}
-      <PaymentModal
-        show={showModal}
-        paymentInfo={{
-          total,
-        }}
-        onHideShow={setShowModal}
-        voucherCode={appliedVoucher?.code}
-        cartItems={cartItems}
-      />
-
+      {showModal && (
+        <PaymentModal
+          paymentInfo={{
+            total,
+          }}
+          onHideShow={setShowModal}
+          voucherCode={appliedVoucher?.code}
+          cartItems={cartItems}
+        />
+      )}
       {createPortal(
         <ProductImageModal imgSrc={selectedImage} onClose={handleCloseProductImageModal} />,
         document.body

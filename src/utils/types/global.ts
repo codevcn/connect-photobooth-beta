@@ -233,6 +233,7 @@ export type TPaymentProductItem = {
     type: TSurfaceType
   }
   preSentImageLink?: string
+  productStock: number
 }
 
 export type TShippingInfo = {

@@ -4,6 +4,7 @@ import {
   TShippingInfo,
   TEndOfPaymentData,
   TPaymentType,
+  TProductInCart,
 } from '@/utils/types/global'
 
 /**
@@ -14,18 +15,34 @@ export class OrderAdapter {
    * Convert dữ liệu cart items + shipping info sang TCreateOrderReq (API format)
    */
   static toCreateOrderRequestPayload(
-    cartItems: TPaymentProductItem[],
+    cartItems: TProductInCart[],
     shippingInfo: TShippingInfo,
     storeCode: string,
     voucherCode?: string
   ): TCreateOrderReq {
     // Validate cart items
+    const items: TCreateOrderReq['items'] = []
     for (const item of cartItems) {
-      if (!item.preSentImageLink) {
-        throw new Error('Thiếu đường dẫn hình ảnh đã gửi trước cho dữ liệu mockup')
+      for (const variant of item.productVariants) {
+        items.push({
+          variant_id: variant.variantId,
+          quantity: variant.quantity,
+          surfaces: variant.mockupDataList.map((mockup) => {
+            const preSentImageSize = mockup.imageData.size
+            if (!mockup.preSentImageLink) {
+              throw new Error('Thiếu đường dẫn hình ảnh đã gửi trước cho dữ liệu mockup')
+            }
+            return {
+              surface_id: mockup.surfaceInfo.id,
+              editor_state_json: mockup.elementsVisualState,
+              file_url: mockup.preSentImageLink,
+              width_px: preSentImageSize.width,
+              height_px: preSentImageSize.height,
+            }
+          }),
+        })
       }
     }
-
     return {
       store_code: storeCode,
       customer: {
@@ -40,19 +57,7 @@ export class OrderAdapter {
         postcode: '000000',
         country: 'VN',
       },
-      items: cartItems.map((item) => ({
-        variant_id: item.productVariantId,
-        quantity: item.quantity,
-        surfaces: [
-          {
-            surface_id: item.surface.id,
-            editor_state_json: item.elementsVisualState,
-            file_url: item.preSentImageLink!,
-            width_px: item.mockupData.widthPx,
-            height_px: item.mockupData.heightPx,
-          },
-        ],
-      })),
+      items,
       voucher_code: voucherCode,
       note: shippingInfo.message,
     }
