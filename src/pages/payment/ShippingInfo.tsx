@@ -81,7 +81,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
     }
 
     return (
-      <form className="space-y-2" ref={ref}>
+      <form className="md:text-base text-sm space-y-2" ref={ref}>
         <h3 className="font-semibold text-gray-900 text-lg">Thông tin giao hàng</h3>
         <div className="space-y-3">
           <div>
@@ -103,7 +103,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="md:gap-3 gap-2 grid grid-cols-2">
             <div>
               <label htmlFor="phone-input" className="block text-sm font-medium text-gray-700 mb-1">
                 Số điện thoại
@@ -133,7 +133,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="md:gap-3 gap-2 grid grid-cols-2">
             <div>
               <label
                 htmlFor="province-input"

@@ -4,6 +4,8 @@ import { cn } from '@/configs/ui/tailwind-utils'
 import { useTemplateStore } from '@/stores/ui/template.store'
 import { EInternalEvents, eventEmitter } from '@/utils/events'
 import { useEditedElementStore } from '@/stores/element/element.store'
+import { useEffect } from 'react'
+import { adjustPlacedImageStylesAfterPlacement } from '../helpers'
 
 type TPrintAreaOverlayPreviewProps = {
   printAreaRef: React.RefObject<HTMLDivElement | null>
@@ -89,6 +91,10 @@ export const PrintAreaOverlay = ({
     }
   }
 
+  // useEffect(() => {
+  //   adjustPlacedImageStylesAfterPlacement()
+  // }, [pickedTemplate])
+
   return (
     <div
       ref={printAreaRef}
@@ -114,7 +120,7 @@ export const PrintAreaOverlay = ({
           template={pickedTemplate}
           onClickFrame={handleClickFrame}
           frameClassNames={{
-            container: 'mobile-touch cursor-pointer',
+            container: 'cursor-pointer',
           }}
         />
       )}

@@ -147,7 +147,7 @@ export const VoucherSection = ({ orderSubtotal, onVoucherApplied }: VoucherSecti
         </div>
       )}
 
-      <div className="flex gap-2 w-full md:flex-col md:items-end">
+      <div className="flex items-center gap-2 w-full md:flex-col md:items-end">
         <input
           type="text"
           value={discountCode}
@@ -160,7 +160,7 @@ export const VoucherSection = ({ orderSubtotal, onVoucherApplied }: VoucherSecti
         <button
           onClick={applyVoucher}
           disabled={!!appliedVoucher || isApplyingVoucher}
-          className="h-10 px-6 bg-main-cl text-white font-medium rounded-xl active:scale-95 transition shadow-sm w-max disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="h-8 px-6 bg-main-cl text-white font-medium rounded-xl active:scale-95 transition shadow-sm w-max disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
           {isApplyingVoucher ? (
             <>

@@ -1,3 +1,23 @@
+window.requestIdleCallback =
+  window.requestIdleCallback ||
+  function (handler) {
+    let startTime = Date.now()
+    return setTimeout(function () {
+      handler({
+        didTimeout: false,
+        timeRemaining: function () {
+          return Math.max(0, 50 - (Date.now() - startTime))
+        },
+      })
+    }, 1)
+  }
+
+window.cancelIdleCallback =
+  window.cancelIdleCallback ||
+  function (id) {
+    clearTimeout(id)
+  }
+
 import { Routes, Route, BrowserRouter } from 'react-router-dom'
 import EditPage from '@/pages/edit/Layout'
 import NotFound from '@/pages/NotFound'

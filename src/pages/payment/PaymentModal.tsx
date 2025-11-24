@@ -158,9 +158,9 @@ export const PaymentModal = ({ onHideShow, voucherCode, cartItems }: PaymentModa
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 animate-pop-in p-4">
+    <div className="md:px-4 px-2 py-4 fixed inset-0 flex items-center justify-center z-50 animate-pop-in">
       <div onClick={() => onHideShow(false)} className="bg-black/50 absolute inset-0 z-10"></div>
-      <div className="flex flex-col pt-12 bg-white rounded-2xl z-20 overflow-hidden relative shadow-2xl w-fit max-w-[95vw] max-h-[95vh] animate-in slide-in-from-bottom duration-200">
+      <div className="flex flex-col pt-12 bg-white rounded-2xl z-20 overflow-hidden relative shadow-2xl w-fit max-w-[98vw] max-h-[95vh] animate-in slide-in-from-bottom duration-200">
         {confirming && (
           <div className="absolute flex justify-center items-center w-full h-full top-0 text-white left-0 bg-black/50 z-30">
             <SectionLoading
@@ -175,8 +175,8 @@ export const PaymentModal = ({ onHideShow, voucherCode, cartItems }: PaymentModa
         )}
 
         {/* Modal Header */}
-        <div className="absolute top-0 left-0 w-full z-20 bg-white border-b border-gray-200 px-4 py-2 flex items-center justify-between rounded-t-3xl">
-          <h2 className="text-xl font-bold text-gray-900">Hoàn tất thanh toán</h2>
+        <div className="px-4 py-2 absolute top-0 left-0 w-full z-20 bg-white border-b border-gray-200 flex items-center justify-between rounded-t-3xl">
+          <h2 className="md:text-xl text-base font-bold text-gray-900">Hoàn tất thanh toán</h2>
           <button
             onClick={() => onHideShow(false)}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors active:scale-90"
@@ -204,7 +204,7 @@ export const PaymentModal = ({ onHideShow, voucherCode, cartItems }: PaymentModa
           style={{
             display: endOfPayment ? 'none' : 'block',
           }}
-          className="px-6 pt-6 pb-4 space-y-4 relative z-10 overflow-y-auto grow"
+          className="md:px-6 px-4 pt-6 pb-4 space-y-4 relative z-10 overflow-y-auto grow gallery-scroll"
         >
           {/* Shipping Information */}
           <ShippingInfoForm ref={formRef} errors={errors} />
@@ -218,9 +218,23 @@ export const PaymentModal = ({ onHideShow, voucherCode, cartItems }: PaymentModa
           <div className="space-y-3 pt-2">
             <button
               onClick={handleConfirmPayment}
-              className="w-full h-[50px] bg-main-cl text-white font-bold text-lg rounded-lg shadow-lg active:scale-90 transition"
+              className="md:text-lg text-base flex items-center justify-center gap-2 w-full h-[50px] bg-main-cl text-white font-bold rounded-lg shadow-lg active:scale-90 transition"
             >
-              Xác nhận thanh toán
+              <span>Xác nhận thanh toán</span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lucide lucide-check-icon lucide-check"
+              >
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
             </button>
             <button
               onClick={() => onHideShow(false)}

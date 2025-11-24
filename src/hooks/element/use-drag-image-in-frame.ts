@@ -44,7 +44,8 @@ export const useDragImageInFrame = (
     if (!imageElement) return false
 
     // Tìm frame container
-    const frameElement = imageElement.closest('.NAME-template-frame') as HTMLElement
+    const frameElement = imageElement.closest('.NAME-frame-placed-image-wrapper') as HTMLElement
+    console.log('>>> frameElement:', frameElement)
     if (!frameElement) return false
 
     // Lấy bounds của frame (relative to viewport)
@@ -208,7 +209,7 @@ export const useDragImageInFrame = (
 
     isDraggingRef.current = false
 
-    // Remove listeners ngay khi xong drag
+    // ✨ Remove listeners ngay khi xong drag
     window.removeEventListener('touchmove', handleTouchMove)
     window.removeEventListener('touchend', handleTouchEnd)
   }, [handleTouchMove])
@@ -237,7 +238,7 @@ export const useDragImageInFrame = (
         imageRef.current.style.cursor = 'grabbing'
       }
 
-      // Add listeners CHỈ KHI đang drag
+      // ✨ Add listeners CHỈ KHI đang drag
       window.addEventListener('mousemove', handleMouseMove, { passive: false })
       window.addEventListener('mouseup', handleMouseUp)
     },
@@ -265,7 +266,7 @@ export const useDragImageInFrame = (
         y: touch.clientY,
       }
 
-      // Add listeners CHỈ KHI đang drag
+      // ✨ Add listeners CHỈ KHI đang drag
       window.addEventListener('touchmove', handleTouchMove, { passive: false })
       window.addEventListener('touchend', handleTouchEnd)
     },
@@ -280,7 +281,7 @@ export const useDragImageInFrame = (
     if (!imageElement) return
 
     // Set initial position
-    updateImagePosition(initialPosition)
+    // updateImagePosition(initialPosition)
 
     // Set cursor
     if (!disabled) {
@@ -297,7 +298,7 @@ export const useDragImageInFrame = (
       imageElement.removeEventListener('mousedown', handleMouseDown)
       imageElement.removeEventListener('touchstart', handleTouchStart)
 
-      // Đảm bảo cleanup window listeners nếu component unmount khi đang drag
+      // ✨ Đảm bảo cleanup window listeners nếu component unmount khi đang drag
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
       window.removeEventListener('touchmove', handleTouchMove)

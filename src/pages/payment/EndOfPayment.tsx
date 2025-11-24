@@ -327,9 +327,9 @@ export const EndOfPayment: React.FC<EndOfPaymentProps> = ({ data }) => {
                 <div className="bg-gray-50 rounded-xl p-4 space-y-3">
                   {/* Subtotal */}
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Tạm tính</span>
+                    <span className="text-gray-600 font-medium">Tạm tính</span>
                     <span className="font-semibold text-gray-800">
-                      {formatNumberWithCommas(subtotal)} VND
+                      <span>{formatNumberWithCommas(subtotal)}</span> VND
                     </span>
                   </div>
 

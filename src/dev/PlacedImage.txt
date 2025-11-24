@@ -1,6 +1,6 @@
 import { stylePlacedImageByTemplateType } from '@/configs/print-template/templates-helpers'
 import { TPlacedImage, TTemplateFrame, TTemplateType } from '@/utils/types/global'
-import { useDragImageInFrame } from '@/hooks/element/use-drag-image-in-frame'
+import { useDragElementInContainer } from '@/hooks/element/use-drag-image-in-frame'
 
 type TPlacedImageProps = {
   placedImage: TPlacedImage
@@ -12,7 +12,7 @@ export const PlacedImage = ({ placedImage, templateType, frameIndex }: TPlacedIm
   const { placementState } = placedImage
 
   // Hook để kéo ảnh trong frame với ràng buộc boundary
-  const { imageRef } = useDragImageInFrame({
+  const { imageRef } = useDragElementInContainer({
     frameId: placedImage.id,
     initialPosition: { x: 0, y: 0 },
     disabled: false,

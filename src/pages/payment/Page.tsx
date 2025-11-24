@@ -218,12 +218,38 @@ const PaymentPage = () => {
   }, [])
 
   return (
-    <div className="min-h-screen pb-12 md:pb-6 bg-gray-100">
+    <div className="h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-sm top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 py-2">
-          <h1 className="text-2xl font-bold text-gray-900">Trang thanh toán</h1>
-          <p className="text-sm md:text-base text-gray-500 mt-1">
+      <header className="2xl:px-24 xl:px-20 lg:px-14 spmd:px-10 sms:px-4 px-2 flex items-center bg-white w-full top-0 z-10">
+        <div>
+          <button
+            onClick={backToEditPage}
+            className="flex items-center gap-2 py-1 px-2 md:px-4 text-sm md:text-base bg-main-cl rounded text-white font-bold active:scale-95 transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-arrow-left-icon lucide-arrow-left md:w-5 md:h-5"
+            >
+              <path d="m12 19-7-7 7-7" />
+              <path d="M19 12H5" />
+            </svg>
+            <span className="sm:inline hidden">Quay về</span>
+          </button>
+        </div>
+
+        <div className="px-4 md:px-6 py-2">
+          <h1 className="sms:text-lg md:text-2xl leading-none font-bold text-gray-900">
+            Trang thanh toán
+          </h1>
+          <p className="md:text-base sms:text-sm text-xs font-medium text-gray-500 mt-1">
             <span>{cartItems.length}</span>
             <span> sản phẩm trong giỏ hàng</span>
           </p>
@@ -233,35 +259,11 @@ const PaymentPage = () => {
       {cartItems && cartItems.length > 0 ? (
         <>
           {/* Main Content */}
-          <div className="flex flex-col gap-2 md:gap-4 max-w-6xl mx-auto px-2 md:px-6 lg:px-8 pt-2 md:pt-4 pb-6 md:pb-8 bg-gray-100">
-            <div>
-              <button
-                onClick={backToEditPage}
-                className="flex items-center gap-2 py-1 px-2 md:px-4 text-sm md:text-base bg-main-cl rounded-md text-white font-bold active:scale-95 transition"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="lucide lucide-arrow-left-icon lucide-arrow-left md:w-5 md:h-5"
-                >
-                  <path d="m12 19-7-7 7-7" />
-                  <path d="M19 12H5" />
-                </svg>
-                <span>Quay về</span>
-              </button>
-            </div>
-
+          <div className="h-auto md:h-[calc(100vh-70px)] 2xl:px-24 xl:px-20 lg:px-14 spmd:px-10 sms:px-4 px-2 flex flex-col gap-2 mx-auto pt-2 bg-gray-100">
             {/* Layout: 2 columns on medium+ screens */}
-            <div className="grid grid-cols-1 md:grid-cols-[4fr_2fr] gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-[4fr_2fr] gap-3 h-full">
               {/* Left Column: Product List */}
-              <div>
+              <div className="overflow-y-hidden md:overflow-y-auto h-full gallery-scroll">
                 <ProductList
                   cartItems={cartItems}
                   onUpdateQuantity={updateQuantity}
@@ -271,7 +273,7 @@ const PaymentPage = () => {
                 />
 
                 {/* Discount Code Section - Mobile */}
-                <div className="md:hidden mt-2">
+                <div className="md:hidden mt-2 shadow">
                   <VoucherSection
                     orderSubtotal={calculateSubtotal()}
                     onVoucherApplied={handleVoucherApplied}
@@ -280,7 +282,7 @@ const PaymentPage = () => {
               </div>
 
               {/* Right Column: Summary & Voucher (Sticky on large screens) */}
-              <div className="flex flex-col gap-2 md:gap-4">
+              <div className="mb-16 md:mb-0 flex flex-col gap-2 h-full overflow-y-auto gallery-scroll">
                 {/* Discount Code Section - Desktop */}
                 <div className="hidden md:block">
                   <VoucherSection
@@ -290,7 +292,7 @@ const PaymentPage = () => {
                 </div>
 
                 {/* Order Summary */}
-                <section className="bg-white rounded-2xl shadow-sm p-4 md:p-5 space-y-2 md:sticky md:top-4">
+                <section className="bg-white rounded-2xl shadow-sm p-4 md:p-5 space-y-2 md:sticky md:top-4 mb-2">
                   <h3 className="text-base md:text-lg font-bold text-gray-900 mb-2 md:mb-3">
                     Tổng đơn hàng
                   </h3>
@@ -311,7 +313,7 @@ const PaymentPage = () => {
                       </span>
                     </div>
                   )}
-                  <div className="border-t border-gray-200 pt-2 mt-2">
+                  <div className="border-t border-gray-200 pt-2 mb-0 mt-2">
                     <div className="flex justify-between">
                       <span className="font-semibold text-gray-900 text-sm md:text-base">
                         Tổng cộng

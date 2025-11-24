@@ -1,6 +1,12 @@
-import { stylePlacedImageByTemplateType } from '@/configs/print-template/templates-helpers'
-import { TPlacedImage, TTemplateFrame, TTemplateType } from '@/utils/types/global'
+import {
+  TPlacedImage,
+  TPlacedImageMetaData,
+  TTemplateFrame,
+  TTemplateType,
+} from '@/utils/types/global'
 import { useDragImageInFrame } from '@/hooks/element/use-drag-image-in-frame'
+import { typeToObject } from '@/utils/helpers'
+import { stylePlacedImageByTemplateType } from '@/configs/print-template/templates-helpers'
 
 type TPlacedImageProps = {
   placedImage: TPlacedImage
@@ -16,26 +22,28 @@ export const PlacedImage = ({ placedImage, templateType, frameIndex }: TPlacedIm
   //   frameId: placedImage.id,
   //   initialPosition: { x: 0, y: 0 },
   //   disabled: false,
-  //   saveElementPosition: (frameId, position) => {
-  //     // TODO: Có thể lưu vị trí vào store nếu cần
-  //     // console.log(`Image ${frameId} moved to:`, position)
-  //   },
+  //   saveElementPosition: (frameId, position) => {},
   // })
 
   return (
-    <div className="NAME-frame-placed-image w-full h-full relative">
+    <div className="NAME-frame-placed-image-wrapper flex w-full h-full relative active:scale-95 transition-transform">
       <img
         // ref={imageRef as React.RefObject<HTMLImageElement>}
         src={placedImage.imgURL}
-        alt="Placed Image"
-        className="h-full w-full absolute top-0 left-0"
+        alt="Ảnh in của bạn"
+        className="NAME-frame-placed-image h-full w-full absolute top-0 left-0"
         style={{
           objectFit: placementState.objectFit,
           willChange: 'transform',
-          ...stylePlacedImageByTemplateType(templateType, frameIndex, {
-            objectPosition: placementState.direction,
-          }),
+          ...stylePlacedImageByTemplateType(templateType, frameIndex),
         }}
+        // data-placed-image-meta-data={JSON.stringify(
+        //   typeToObject<TPlacedImageMetaData>({
+        //     frameIndex,
+        //     templateType: templateType,
+        //     placedImageId: placedImage.id,
+        //   })
+        // )}
       />
     </div>
   )

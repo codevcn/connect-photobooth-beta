@@ -15,16 +15,13 @@ type TTemplatePickerProps = {
 
 export const TemplatesPicker = ({ printedImagesCount, classNames }: TTemplatePickerProps) => {
   const allTemplates = useTemplateStore((s) => s.allTemplates)
-  const availableTemplates = useMemo<TPrintTemplate[]>(() => {
-    return allTemplates
-  }, [printedImagesCount, allTemplates])
   const pickTemplate = useTemplateStore((s) => s.pickTemplate)
 
   return (
     <div className="NAME-sss w-full">
       <h3 className="smd:text-base text-xs mb-1 font-bold text-gray-800">Chọn mẫu in</h3>
       <div className={classNames?.templatesList}>
-        {availableTemplates.map((template) => (
+        {allTemplates.map((template) => (
           <div
             key={template.id}
             onClick={() => pickTemplate(template)}

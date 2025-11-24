@@ -289,39 +289,35 @@ export const matchPrintedImgAndAllowSquareMatchToShapeSize = (
   return true
 }
 
-export const adjustPlacedImageStylesAfterPlacement = (printAreaContainer: HTMLElement) => {
+export const adjustPlacedImageStylesAfterPlacement = () => {
   requestAnimationFrame(() => {
     // Logic để điều chỉnh styles của ảnh đã đặt trong frame sau khi UI đã render xong
-    for (const img of printAreaContainer.querySelectorAll<HTMLImageElement>(
-      '.NAME-frame-placed-image'
+    for (const placedImage of document.body.querySelectorAll<HTMLImageElement>(
+      '.NAME-print-area-container .NAME-frame-placed-image'
     )) {
-      const imgWrapper = img.closest<HTMLElement>('.NAME-frame-placed-image-wrapper')
+      const imgWrapper = placedImage.closest<HTMLElement>('.NAME-frame-placed-image-wrapper')
       if (imgWrapper) {
-        const placedImage = imgWrapper.querySelector<HTMLElement>('.NAME-frame-placed-image')
-        if (placedImage) {
-          const { width, height } = imgWrapper.getBoundingClientRect()
-          if (width < height) {
-            placedImage.style.width = 'auto'
-            placedImage.style.height = '100%'
-          } else {
-            placedImage.style.width = '100%'
-            placedImage.style.height = 'auto'
-          }
-          const placedImageMetaData = placedImage.getAttribute('data-placed-image-meta-data')
-          if (!placedImageMetaData) continue
-          // const metaData = JSON.parse(placedImageMetaData) as TPlacedImageMetaData
-          // const { transform, top, left, right, bottom } = stylePlacedImageByTemplateType(
-          //   metaData.templateType,
-          //   metaData.frameIndex,
-          //   {}
-          // )
-          // console.log('>>> metaData:', { metaData, transform, top, left, right, bottom })
-          // placedImage.style.transform = transform ? `${transform}` : ''
-          // placedImage.style.top = top ? `${top}` : ''
-          // placedImage.style.left = left ? `${left}` : ''
-          // placedImage.style.right = right ? `${right}` : ''
-          // placedImage.style.bottom = bottom ? `${bottom}` : ''
+        const { width, height } = imgWrapper.getBoundingClientRect()
+        if (width < height) {
+          placedImage.style.width = 'auto'
+          placedImage.style.height = '100%'
+        } else {
+          placedImage.style.width = '100%'
+          placedImage.style.height = 'auto'
         }
+        const placedImageMetaData = placedImage.getAttribute('data-placed-image-meta-data')
+        if (!placedImageMetaData) continue
+        const metaData = JSON.parse(placedImageMetaData) as TPlacedImageMetaData
+        const { transform, top, left, right, bottom } = stylePlacedImageByTemplateType(
+          metaData.templateType,
+          metaData.frameIndex,
+          {}
+        )
+        placedImage.style.transform = transform ? `${transform}` : ''
+        placedImage.style.top = top ? `${top}` : ''
+        placedImage.style.left = left ? `${left}` : ''
+        placedImage.style.right = right ? `${right}` : ''
+        placedImage.style.bottom = bottom ? `${bottom}` : ''
       }
     }
   })

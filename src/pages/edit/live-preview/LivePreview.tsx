@@ -1,10 +1,9 @@
 import { usePrintArea } from '@/hooks/use-print-area'
-import { TBaseProduct, TPlacedImageMetaData, TProductWithTemplate } from '@/utils/types/global'
+import { TBaseProduct, TProductWithTemplate } from '@/utils/types/global'
 import { useEffect, useMemo, useRef } from 'react'
 import { PrintAreaOverlay } from './PrintAreaOverlay'
 import { EditedElementsArea } from './EditedElementsArea'
 import { AddToCartHandler } from './AddToCartHandler'
-import { stylePlacedImageByTemplateType } from '@/configs/print-template/templates-helpers'
 import { adjustPlacedImageStylesAfterPlacement } from '../helpers'
 
 type TDisplayedImage = {
@@ -28,6 +27,9 @@ export const LivePreview = ({
   const printAreaInfo = useMemo(() => {
     return pickedProduct.printAreaList.find((printArea) => printArea.id === editedPrintSurfaceId)!
   }, [pickedProduct, editedPrintSurfaceId])
+
+  // const { printAreaRef, printAreaContainerRef, checkIfAnyElementOutOfBounds, isOutOfBounds } =
+  //   usePrintArea(printAreaInfo, adjustPlacedImageStylesAfterPlacement)
 
   const { printAreaRef, printAreaContainerRef, checkIfAnyElementOutOfBounds, isOutOfBounds } =
     usePrintArea(printAreaInfo)
@@ -71,9 +73,6 @@ export const LivePreview = ({
 
   useEffect(() => {
     displayProductChangingModal()
-    if (printAreaContainerRef.current) {
-      adjustPlacedImageStylesAfterPlacement(printAreaContainerRef.current)
-    }
   }, [displayedImage])
 
   return (
