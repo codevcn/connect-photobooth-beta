@@ -119,7 +119,7 @@ export const useProductUIDataStore = create<TProductUIDataStore>((set, get) => (
     set({ pickedProduct: { ...product, template: initialTemplate } })
     set({ pickedVariant: product.variants[0] })
     set({ pickedSurface: product.printAreaList[0] })
-    useTemplateStore.getState().pickTemplate(initialTemplate)
+    useTemplateStore.getState().pickTemplate(initialTemplate, product.printAreaList[0])
   },
 
   initFirstProduct: (product: TBaseProduct, initialTemplate: TPrintTemplate) => {

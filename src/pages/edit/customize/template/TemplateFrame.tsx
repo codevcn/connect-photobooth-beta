@@ -18,6 +18,7 @@ type TemplateFrameProps = {
     plusIconWrapper: string
   }>
   onClickFrame: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, frameId: string) => void
+  displayPlusIcon: boolean
 }>
 
 export const TemplateFrame = ({
@@ -27,6 +28,7 @@ export const TemplateFrame = ({
   styles,
   classNames,
   onClickFrame,
+  displayPlusIcon = true,
 }: TemplateFrameProps) => {
   return (
     <div
@@ -47,7 +49,8 @@ export const TemplateFrame = ({
           frameIndex={templateFrame.index}
         />
       ) : (
-        plusIconReplacer || (
+        displayPlusIcon &&
+        (plusIconReplacer || (
           <div
             style={styles?.plusIconWrapper}
             className={cn(
@@ -71,7 +74,7 @@ export const TemplateFrame = ({
               <path d="M12 5v14" />
             </svg>
           </div>
-        )
+        ))
       )}
     </div>
   )

@@ -13,7 +13,7 @@ import {
   stylePlacedImageByTemplateType,
 } from '@/configs/print-template/templates-helpers'
 
-const initFramePlacedImageByPrintedImage = (
+export const initFramePlacedImageByPrintedImage = (
   frameIndexProperty: TTemplateFrame['index'],
   printedImage: TPrintedImage
 ): TPlacedImage => {
@@ -27,6 +27,8 @@ const initFramePlacedImageByPrintedImage = (
       zoom: getInitialContants('PLACED_IMG_ZOOM'),
       direction: getInitialContants('PLACED_IMG_DIRECTION'),
     },
+    prrintedImageWidth: printedImage.width,
+    printedImageHeight: printedImage.height,
   }
 }
 
@@ -225,7 +227,9 @@ export const cleanPrintAreaOnExtractMockupImage = (
   )
   allowedPrintArea?.style.setProperty('border', 'none')
   allowedPrintArea?.style.setProperty('background-color', 'transparent')
-  const framesDisplayer = allowedPrintArea?.querySelector<HTMLElement>('.NAME-frames-displayer')
+  const framesDisplayer = allowedPrintArea?.querySelector<HTMLElement>(
+    '.NAME-frames-add-image-displayer'
+  )
   framesDisplayer?.style.setProperty('background-color', 'transparent')
   framesDisplayer?.style.setProperty('border', 'none')
   for (const frame of allowedPrintArea?.querySelectorAll<HTMLElement>('.NAME-template-frame') ||
@@ -289,16 +293,15 @@ export const matchPrintedImgAndAllowSquareMatchToShapeSize = (
   return true
 }
 
-export const initPlacedImageStyle = () => {
+export const initPlacedImageStyle = (
+  placedImageQuery: string = '.NAME-print-area-container .NAME-frame-placed-image',
+  closestPlacedImageWrapperQuery: string = '.NAME-frame-placed-image-wrapper'
+) => {
   requestAnimationFrame(() => {
     // Logic để điều chỉnh styles của ảnh đã đặt trong frame sau khi UI đã render xong
-    for (const placedImage of document.body.querySelectorAll<HTMLImageElement>(
-      '.NAME-print-area-container .NAME-frame-placed-image'
-    )) {
-      const imgWrapper = placedImage.closest<HTMLElement>('.NAME-frame-placed-image-wrapper')
+    for (const placedImage of document.body.querySelectorAll<HTMLImageElement>(placedImageQuery)) {
+      const imgWrapper = placedImage.closest<HTMLElement>(closestPlacedImageWrapperQuery)
       if (imgWrapper) {
-        placedImage.style.top = '0px'
-        placedImage.style.left = '0px'
         const { width, height } = imgWrapper.getBoundingClientRect()
         if (width < height) {
           placedImage.style.width = 'auto'

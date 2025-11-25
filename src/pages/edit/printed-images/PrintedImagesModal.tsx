@@ -62,21 +62,18 @@ export const PrintedImagesModal = ({ printedImages }: PrintedImagesProps) => {
     pickedFrameId: undefined,
   })
   const [showPrintedImagesModal, setShowPrintedImagesModal] = useState(false)
-  const addImageToFrame = useTemplateStore((s) => s.addImageToFrame)
 
   const handleAddPrintedImageToFrame = (printedImg: TPrintedImage) => {
-    window.requestIdleCallback(() => {
-      const pickedPrintSurface = useProductUIDataStore.getState().pickedSurface
-      if (!pickedPrintSurface) return
-      const printAreaSize = {
-        width: pickedPrintSurface.area.printW,
-        height: pickedPrintSurface.area.printH,
-      }
-      const { pickedFrameId } = dataOnOpenRef.current
-      if (!printAreaSize) return
-      addImageToFrame(printedImg, printAreaSize, pickedFrameId)
-      setShowPrintedImagesModal(false)
-    })
+    const pickedPrintSurface = useProductUIDataStore.getState().pickedSurface
+    if (!pickedPrintSurface) return
+    const printAreaSize = {
+      width: pickedPrintSurface.area.printW,
+      height: pickedPrintSurface.area.printH,
+    }
+    const { pickedFrameId } = dataOnOpenRef.current
+    if (!printAreaSize) return
+    useTemplateStore.getState().addImageToFrame(printedImg, printAreaSize, pickedFrameId)
+    setShowPrintedImagesModal(false)
   }
 
   const listenHideShowPrintedImagesModal = (show: boolean, frameId?: TTemplateFrame['id']) => {

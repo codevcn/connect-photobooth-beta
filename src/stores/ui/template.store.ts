@@ -4,11 +4,14 @@ import {
   TPrintedImage,
   TPlacedImage,
   TSizeInfo,
+  TPrintAreaInfo,
 } from '@/utils/types/global'
 import { getInitialContants } from '@/utils/contants'
 import { create } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 import { hardCodedPrintTemplates } from '@/configs/print-template/templates-data'
+import { assignFrameSizeByTemplateType } from '@/configs/print-template/templates-helpers'
+import { initFramePlacedImageByPrintedImage } from '@/pages/edit/helpers'
 
 type TTemplateStore = {
   allTemplates: TPrintTemplate[]
@@ -23,7 +26,7 @@ type TTemplateStore = {
     templateId: TPrintTemplate['id']
   ) => TTemplateFrame | undefined
   initializeAddingTemplates: (templates: TPrintTemplate[], isFinal: boolean) => void
-  pickTemplate: (template: TPrintTemplate) => void
+  pickTemplate: (template: TPrintTemplate, printAreaForTemplate: TPrintAreaInfo) => void
   hideShowTemplatePicker: (show: boolean) => void
   pickFrame: (frame: TTemplateFrame | undefined) => void
   addImageToFrame: (printedImage: TPrintedImage, printAreaSize: TSizeInfo, frameId?: string) => void
@@ -83,9 +86,17 @@ export const useTemplateStore = create(
       }
     },
 
-    pickTemplate: (template) => {
+    pickTemplate: (template, printAreaForTemplate) => {
       const { pickedTemplate } = get()
       if (pickedTemplate && pickedTemplate.id === template.id) return
+      for (const frame of template.frames) {
+        assignFrameSizeByTemplateType(
+          { width: printAreaForTemplate.area.printW, height: printAreaForTemplate.area.printH },
+          template.type,
+          frame
+        )
+      }
+      console.log('>>> template picked:', template)
       set({ pickedTemplate: template })
     },
 
@@ -103,30 +114,16 @@ export const useTemplateStore = create(
 
       const templates = [...allTemplates]
 
-      const initPlacedImage = (frameIndex: TTemplateFrame['index']): TPlacedImage => {
-        return {
-          id: printedImage.id,
-          imgURL: printedImage.url,
-          placementState: {
-            frameIndex,
-            zoom: getInitialContants<number>('PLACED_IMG_ZOOM'),
-            objectFit: getInitialContants<'contain'>('PLACED_IMG_OBJECT_FIT'),
-            squareRotation: getInitialContants<number>('PLACED_IMG_SQUARE_ROTATION'),
-            direction: getInitialContants<'center'>('PLACED_IMG_DIRECTION'),
-          },
-        }
-      }
-
       if (frameId) {
         // Thêm vào frame cụ thể
         for (const template of templates) {
           let frameIndex: number = getInitialContants<number>('PLACED_IMG_FRAME_INDEX')
           for (const frame of template.frames) {
             if (frame.id === frameId) {
-              frame.placedImage = initPlacedImage(frameIndex)
+              frame.placedImage = initFramePlacedImageByPrintedImage(frameIndex, printedImage)
               // assignFrameSizeByTemplateType(printAreaSize, template.type, frame)
               // if (matchPrintedImgAndAllowSquareMatchToShapeSize(frame, printedImage)) {
-              //   frame.placedImage = initPlacedImage(frameIndex)
+              //   frame.placedImage = initFramePlacedImageByPrintedImage(frameIndex, printedImage)
               // } else {
               //   toast.warning('Ảnh không phù hợp với khung hình. Vui lòng chọn ảnh khác.')
               // }
@@ -143,10 +140,13 @@ export const useTemplateStore = create(
             const foundFrameIndex = template.frames.findIndex((f) => !f.placedImage)
             if (foundFrameIndex >= 0) {
               const foundFrame = template.frames[foundFrameIndex]
-              foundFrame.placedImage = initPlacedImage(foundFrameIndex + 1)
+              foundFrame.placedImage = initFramePlacedImageByPrintedImage(
+                foundFrameIndex + 1,
+                printedImage
+              )
               // assignFrameSizeByTemplateType(printAreaSize, template.type, foundFrame)
               // if (matchPrintedImgAndAllowSquareMatchToShapeSize(foundFrame, printedImage)) {
-              //   foundFrame.placedImage = initPlacedImage(foundFrameIndex + 1)
+              //   foundFrame.placedImage = initFramePlacedImageByPrintedImage(foundFrameIndex + 1, printedImage)
               // } else {
               //   toast.warning('Ảnh không phù hợp với khung hình. Vui lòng chọn ảnh khác.')
               // }

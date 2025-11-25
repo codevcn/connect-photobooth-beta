@@ -229,9 +229,9 @@ export const TextElementMenu = ({ elementId, onClose }: TPrintedImageMenuProps) 
       <h3 className="text-xs smd:text-sm mt-3 mb-1 font-bold">Tùy chỉnh</h3>
       <div
         ref={menuRef}
-        className="smd:grid-cols-2 2xl:grid-cols-3 spmd:gap-2 sm:grid-rows-2 grid-rows-3 grid-flow-col gap-1 grid rounded-md text-white"
+        className="sm:grid-cols-2 2xl:grid-cols-3 spmd:gap-2 sm:grid-rows-2 sms:grid-flow-row grid-rows-3 grid-flow-col gap-1 grid rounded-md text-white"
       >
-        <div className="NAME-form-group NAME-form-content h-8 smd:h-9 smd:col-span-3 col-span-1 flex items-center bg-main-cl rounded px-1 shadow">
+        <div className="NAME-form-group NAME-form-content h-8 smd:h-9 2xl:col-span-3 col-span-1 flex items-center bg-main-cl rounded px-1 shadow">
           <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -310,7 +310,7 @@ export const TextElementMenu = ({ elementId, onClose }: TPrintedImageMenuProps) 
             <span className="text-white text-[1em] font-bold">độ</span>
           </div>
         </div>
-        <div className="NAME-form-group NAME-form-position smd:col-span-2 2xl:col-span-1 col-span-1 h-8 smd:h-9 flex items-center bg-main-cl rounded px-1 shadow">
+        <div className="NAME-form-group NAME-form-position h-8 smd:h-9 flex items-center bg-main-cl rounded px-1 shadow">
           <div>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -345,7 +345,7 @@ export const TextElementMenu = ({ elementId, onClose }: TPrintedImageMenuProps) 
             />
           </div>
         </div>
-        <div className="NAME-form-group NAME-form-zindex smd:col-span-2 2xl:col-span-1 col-span-1 h-8 smd:h-9 flex items-center justify-between bg-main-cl rounded px-1 shadow">
+        <div className="NAME-form-group NAME-form-zindex h-8 smd:h-9 flex items-center justify-between bg-main-cl rounded px-1 shadow">
           <div className="mr-0.5">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -462,10 +462,10 @@ export const TextElementMenu = ({ elementId, onClose }: TPrintedImageMenuProps) 
             <TextFontPicker onHideShow={setShowTextFontPicker} onSelectFont={handleSelectFont} />
           )}
         </div>
-        <div className="sm:row-span-1 row-span-2 flex items-center">
+        <div className="2xl:col-span-3 sm:row-span-1 row-span-2 flex items-center">
           <button
             onClick={handleClickCheck}
-            className="group smd:h-8 smd:px-1 px-3 w-full h-full cursor-pointer flex flex-nowrap items-center justify-center shadow-md font-bold bg-main-cl gap-1 text-white mobile-touch rounded"
+            className="group 2xl:h-9 smd:px-1 px-3 w-full h-full cursor-pointer flex flex-nowrap items-center justify-center shadow-md font-bold bg-main-cl gap-1 text-white mobile-touch rounded"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

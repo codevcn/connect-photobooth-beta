@@ -2,7 +2,7 @@ import { TBaseProduct, TPrintedImage, TPrintTemplate } from '@/utils/types/globa
 import { PrintAreaOverlayPreview } from './live-preview/PrintAreaOverlay'
 import { usePrintArea } from '@/hooks/use-print-area'
 import { usePrintedImageStore } from '@/stores/printed-image/printed-image.store'
-import { initTheBestTemplateForPrintedImages } from './helpers'
+import { initPlacedImageStyle, initTheBestTemplateForPrintedImages } from './helpers'
 import { useEffect } from 'react'
 import { useProductUIDataStore } from '@/stores/ui/product-ui-data.store'
 import { useTemplateStore } from '@/stores/ui/template.store'
@@ -85,12 +85,18 @@ export const ProductGallery = ({ products }: TProductGalleryProps) => {
     scrollToPickedProduct()
   }, [products, pickedProduct])
 
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     initPlacedImageStyle('.NAME-products-gallery .NAME-frame-placed-image')
+  //   }, 0)
+  // }, [products])
+
   return (
-    <div className="spmd:py-3 spmd:pb-3 spmd:h-screen spmd:w-auto w-full h-fit pt-2 pb-1 flex flex-col bg-white border border-gray-200">
-      <h2 className="text-base w-full text-center font-bold text-gray-800 flex items-center justify-center gap-2">
+    <div className="spmd:pb-3 spmd:h-screen spmd:w-auto md:text-base text-sm w-full h-fit pb-1 flex flex-col bg-white border border-gray-200">
+      <h2 className="text-[1em] py-2 w-full text-center font-bold text-gray-800 flex items-center justify-center gap-2">
         Gian hàng sản phẩm
       </h2>
-      <div className="spmd:overflow-y-auto spmd:max-h-full spmd:flex-col smpd:px-1.5 px-3 py-2 overflow-x-auto gallery-scroll w-full h-fit flex items-center gap-3">
+      <div className="NAME-products-gallery spmd:overflow-y-auto spmd:max-h-full spmd:flex-col smpd:px-1.5 px-3 py-2 overflow-x-auto gallery-scroll w-full h-fit flex items-center gap-3">
         {products &&
           products.length > 0 &&
           products.map((product, index) => {

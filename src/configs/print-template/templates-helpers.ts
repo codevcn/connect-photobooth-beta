@@ -1,4 +1,4 @@
-import { TSizeInfo, TTemplateFrame, TTemplateType } from '@/utils/types/global'
+import { TPlacedImage, TSizeInfo, TTemplateFrame, TTemplateType } from '@/utils/types/global'
 
 /**
  * Chuyển đổi template type sang grid CSS styles
@@ -138,94 +138,64 @@ export const stylePlacedImageByTemplateType = (
   if (templateType === '2-horizon') {
     if (frameIndex === 1) {
       return {
-        bottom: '0',
-        top: 'auto',
-        left: '0',
-        right: 'auto',
+        objectPosition: 'bottom',
       }
     } else {
       return {
-        top: '0',
-        left: '0',
-        right: 'auto',
-        bottom: 'auto',
+        objectPosition: 'top',
       }
     }
   } else if (templateType === '2-vertical') {
     if (frameIndex === 1) {
-      return { right: '0', top: '0', bottom: 'auto', left: 'auto' }
+      return { objectPosition: 'right' }
     } else {
-      return { left: '0', top: '0', right: 'auto', bottom: 'auto' }
+      return { objectPosition: 'left' }
     }
   } else if (templateType === '3-left') {
     if (frameIndex === 1) {
-      return { right: '0', bottom: '0', top: 'auto', left: 'auto' }
+      return { objectPosition: 'right bottom' }
     } else if (frameIndex === 2) {
-      return { left: '0', top: '50%', right: 'auto', bottom: 'auto', transform: 'translateY(-50%)' }
+      return { objectPosition: 'left center' }
     } else {
-      return { right: '0', top: '0', left: 'auto', bottom: 'auto' }
+      return { objectPosition: 'right top' }
     }
   } else if (templateType === '3-right') {
     if (frameIndex === 1) {
-      return {
-        right: '0',
-        top: '50%',
-        left: 'auto',
-        bottom: 'auto',
-        transform: 'translateY(-50%)',
-      }
+      return { objectPosition: 'right center' }
     } else if (frameIndex === 2) {
-      return { left: '0', bottom: '0', top: 'auto', right: 'auto' }
+      return { objectPosition: 'left bottom' }
     } else {
-      return { left: '0', top: '0', right: 'auto', bottom: 'auto' }
+      return { objectPosition: 'left top' }
     }
   } else if (templateType === '3-top') {
     if (frameIndex === 1) {
-      return { right: '0', bottom: '0', top: 'auto', left: 'auto' }
+      return { objectPosition: 'right bottom' }
     } else if (frameIndex === 2) {
-      return { left: '0', bottom: '0', top: 'auto', right: 'auto' }
+      return { objectPosition: 'left bottom' }
     } else {
-      return { top: '0', left: '50%', right: 'auto', bottom: 'auto', transform: 'translateX(-50%)' }
+      return { objectPosition: 'top center' }
     }
   } else if (templateType === '3-bottom') {
     if (frameIndex === 1) {
-      return {
-        bottom: '0',
-        left: '50%',
-        right: 'auto',
-        top: 'auto',
-        transform: 'translateX(-50%)',
-      }
+      return { objectPosition: 'bottom center' }
     } else if (frameIndex === 2) {
-      return { right: '0', top: '0', left: 'auto', bottom: 'auto' }
+      return { objectPosition: 'right top' }
     } else {
-      return { left: '0', top: '0', right: 'auto', bottom: 'auto' }
+      return { objectPosition: 'left top' }
     }
   } else if (templateType === '4-horizon') {
-    return {
-      top: '50% ',
-      left: 'auto',
-      right: 'auto',
-      bottom: 'auto',
-      transform: 'translateY(-50%)',
-    }
+    return { objectPosition: 'center' }
   } else if (templateType === '4-vertical') {
-    return {
-      left: '50% ',
-      right: 'auto',
-      top: 'auto',
-      bottom: 'auto',
-      transform: 'translateX(-50%)',
-    }
+    return { objectPosition: 'center' }
   } else if (templateType === '4-square') {
     if (frameIndex === 1) {
-      return { right: '0', bottom: '0', top: 'auto', left: 'auto' }
+      return { objectPosition: 'right bottom' }
     } else if (frameIndex === 2) {
-      return { left: '0', bottom: '0', top: 'auto', right: 'auto' }
+      return { objectPosition: 'left bottom' }
     } else if (frameIndex === 3) {
-      return { right: '0', top: '0', left: 'auto', bottom: 'auto' }
+      return { objectPosition: 'right top' }
     } else {
-      return { left: '0', top: '0', right: 'auto', bottom: 'auto' }
+      return { objectPosition: 'left top' }
     }
   }
   return defaultStyle
@@ -303,3 +273,33 @@ export const assignFrameSizeByTemplateType = (
       break
   }
 }
+
+// /**
+
+// * Xác định chiều khớp trước khi scale item tới box
+// * @param {number} boxW - width của box
+// * @param {number} boxH - height của box
+// * @param {number} itemW - width ban đầu của item
+// * @param {number} itemH - height ban đầu của item
+// * @returns {object} - { shrinkFirst: 'width'|'height', expandFirst: 'width'|'height' }
+//   */
+// function getFirstMatchedDimension(boxW, boxH, itemW, itemH) {
+//   const scaleW = boxW / itemW
+//   const scaleH = boxH / itemH
+
+//   // Khi co (shrink): chiều có scale nhỏ hơn khớp trước
+//   const shrinkFirst = scaleW < scaleH ? 'width' : 'height'
+
+//   // Khi giãn (expand): chiều có scale lớn hơn khớp trước
+//   const expandFirst = scaleW > scaleH ? 'width' : 'height'
+
+//   return { shrinkFirst, expandFirst }
+// }
+
+// // Ví dụ
+// const boxW = 200,
+//   boxH = 300
+// const itemW = 400,
+//   itemH = 500
+// console.log(getFirstMatchedDimension(boxW, boxH, itemW, itemH))
+// // Output: { shrinkFirst: 'width', expandFirst: 'height' }

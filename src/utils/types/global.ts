@@ -314,6 +314,8 @@ export type TPlacedImage = {
   id: string
   placementState: TPlacementState
   imgURL: string
+  prrintedImageWidth: number
+  printedImageHeight: number
 }
 
 export type TPlacementState = {

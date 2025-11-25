@@ -1,8 +1,60 @@
 import { TPrintTemplate } from '@/utils/types/global'
-import { FramesDisplayer } from './FrameDisplayer'
+// import { FramesDisplayer } from './FrameDisplayer'
 import { cn } from '@/configs/ui/tailwind-utils'
 import { useTemplateStore } from '@/stores/ui/template.store'
 import { useProductUIDataStore } from '@/stores/ui/product-ui-data.store'
+import { styleToFramesDisplayerByTemplateType } from '@/configs/print-template/templates-helpers'
+import { TemplateFrame } from './TemplateFrame'
+
+type TFramesDisplayerProps = {
+  template: TPrintTemplate
+} & Partial<{
+  plusIconReplacer?: React.JSX.Element
+  frameStyles: Partial<{
+    container: React.CSSProperties
+    plusIconWrapper: React.CSSProperties
+  }>
+  frameClassNames: Partial<{
+    container: string
+    plusIconWrapper: string
+  }>
+  displayerClassNames: {
+    container: string
+  }
+  onClickFrame: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, frameId: string) => void
+}>
+
+export const FramesDisplayer = ({
+  template,
+  plusIconReplacer,
+  frameStyles,
+  frameClassNames,
+  displayerClassNames,
+  onClickFrame,
+}: TFramesDisplayerProps) => {
+  const { frames, type } = template
+  return (
+    <div
+      className={cn(
+        'NAME-frames-displayer bg-gray-600/30 p-0.5 max-h-full max-w-full',
+        displayerClassNames?.container
+      )}
+      style={{ ...styleToFramesDisplayerByTemplateType(type) }}
+    >
+      {frames.map((frame) => (
+        <TemplateFrame
+          key={frame.id}
+          templateFrame={frame}
+          templateType={type}
+          plusIconReplacer={plusIconReplacer}
+          styles={frameStyles}
+          classNames={frameClassNames}
+          onClickFrame={onClickFrame}
+        />
+      ))}
+    </div>
+  )
+}
 
 type TTemplatePickerProps = {
   printedImagesCount: number

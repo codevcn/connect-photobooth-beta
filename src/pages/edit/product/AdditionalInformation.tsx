@@ -41,7 +41,7 @@ export const AdditionalInformation = ({ productDescription }: TAdditionalInforma
                 />
               </svg>
             </div>
-            <span className="text-gray-700 font-semibold text-base">Description</span>
+            <span className="text-gray-700 font-semibold text-base">Mô tả sản phẩm</span>
           </div>
           <div className="text-gray-600 group-hover:text-gray-800">
             <svg
@@ -58,7 +58,11 @@ export const AdditionalInformation = ({ productDescription }: TAdditionalInforma
         </div>
         {activeTab === 'description' && (
           <div className="px-2 py-4 text-sm text-black/80">
-            {productDescription || 'Sản phẩm chưa có mô tả'}
+            {productDescription ? (
+              <div dangerouslySetInnerHTML={{ __html: productDescription }}></div>
+            ) : (
+              'Sản phẩm chưa có mô tả'
+            )}
           </div>
         )}
       </div>
@@ -81,7 +85,7 @@ export const AdditionalInformation = ({ productDescription }: TAdditionalInforma
               />
             </svg>
           </div>
-          <span className="text-gray-700 font-semibold text-base">Shipping & Returns</span>
+          <span className="text-gray-700 font-semibold text-base">Vận chuyển & Trả hàng</span>
         </div>
         <div className="text-gray-600 group-hover:text-gray-800">
           <svg
