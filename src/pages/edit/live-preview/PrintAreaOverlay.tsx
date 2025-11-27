@@ -1,18 +1,75 @@
 import { TPrintedImage, TPrintTemplate, TTemplateFrame } from '@/utils/types/global'
-import { FramesDisplayer } from '../customize/template/FrameDisplayer'
 import { cn } from '@/configs/ui/tailwind-utils'
 import { useTemplateStore } from '@/stores/ui/template.store'
 import { EInternalEvents, eventEmitter } from '@/utils/events'
 import { useEditedElementStore } from '@/stores/element/element.store'
-import { useEffect } from 'react'
-import { initPlacedImageStyle } from '../helpers'
-import {
-  styleFrameByTemplateType,
-  styleToFramesDisplayerByTemplateType,
-} from '@/configs/print-template/templates-helpers'
-import { AddImageIcon, TemplateFrame } from '../customize/template/TemplateFrame'
-import { PlacedImage } from '../customize/template/PlacedImage'
-import { adjustSizeOfPlacedImageOnPlaced } from './test'
+
+import type React from 'react'
+import { styleToFramesDisplayerByTemplateType } from '@/configs/print-template/templates-helpers'
+import { TemplateFrame } from '../customize/template/TemplateFrame'
+import { FramesDisplayer } from '../customize/template/FrameDisplayer'
+
+type TFramesDisplayerProps = {
+  template: TPrintTemplate
+  printedImages: TPrintedImage[]
+} & Partial<{
+  plusIconReplacer?: React.JSX.Element
+  frameStyles: Partial<{
+    container: React.CSSProperties
+    plusIconWrapper: React.CSSProperties
+  }>
+  frameClassNames: Partial<{
+    container: string
+    plusIconWrapper: string
+  }>
+  displayerClassNames: {
+    container: string
+  }
+  onClickFrame: (e: React.MouseEvent<HTMLDivElement, MouseEvent>, frameId: string) => void
+  displayScrollButton: boolean
+  displaySelectingColor: boolean
+  allowDragging: boolean
+  scrollable: boolean
+}>
+
+const FramesDisplayerForOverview = ({
+  template,
+  plusIconReplacer,
+  frameStyles,
+  frameClassNames,
+  displayerClassNames,
+  onClickFrame,
+  displaySelectingColor = false,
+  scrollable = true,
+}: TFramesDisplayerProps) => {
+  const { type } = template
+  return (
+    <div className="relative w-full h-full overflow-hidden">
+      <div
+        className={cn(
+          'NAME-frames-displayer relative p-0.5 h-full w-full',
+          displayerClassNames?.container
+        )}
+        style={{ ...styleToFramesDisplayerByTemplateType(type) }}
+      >
+        {template.frames.map((frame, idx) => (
+          <TemplateFrame
+            key={frame.id}
+            templateFrame={frame}
+            templateType={type}
+            plusIconReplacer={plusIconReplacer}
+            styles={frameStyles}
+            classNames={frameClassNames}
+            onClickFrame={onClickFrame}
+            childIndex={idx}
+            displaySelectingColor={displaySelectingColor}
+            scrollable={scrollable}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
 
 type TPrintAreaOverlayPreviewProps = {
   printAreaRef: React.RefObject<HTMLDivElement | null>
@@ -36,7 +93,7 @@ export const PrintAreaOverlayPreview = ({
         printAreaOptions?.className
       )}
     >
-      <FramesDisplayer
+      <FramesDisplayerForOverview
         template={printTemplate}
         frameClassNames={{
           container: 'border-none',

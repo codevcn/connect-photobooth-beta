@@ -32,7 +32,6 @@ export const StickerElement = ({
   removeStickerElement,
   printAreaContainerRef,
 }: TStickerElementProps) => {
-  console.log('>>> [now] element sticker:', element)
   const { path, id, mountType, height, width } = element
   const rootRef = useRef<HTMLElement | null>(null)
   const {
@@ -51,7 +50,6 @@ export const StickerElement = ({
     zindex: element.zindex,
     mountType,
   })
-  console.log('>>> [now] state visual:', { position, angle, scale, zindex })
 
   const pickElement = () => {
     const root = rootRef.current
@@ -78,7 +76,6 @@ export const StickerElement = ({
     elementContainer: HTMLElement,
     printAreaContainer: HTMLElement
   ) => {
-    console.log('>>> [now] quay ve 1:', element)
     const elementContainerRect = elementContainer.getBoundingClientRect()
     const rootRect = root.getBoundingClientRect()
     const printAreaContainerRect = printAreaContainer.getBoundingClientRect()
@@ -98,7 +95,6 @@ export const StickerElement = ({
     elementContainer: HTMLElement,
     moveToCenter?: boolean
   ) => {
-    console.log('>>> [now] quay ve 2:', element)
     const display = root.querySelector<HTMLImageElement>('.NAME-element-display')
     if (!display) return
     getNaturalSizeOfImage(

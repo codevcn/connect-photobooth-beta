@@ -27,7 +27,6 @@ export const TextElement = ({
   removeTextElement,
   printAreaContainerRef,
 }: TTextElementProps) => {
-  console.log('>>> mountType:', element.mountType)
   const { id, mountType } = element
   const rootRef = useRef<HTMLElement | null>(null)
   const {

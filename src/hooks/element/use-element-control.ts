@@ -211,12 +211,11 @@ export const useElementControl = (
   }
 
   useEffect(() => {
+    // Setup ResizeObserver to watch for print container size changes
     const container = conatinerElementAbsoluteToRef.current
     if (!container) return
     const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        dragElementAlongWithPrintContainer()
-      }
+      dragElementAlongWithPrintContainer()
     })
     observer.observe(container)
     return () => {
@@ -231,10 +230,6 @@ export const useElementControl = (
   useEffect(() => {
     setupVisualData()
   }, [mountType, initialPosition?.x, initialPosition?.y, initialAngle, initialZoom, initialZindex])
-
-  // useEffect(() => {
-  //   console.log('>>> initial pos changed:', initialPosition)
-  // }, [initialPosition])
 
   return {
     forPinch: {

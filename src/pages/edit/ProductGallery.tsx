@@ -83,7 +83,7 @@ export const ProductGallery = ({ products }: TProductGalleryProps) => {
 
   useEffect(() => {
     scrollToPickedProduct()
-  }, [products, pickedProduct])
+  }, [pickedProduct?.id])
 
   // useEffect(() => {
   //   setTimeout(() => {

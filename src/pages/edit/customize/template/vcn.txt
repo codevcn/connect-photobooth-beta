@@ -66,11 +66,14 @@ export const FramesDisplayer = ({
   const restoredOffsetYRef = useRef(0)
   const startYRef = useRef(0)
   const startOffsetRef = useRef(0)
-  const minTopRef = useRef<number>(Infinity)
-  const maxBottomRef = useRef<number>(-Infinity)
-  const firstCollectForDraggingRef = useRef(true)
+  const [framesBounds, setFramesBounds] = useState<Record<string, TFrameBounds>>({})
 
   const finalFrames = useMemo<TTemplateFrame[]>(() => {
+    console.log('>>> [now] toyyy vcn:', {
+      didSetStoredTemplate,
+      storedTemplate,
+      template,
+    })
     if (!mockupId) return template.frames
     if (!didSetStoredTemplate) return []
     let frames = storedTemplate ? storedTemplate.frames : template.frames
@@ -97,16 +100,28 @@ export const FramesDisplayer = ({
     }
   }, [mockupId, didSetStoredTemplate])
 
-  const onPointerDown = (e: React.PointerEvent, frameId: string): void => {
+  // hàm clamp offsetY theo tất cả frames
+  const clampOffset = (value: number) => {
+    const allBounds = Object.values(framesBounds)
+    if (!allBounds.length) return value
+    console.log('>>> [112] run this, allBounds:', allBounds)
+    // giao nhau của các khoảng [min, max]
+    const min = Math.max(...allBounds.map((b) => b.min))
+    const max = Math.min(...allBounds.map((b) => b.max))
+    console.log('>>>  min, max:', { min, max })
+    if (min > max) return value // nếu config sai, thôi kệ :v
+
+    if (value < min) return min
+    if (value > max) return max
+    return value
+  }
+
+  const onPointerDown = (e: React.PointerEvent, frameId: string) => {
     if (!allowDragging) return
     if (useTemplateStore.getState().pickedTemplate?.frames.some((f) => !f.placedImage)) return
     setDragging(true)
     startYRef.current = e.clientY
     startOffsetRef.current = offsetY
-    if (firstCollectForDraggingRef.current) {
-      resetDataForDragging()
-      firstCollectForDraggingRef.current = false
-    }
     ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
   }
 
@@ -117,40 +132,41 @@ export const FramesDisplayer = ({
     listChildRef.current[index] = el
   }
 
-  const resetDataForDragging = () => {
+  useEffect(() => {
+    setOffsetY(0)
+  }, [pickedTemplate])
+
+  const handleCanMove = () => {
     const parent = displayerRef.current
-    if (!parent) return
+    if (!parent) return 0
+
     const parentRect = parent.getBoundingClientRect()
-    minTopRef.current = Infinity
-    maxBottomRef.current = -Infinity
+    let minTop = 0
+    let maxBottom = 0
     for (const child of listChildRef.current) {
       if (!child) continue
       const childRect = child.getBoundingClientRect()
-      const topDiff =
-        childRect.top - parentRect.top < 0 ? parentRect.top : childRect.top - parentRect.top
-      const bottomDiff =
-        childRect.bottom - parentRect.bottom > 0
-          ? parentRect.bottom
-          : childRect.bottom - parentRect.bottom
-      if (topDiff < minTopRef.current) {
-        minTopRef.current = topDiff
+
+      const topDiff = childRect.top - parentRect.top
+      const bottomDiff = childRect.bottom - parentRect.bottom
+      console.log('>>> diff:', { topDiff, bottomDiff, minTop, maxBottom })
+      if (topDiff < minTop) {
+        minTop = topDiff
       }
-      if (bottomDiff > maxBottomRef.current) {
-        maxBottomRef.current = bottomDiff
+      if (bottomDiff > maxBottom) {
+        maxBottom = bottomDiff
       }
     }
-  }
 
+    return minTop + maxBottom
+  }
   useEffect(() => {
-    setOffsetY(0)
-    firstCollectForDraggingRef.current = true
-  }, [pickedTemplate?.id])
-
-  const handleCanMove = (nextOffsetY: number, delta: number) => {
-    if (-nextOffsetY > minTopRef.current) return -minTopRef.current
-    if (-nextOffsetY < maxBottomRef.current) return -maxBottomRef.current
-    return nextOffsetY
-  }
+    const canMove = handleCanMove()
+    console.log('>>> canMove:', canMove)
+    if (canMove != 0) {
+      setOffsetY((pre) => pre - canMove)
+    }
+  }, [offsetY])
 
   useEffect(() => {
     const handleMove = (e: PointerEvent) => {
@@ -158,7 +174,7 @@ export const FramesDisplayer = ({
       const delta = e.clientY - startYRef.current
       const next = startOffsetRef.current + delta
 
-      setOffsetY((prev) => handleCanMove(next, delta))
+      setOffsetY((prev) => clampOffset(next))
     }
 
     const handleUp = () => {
@@ -172,7 +188,7 @@ export const FramesDisplayer = ({
       window.removeEventListener('pointermove', handleMove)
       window.removeEventListener('pointerup', handleUp)
     }
-  }, [dragging])
+  }, [dragging, framesBounds])
 
   return (
     <div ref={displayerRef} className="relative w-full h-full overflow-hidden">
