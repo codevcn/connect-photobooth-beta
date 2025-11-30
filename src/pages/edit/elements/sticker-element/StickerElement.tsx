@@ -35,7 +35,7 @@ export const StickerElement = ({
   const { path, id, mountType, height, width } = element
   const rootRef = useRef<HTMLElement | null>(null)
   const {
-    forPinch: { ref: refForPinch },
+    // forPinch: { ref: refForPinch },
     forRotate: { ref: refForRotate, rotateButtonRef },
     forZoom: { ref: refForZoom, zoomButtonRef },
     forDrag: { ref: refForDrag },
@@ -170,7 +170,7 @@ export const StickerElement = ({
         rootRef.current = node
         refForRotate.current = node
         refForZoom.current = node
-        refForPinch.current = node
+        // refForPinch.current = node
       }}
       style={{
         left: position.x,

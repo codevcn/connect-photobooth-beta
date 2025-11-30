@@ -1,9 +1,9 @@
-import { getContrastColor } from '@/utils/helpers'
+import { getContrastColor, sortSizes } from '@/utils/helpers'
 import { TProductVariantAttributesJson } from '@/utils/types/api'
 import { TBaseProduct, TClientProductVariant } from '@/utils/types/global'
 import { PrintSurface } from '../print-surface/PrintSurface'
 import { Modal } from '@/components/custom/common/Modal'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useProductUIDataStore } from '@/stores/ui/product-ui-data.store'
 
 type TProductImagePreviewProps = {
@@ -119,6 +119,10 @@ export const VariantInfo = ({ pickedProduct, pickedVariant }: TVariantInfoProps)
 
   const mergedAttributes = pickedProduct.mergedAttributes
   const hintForSizeChart: string = 'none'
+
+  const sortedSizes: string[] = useMemo(() => {
+    return sortSizes(mergedAttributes.uniqueSizes)
+  }, [mergedAttributes])
 
   const pickMaterial = (material: string) => {
     // Reset dependent attributes when material changes
@@ -355,7 +359,7 @@ export const VariantInfo = ({ pickedProduct, pickedVariant }: TVariantInfoProps)
       )}
 
       {/* Size Section */}
-      {mergedAttributes.uniqueSizes.length > 0 && mergedAttributes.uniqueSizes[0] !== 'null' && (
+      {sortedSizes.length > 0 && sortedSizes[0] !== 'null' && (
         <div className="mb-4">
           <div className="flex justify-between w-full mb-2">
             <label className="block text-sm font-bold text-slate-900">
@@ -371,7 +375,7 @@ export const VariantInfo = ({ pickedProduct, pickedVariant }: TVariantInfoProps)
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            {mergedAttributes.uniqueSizes.map((size) => {
+            {sortedSizes.map((size) => {
               const isSelected = selectedAttributes.size?.toUpperCase() === size.toUpperCase()
               const isScopeDisabled = !mergedAttributes.groups?.[
                 selectedAttributes.material ?? 'null'

@@ -43,9 +43,9 @@ type TInitialParams = Partial<
 >
 
 type TElementControlReturn = {
-  forPinch: {
-    ref: React.RefObject<HTMLElement | null>
-  }
+  // forPinch: {
+  //   ref: React.RefObject<HTMLElement | null>
+  // }
   forRotate: {
     ref: React.RefObject<HTMLElement | null>
     isRotating: boolean
@@ -130,18 +130,18 @@ export const useElementControl = (
   const [angle, setAngle] = useState<TElementVisualBaseState['angle']>(initialAngle)
   const [zindex, setZindex] = useState<TElementVisualBaseState['zindex']>(initialZindex)
   const scaleFactor = useEditAreaStore((s) => s.editBackgroundScaleValue)
-  const { ref: refForPinch } = usePinchElement({
-    maxScale: maxZoom,
-    minScale: minZoom,
-    currentScale: scale,
-    setCurrentScale: setScale,
-    currentRotation: angle,
-    setCurrentRotation: setAngle,
-    currentPosition: position,
-    setCurrentPosition: (pos) => {
-      handleSetElementPosition(pos.x, pos.y)
-    },
-  })
+  // const { ref: refForPinch } = usePinchElement({
+  //   maxScale: maxZoom,
+  //   minScale: minZoom,
+  //   currentScale: scale,
+  //   setCurrentScale: setScale,
+  //   currentRotation: angle,
+  //   setCurrentRotation: setAngle,
+  //   currentPosition: position,
+  //   setCurrentPosition: (pos) => {
+  //     handleSetElementPosition(pos.x, pos.y)
+  //   },
+  // })
   const {
     rotateButtonRef,
     containerRef: refForRotate,
@@ -369,9 +369,9 @@ export const useElementControl = (
   }, [mountType, initialPosition?.x, initialPosition?.y, initialAngle, initialZoom, initialZindex])
 
   return {
-    forPinch: {
-      ref: refForPinch,
-    },
+    // forPinch: {
+    //   ref: refForPinch,
+    // },
     forRotate: {
       ref: refForRotate,
       isRotating,

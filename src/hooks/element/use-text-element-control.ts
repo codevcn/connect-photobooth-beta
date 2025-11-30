@@ -13,9 +13,9 @@ type TInitialTextParams = Partial<
 >
 
 type TTextElementControlReturn = {
-  forPinch: {
-    ref: React.RefObject<HTMLElement | null>
-  }
+  // forPinch: {
+  //   ref: React.RefObject<HTMLElement | null>
+  // }
   forRotate: {
     ref: React.RefObject<HTMLElement | null>
     isRotating: boolean
@@ -69,7 +69,7 @@ export const useTextElementControl = (
   } = initialParams || {}
 
   const {
-    forPinch,
+    // forPinch,
     forDrag,
     forRotate,
     forZoom,
@@ -203,7 +203,7 @@ export const useTextElementControl = (
   }, [initialFontSize, initialColor, initialContent, initialFontFamily, initialFontWeight])
 
   return {
-    forPinch,
+    // forPinch,
     forDrag,
     forRotate,
     forZoom,

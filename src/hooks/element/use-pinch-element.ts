@@ -13,6 +13,7 @@ type PinchZoomOptions = {
   setCurrentRotation: React.Dispatch<React.SetStateAction<number>>
   currentPosition: Position
   setCurrentPosition: (position: TPosition) => void
+  scaleFactor?: number
 }
 
 type Position = {
@@ -48,6 +49,7 @@ export const usePinchElement = (options: PinchZoomOptions): UsePinchZoomReturn =
     setCurrentRotation,
     currentPosition,
     setCurrentPosition,
+    scaleFactor = 1,
   } = options
 
   const elementRef = useRef<HTMLDivElement>(null)

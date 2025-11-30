@@ -414,8 +414,8 @@ export function calContrastForReadableColor(hex: string): string {
 }
 
 export const sortSizes = (sizes: string[]): string[] => {
-  // Thứ tự nền tảng
   const baseOrder: Record<string, number> = {
+    xs: 0,
     s: 1,
     m: 2,
     l: 3,
@@ -425,11 +425,19 @@ export const sortSizes = (sizes: string[]): string[] => {
   const getRank = (size: string): number => {
     const s = size.toLowerCase().trim()
 
+    if (!s) return 999 // empty string
+
+    // Xử lý xxl, xxxl... thành 2xl, 3xl...
+    const xCount = s.match(/^(x+)l$/)?.[1]?.length
+    if (xCount) {
+      return 3 + xCount // xl→4, xxl→5, xxxl→6
+    }
+
     // Size dạng Nxl (2xl, 3xl...)
     const match = /^(\d+)xl$/.exec(s)
     if (match) {
       const n = parseInt(match[1], 10)
-      return 4 + n // xl=4 → 2xl=5 → 3xl=6...
+      return 3 + n // 1xl→4, 2xl→5, 3xl→6
     }
 
     // Size thường
@@ -437,12 +445,13 @@ export const sortSizes = (sizes: string[]): string[] => {
       return baseOrder[s]
     }
 
-    // Nếu gặp size lạ → đẩy ra sau cùng nhưng vẫn cố giữ thứ tự ổn định
+    // Size không xác định
     return 999
   }
 
   return [...sizes].sort((a, b) => getRank(a) - getRank(b))
 }
+
 export function adjustNearF3F4F6(hex: string): string {
   const normalizeHex = (h: string) => {
     const c = h.replace('#', '').trim()
