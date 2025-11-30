@@ -44,7 +44,7 @@ const Image = ({ img, imgsContainerRef, onClickImage }: ImageProps) => {
       <img
         src={url || '/images/placeholder.svg'}
         alt={`Printed Image`}
-        className="max-w-full group-hover:scale-105 transition-transform duration-200 object-contain"
+        className="max-w-full max-h-[calc(100vh-135px)] group-hover:scale-105 transition-transform duration-200 object-contain"
       />
     </div>
   )
@@ -79,7 +79,7 @@ const PrintedImagePreviewModal = ({ printedImage, onClose }: PrintedImageProps) 
   return (
     <div className="NAME-printed-images-modal fixed inset-0 z-999 flex items-center justify-center">
       <div onClick={onClose} className="bg-black/70 absolute inset-0 z-10"></div>
-      <div className="relative z-20 bg-white w-full max-w-[90vw] rounded-lg max-h-[90vh] flex flex-col transition duration-300 ease-in-out">
+      <div className="relative z-20 bg-white w-fit max-w-[90vw] rounded-lg max-h-[95vh] flex flex-col transition duration-300 ease-in-out">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-b-gray-200 shadow">
           <h2 className="text-lg font-bold">Ảnh của bạn</h2>
@@ -189,7 +189,7 @@ const PrintedImagesForTemplate = ({ printedImages }: PrintedImageForTemplateProp
               <img
                 className={`${
                   index === 0 ? 'aspect-video' : 'aspect-square'
-                } h-12 border border-gray-300 object-contain mobile-touch`}
+                } h-12 border border-main-cl object-contain mobile-touch`}
                 src={printedImage.url}
                 alt="Ảnh chụp photobooth"
               />
