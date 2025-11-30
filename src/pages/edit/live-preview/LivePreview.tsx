@@ -1,6 +1,6 @@
 import { usePrintArea } from '@/hooks/use-print-area'
 import { TBaseProduct, TPrintedImage } from '@/utils/types/global'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { PrintAreaOverlay } from './PrintAreaOverlay'
 import { EditedElementsArea } from './EditedElementsArea'
 import { AddToCartHandler } from './AddToCartHandler'
@@ -12,6 +12,92 @@ import { createCommonConstants } from '@/utils/contants'
 import { useZoomEditBackground } from '@/hooks/use-zoom-edit-background'
 import { adjustSizeOfPlacedImageOnPlaced } from '../helpers'
 import { useEditAreaStore } from '@/stores/ui/edit-area.store'
+
+type TZoomButtonsProps = {
+  scale: number
+  onZoomIn: () => void
+  onZoomOut: () => void
+  setZoom: (scale: number) => void
+  minZoom: number
+  maxZoom: number
+}
+
+const ZoomButtons = ({
+  scale,
+  onZoomIn,
+  onZoomOut,
+  setZoom,
+  minZoom,
+  maxZoom,
+}: TZoomButtonsProps) => {
+  const [hasSnappedTo100, setHasSnappedTo100] = useState(false)
+
+  // Hàm xử lý zoom với logic snap to 100%
+  const handleZoom = (direction: 'in' | 'out') => {
+    // Tính toán giá trị zoom tiếp theo dựa trên logic thực tế của controls
+    // zoomIn: scale * 1.2, zoomOut: scale * 0.8
+    const nextScale = direction === 'in' ? scale * 1.2 : scale * 0.8
+
+    // Kiểm tra nếu giá trị tiếp theo vượt qua hoặc tụt dưới 100%
+    const crosses100 =
+      (direction === 'in' && scale < 1 && nextScale >= 1) ||
+      (direction === 'out' && scale > 1 && nextScale <= 1)
+
+    if (crosses100 && !hasSnappedTo100) {
+      // Snap to 100% lần đầu tiên
+      setZoom(1)
+      setHasSnappedTo100(true)
+    } else {
+      // Zoom bình thường
+      if (direction === 'in') {
+        onZoomIn()
+      } else {
+        onZoomOut()
+      }
+      setHasSnappedTo100(false)
+    }
+  }
+
+  return (
+    <div className="absolute z-52 bottom-1 right-1 flex flex-col px-1 py-2 items-center gap-2 bg-white rounded-lg shadow-lg border border-gray-200">
+      <button
+        onClick={() => handleZoom('out')}
+        disabled={scale <= minZoom}
+        className="flex items-center justify-center rounded hover:bg-gray-100 active:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        aria-label="Zoom out"
+      >
+        <svg
+          className="w-4 h-4 text-gray-700"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          strokeWidth={3}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+        </svg>
+      </button>
+      <span className="text-xs font-medium text-gray-700 text-center">
+        {Math.round(scale * 100)}%
+      </span>
+      <button
+        onClick={() => handleZoom('in')}
+        disabled={scale >= maxZoom}
+        className="flex items-center justify-center rounded hover:bg-gray-100 active:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        aria-label="Zoom in"
+      >
+        <svg
+          className="w-4 h-4 text-gray-700"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          strokeWidth={3}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
+    </div>
+  )
+}
 
 type TDisplayedImage = {
   surfaceId: TBaseProduct['printAreaList'][number]['id']
@@ -39,7 +125,7 @@ export const LivePreview = ({
     )!
   }, [pickedProduct.id, pickedProduct.printAreaList, pickedSurfaceId, editedVariantId])
 
-  const { containerRef, scale, position, handlers } = useZoomEditBackground(0.8, 5)
+  const { containerRef, scale, position, handlers, controls } = useZoomEditBackground(0.8, 5)
 
   const { printAreaRef, printAreaContainerRef, checkIfAnyElementOutOfBounds, isOutOfBounds } =
     usePrintArea(
@@ -130,11 +216,9 @@ export const LivePreview = ({
       </div>
       <div
         style={{ display: isOutOfBounds ? 'block' : 'none' }}
-        className="NAME-out-of-bounds-overlay-warning absolute inset-0 bg-red-600/20 z-5"
+        className="NAME-out-of-bounds-overlay-warning-top z-51 absolute top-0 left-0 text-sm text-white font-medium bg-red-600 px-3 py-1 rounded-br-md"
       >
-        <p className="absolute top-0 left-0 text-sm text-white font-medium bg-red-600 px-3 py-1 rounded-br-md">
-          Ngoài phạm vi in cho phép
-        </p>
+        Ngoài phạm vi in cho phép
       </div>
       <div
         ref={(node) => {
@@ -146,6 +230,10 @@ export const LivePreview = ({
           transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
         }}
       >
+        <div
+          style={{ display: isOutOfBounds ? 'block' : 'none' }}
+          className="NAME-out-of-bounds-overlay-warning absolute inset-0 bg-red-600/20 z-5"
+        ></div>
         <img
           src={displayedImage.imageURL}
           alt={displayedImage.altText}
@@ -167,6 +255,15 @@ export const LivePreview = ({
           printAreaContainerRef={printAreaContainerRef}
         />
       </div>
+
+      <ZoomButtons
+        scale={scale}
+        onZoomIn={controls.zoomIn}
+        setZoom={controls.setZoom}
+        onZoomOut={controls.zoomOut}
+        minZoom={0.8}
+        maxZoom={5}
+      />
     </div>
   )
 }

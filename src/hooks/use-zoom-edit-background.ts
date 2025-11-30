@@ -201,6 +201,7 @@ export const useZoomEditBackground = (minZoom = 0.5, maxZoom = 3) => {
       zoomIn,
       zoomOut,
       reset,
+      setZoom: setScale,
     },
   }
 }
