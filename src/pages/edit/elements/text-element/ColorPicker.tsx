@@ -1,6 +1,6 @@
 import { useDebouncedCallback } from '@/hooks/use-debounce'
 import { useEditedElementStore } from '@/stores/element/element.store'
-import { detectColorFormat, getContrastColor, rgbStringToHex, rgbToHex } from '@/utils/helpers'
+import { detectColorFormat, getContrastColor, rgbStringToHex } from '@/utils/helpers'
 import { TTextVisualState } from '@/utils/types/global'
 import { useEffect, useRef, useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
@@ -65,7 +65,7 @@ export const ColorPickerModal = ({
   }, [])
 
   return (
-    <div className="NAME-color-picker-modal fixed inset-0 flex items-center justify-center z-50 animate-pop-in">
+    <div className="NAME-color-picker-modal fixed inset-0 flex items-center justify-center z-99 animate-pop-in">
       <div onClick={() => onHideShow(false)} className="bg-black/50 absolute inset-0 z-10"></div>
       <div className="bg-white rounded-lg p-4 w-full mx-4 shadow-2xl max-h-[95vh] overflow-y-auto relative z-20">
         {/* Header */}

@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 
-export const MyDevComponent: React.FC = () => {
+const MyDevComponent2: React.FC = () => {
+  const buttonRef = useRef<HTMLDivElement>(null)
   const [showModal, setShowModal] = useState(false)
 
   const [coords, setCoords] = useState([
@@ -51,7 +52,7 @@ export const MyDevComponent: React.FC = () => {
       <div
         key={`line-${index}`}
         style={{
-          position: 'absolute',
+          position: 'fixed',
           top: p1.y,
           left: p1.x,
           width: length,
@@ -59,18 +60,53 @@ export const MyDevComponent: React.FC = () => {
           background: '#2563eb',
           transform: `rotate(${angle}deg)`,
           transformOrigin: '0 50%',
-          zIndex: 9997,
+          zIndex: 9999,
         }}
       />
     )
+  }
+
+  const handleShowModal = () => {
+    setShowModal(true)
+  }
+
+  const showMockPrintArea = () => {
+    const tempContainer = document.querySelector<HTMLElement>('.NAME-app-temp-container')!
+    tempContainer.style.zIndex = '9999'
+    tempContainer.style.overflow = 'visible'
+    tempContainer.style.top = '0'
+    tempContainer.style.bottom = 'auto'
+    document.querySelector('.NAME-edit-page-root')?.classList.add('hidden')
+  }
+
+  const hideMockPrintArea = () => {
+    const tempContainer = document.querySelector<HTMLElement>('.NAME-app-temp-container')!
+    tempContainer.style.zIndex = '-1'
+    tempContainer.style.overflow = 'hidden'
+    tempContainer.style.top = 'auto'
+    tempContainer.style.bottom = '0'
+    document.querySelector('.NAME-edit-page-root')?.classList.remove('hidden')
   }
 
   return ReactDOM.createPortal(
     <>
       {/* Trigger bar */}
       <div
-        onClick={() => setShowModal(true)}
-        className="fixed top-0 left-0 bg-blue-600 text-white px-4 py-2 cursor-pointer z-9999"
+        onClick={showMockPrintArea}
+        className="fixed top-0 left-0 bg-red-600 text-white px-4 py-2 cursor-pointer z-9999"
+      >
+        show
+      </div>
+      <div
+        onClick={hideMockPrintArea}
+        className="fixed top-12 left-0 bg-green-600 text-white px-4 py-2 cursor-pointer z-9999"
+      >
+        hide
+      </div>
+
+      <div
+        onClick={handleShowModal}
+        className="fixed top-24 left-0 bg-blue-600 text-white px-4 py-2 cursor-pointer z-9999"
       >
         OK
       </div>
@@ -79,7 +115,7 @@ export const MyDevComponent: React.FC = () => {
       {points.map((p, idx) => (
         <div
           key={idx}
-          className="absolute bg-blue-600"
+          className="fixed bg-blue-600"
           style={{
             width: 12,
             height: 12,
@@ -87,7 +123,7 @@ export const MyDevComponent: React.FC = () => {
             top: p.y,
             left: p.x,
             transform: 'translate(-50%, -50%)',
-            zIndex: 9998,
+            zIndex: 10000,
           }}
         />
       ))}
@@ -146,4 +182,8 @@ export const MyDevComponent: React.FC = () => {
     </>,
     portalRoot
   )
+}
+
+export const MyDevComponent = () => {
+  return <></>
 }

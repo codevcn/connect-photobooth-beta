@@ -17,8 +17,6 @@ import {
 import { useEffect } from 'react'
 import { toast } from 'react-toastify'
 import { cleanPrintAreaOnExtractMockupImage } from '../helpers'
-import { useEditAreaStore } from '@/stores/ui/edit-area.store'
-import { createInitialConstants } from '@/utils/contants'
 
 type TAddToCartHandlerProps = {
   printAreaContainerRef: React.RefObject<HTMLDivElement | null>
@@ -31,7 +29,7 @@ export const AddToCartHandler = ({
 }: TAddToCartHandlerProps) => {
   const { sessionId } = useGlobalContext()
   const { collectMockupVisualStates } = useVisualStatesCollector()
-  const { saveHtmlAsImage, saveHtmlAsImageWithDesiredSize } = useHtmlToCanvas()
+  const { saveHtmlAsImageWithDesiredSize } = useHtmlToCanvas()
 
   const validateBeforeAddToCart = (): [
     string | null,
@@ -75,98 +73,85 @@ export const AddToCartHandler = ({
       return onError(new Error(message))
     }
     if (!pickedVariant || !pickedProduct || !pickedSurface || !printAreaContainerRef.current) return
-    const { printAreaContainer, allowedPrintArea, removeMockPrintArea } =
-      cleanPrintAreaOnExtractMockupImage(printAreaContainerRef.current)
-    if (!printAreaContainer || !allowedPrintArea) {
+    const { printAreaContainer, removeMockPrintArea } = cleanPrintAreaOnExtractMockupImage(
+      printAreaContainerRef.current
+    )
+    if (!printAreaContainer) {
       return onError(new Error('Không tìm thấy khu vực in trên sản phẩm'))
     }
     const imgMimeType: TImgMimeType = 'image/png'
-    console.log('>>> [add] allow print area:', {
-      allowedPrintArea,
-      devPreview: document.body.querySelector<HTMLElement>('.NAME-dev-preview'),
-    })
-    document.body.querySelector<HTMLElement>('.NAME-dev-preview')!.innerHTML = ''
-    document.body.querySelector<HTMLElement>('.NAME-dev-preview')!.appendChild(allowedPrintArea)
-    // saveHtmlAsImage(
-    //   printAreaContainer,
-    //   imgMimeType,
-    //   8,
-    //   (imageData) => {
-    //     const mockupId = LocalStorageHelper.saveMockupImageAtLocal(
-    //       sessionId,
-    //       {
-    //         productId: pickedProduct.id,
-    //         productName: pickedProduct.name,
-    //       },
-    //       {
-    //         variantId: pickedVariant.id,
-    //       },
-    //       {
-    //         id: pickedSurface.id,
-    //         type: pickedSurface.surfaceType,
-    //       },
-    //       {
-    //         dataUrl: URL.createObjectURL(imageData),
-    //         size: {
-    //           width: -1,
-    //           height: -1,
-    //         },
-    //       },
-    //       elementsVisualState
-    //     )
-    //     saveHtmlAsImageWithDesiredSize(
-    //       allowedPrintArea,
-    //       pickedSurface.area.widthRealPx,
-    //       pickedSurface.area.heightRealPx,
-    //       imgMimeType,
-    //       (imageData, canvasWithDesiredSize) => {
-    //         removeMockPrintArea()
-    //         productService
-    //           .preSendMockupImage(
-    //             imageData,
-    //             `mockup-${Date.now()}.${convertMimeTypeToExtension(imgMimeType)}`
-    //           )
-    //           .then((res) => {
-    //             const result = LocalStorageHelper.updateMockupImagePreSent(
-    //               sessionId,
-    //               pickedProduct.id,
-    //               pickedVariant.id,
-    //               mockupId,
-    //               res.url,
-    //               {
-    //                 width: canvasWithDesiredSize.width,
-    //                 height: canvasWithDesiredSize.height,
-    //               }
-    //             )
-    //             if (!result) {
-    //               toast.error('Không thể cập nhật kích thước mockup')
-    //             }
-    //           })
-    //           .catch((err) => {
-    //             console.error('>>> pre-send mockup image error:', err)
-    //             toast.error('Không thể lưu mockup lên server')
-    //           })
-    //       },
-    //       (error) => {
-    //         console.error('Error saving mockup image:', error)
-    //         toast.warning(error.message || 'Không thể tạo mockup để lưu lên server')
-    //         onError(error)
-    //       }
-    //     )
-    //     toast.success('Đã thêm vào giỏ hàng')
-    //     useProductUIDataStore.getState().setCartCount(LocalStorageHelper.countSavedMockupImages())
-    //     onDoneAdd()
-    //   },
-    //   (error) => {
-    //     console.error('Error saving mockup image:', error)
-    //     useProductUIDataStore.getState().setCartCount(LocalStorageHelper.countSavedMockupImages())
-    //     onError(error || new Error('Không thể lưu mockup, không thể thêm sản phẩm vào giỏ hàng'))
-    //   }
-    // )
+    saveHtmlAsImageWithDesiredSize(
+      printAreaContainer,
+      pickedSurface.area.widthRealPx,
+      pickedSurface.area.heightRealPx,
+      8,
+      imgMimeType,
+      (fullContainerImageData, allowedPrintAreaImageData, allowedPrintAreaCanvas) => {
+        const mockupId = LocalStorageHelper.saveMockupImageAtLocal(
+          sessionId,
+          {
+            productId: pickedProduct.id,
+            productName: pickedProduct.name,
+          },
+          {
+            variantId: pickedVariant.id,
+          },
+          {
+            id: pickedSurface.id,
+            type: pickedSurface.surfaceType,
+          },
+          {
+            dataUrl: URL.createObjectURL(fullContainerImageData),
+            size: {
+              width: -1,
+              height: -1,
+            },
+          },
+          elementsVisualState
+        )
+        removeMockPrintArea()
+        productService
+          .preSendMockupImage(
+            allowedPrintAreaImageData,
+            `mockup-${Date.now()}.${convertMimeTypeToExtension(imgMimeType)}`
+          )
+          .then((res) => {
+            const result = LocalStorageHelper.updateMockupImagePreSent(
+              sessionId,
+              pickedProduct.id,
+              pickedVariant.id,
+              mockupId,
+              res.url,
+              {
+                width: allowedPrintAreaCanvas.width,
+                height: allowedPrintAreaCanvas.height,
+                // width: 111,
+                // height: 222,
+              }
+            )
+            if (!result) {
+              toast.error('Không thể cập nhật kích thước mockup')
+            }
+          })
+          .catch((err) => {
+            console.error('>>> pre-send mockup image error:', err)
+            toast.error('Không thể lưu mockup lên server')
+          })
+        toast.success('Đã thêm vào giỏ hàng')
+        useProductUIDataStore.getState().setCartCount(LocalStorageHelper.countSavedMockupImages())
+        onDoneAdd()
+      },
+      (error) => {
+        removeMockPrintArea()
+        console.error('Error saving mockup image:', error)
+        useProductUIDataStore.getState().setCartCount(LocalStorageHelper.countSavedMockupImages())
+        onError(error || new Error('Không thể lưu mockup, không thể thêm sản phẩm vào giỏ hàng'))
+      }
+    )
   }
 
   const listenAddToCart = () => {
-    // useProductUIDataStore.getState().setIsAddingToCart(true)
+    useProductUIDataStore.getState().setIsAddingToCart(true)
     useEditedElementStore.getState().cancelSelectingElement()
     // Thu thập visual states của tất cả elements
     handleAddToCart(

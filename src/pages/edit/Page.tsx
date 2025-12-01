@@ -223,7 +223,7 @@ export default function EditPage({ products, printedImages }: TEditPageProps) {
   }, [])
 
   return (
-    <div className="spmd:grid-cols-[1fr_6fr] xl:gap-4 smd:grid-rows-[1fr_6fr] grid-cols-1 font-sans grid h-screen bg-white z-10 relative">
+    <div className="NAME-edit-page-root spmd:grid-cols-[1fr_6fr] xl:gap-4 smd:grid-rows-[1fr_6fr] grid-cols-1 font-sans grid h-screen bg-white z-10 relative">
       <AddingToCartLoadingModal />
       <ProductGallery products={products} printedImages={printedImages} />
       <div className="NAME-main-parent xl:gap-4 spmd:h-screen spmd:min-h-auto md:grid-cols-[3fr_2fr] smd:grid-cols-[3fr_2.5fr] smd:min-h-0 smd:w-auto w-full grid-cols-1 grid gap-2">

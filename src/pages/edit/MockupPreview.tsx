@@ -65,6 +65,7 @@ export const MockupPreview = ({ onClose }: TMockupPreviewProps) => {
         }, 100)
       },
       (error) => {
+        removeMockPrintArea()
         console.log('>>> [err] error:', error)
         setError('Không thể tạo bản xem trước. Vui lòng thử lại.')
       }

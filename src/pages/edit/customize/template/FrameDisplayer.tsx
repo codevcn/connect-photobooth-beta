@@ -205,7 +205,7 @@ export const FramesDisplayer = ({
   }, [isDragging, position])
 
   return (
-    <div ref={containerRef} className="relative w-full h-full">
+    <div ref={containerRef} className="relative w-full h-full overflow-hidden">
       <div
         ref={elementsBoxRef}
         onPointerDown={handleMouseDown}

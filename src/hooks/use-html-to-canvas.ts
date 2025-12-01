@@ -36,7 +36,7 @@ type TUseHtlmToCanvasReturn = {
     onSaved: (imgData: Blob, canvas: HTMLCanvasElement) => void,
     onError: (error: Error) => void
   ) => void
-  saveHtmlAsImageWithDesiredSize: (
+  saveHtmlAsImageWithDesiredSizeOldVersion: (
     htmlContainer: HTMLDivElement,
     desiredOutputWidth: number,
     desiredOutputHeight: number,
@@ -51,6 +51,19 @@ type TUseHtlmToCanvasReturn = {
     desiredOutputHeight: number,
     desiredImgMimeType: string | null,
     onSaved: (imgData: Blob, canvas: HTMLCanvasElement) => void,
+    onError: (error: Error) => void
+  ) => void
+  saveHtmlAsImageWithDesiredSize: (
+    htmlContainer: HTMLDivElement,
+    desiredOutputWidth: number,
+    desiredOutputHeight: number,
+    upScale: number,
+    desiredImgMimeType: string | null,
+    onSaved: (
+      fullContainerImageData: Blob,
+      allowedPrintAreaImageData: Blob,
+      allowedPrintAreaCanvas: HTMLCanvasElement
+    ) => void,
     onError: (error: Error) => void
   ) => void
 }
@@ -86,6 +99,97 @@ export const useHtmlToCanvas = (): TUseHtlmToCanvasReturn => {
   }
 
   const saveHtmlAsImageWithDesiredSize = async (
+    htmlContainer: HTMLDivElement,
+    desiredOutputWidth: number,
+    desiredOutputHeight: number,
+    upScale: number = 8,
+    desiredImgMimeType: string | null,
+    onSaved: (
+      fullContainerImageData: Blob,
+      allowedPrintAreaImageData: Blob,
+      allowedPrintAreaCanvas: HTMLCanvasElement
+    ) => void,
+    onError: (error: Error) => void
+  ) => {
+    requestIdleCallback(async () => {
+      // Lấy vị trí của container và element cần crop
+      const containerRect = htmlContainer.getBoundingClientRect()
+      const elementRect = htmlContainer
+        .querySelector('.NAME-print-area-allowed')
+        ?.getBoundingClientRect()
+      if (!elementRect) return
+      // Tính vị trí relative của element so với container
+      const relativeX = elementRect.left - containerRect.left
+      const relativeY = elementRect.top - containerRect.top
+      // insert(htmlContainer, true)
+      const imageDataPromises: Promise<Blob>[] = []
+      try {
+        await document.fonts.ready
+
+        const fullCanvas = await domToCanvas(htmlContainer, {
+          scale: upScale,
+          quality: 1,
+          type: desiredImgMimeType || 'image/webp',
+        })
+        imageDataPromises.push(
+          new Promise((resolve, reject) => {
+            fullCanvas.toBlob((blob) => {
+              if (blob) {
+                resolve(blob)
+              } else {
+                reject(new Error('Failed to convert full canvas to Blob'))
+              }
+            }, desiredImgMimeType || 'image/webp')
+          })
+        )
+
+        // Tạo canvas mới để crop
+        const croppedCanvas = document.createElement('canvas')
+        const ctx = croppedCanvas.getContext('2d')
+
+        if (!ctx) {
+          return new Error('Failed to get canvas context for cropping')
+        }
+
+        // Set kích thước canvas crop (đã scale)
+        const cropWidth = elementRect.width * upScale
+        const cropHeight = elementRect.height * upScale
+        croppedCanvas.width = cropWidth
+        croppedCanvas.height = cropHeight
+
+        // Crop vùng cần thiết từ fullCanvas
+        ctx.drawImage(
+          fullCanvas,
+          relativeX * upScale, // source x (đã upScale)
+          relativeY * upScale, // source y (đã upScale)
+          cropWidth, // source width
+          cropHeight, // source height
+          0, // destination x
+          0, // destination y
+          cropWidth, // destination width
+          cropHeight // destination height
+        )
+
+        imageDataPromises.push(
+          new Promise((resolve, reject) => {
+            croppedCanvas.toBlob((blob) => {
+              if (blob) {
+                resolve(blob)
+              } else {
+                reject(new Error('Failed to convert cropped canvas to Blob'))
+              }
+            }, desiredImgMimeType || 'image/webp')
+          })
+        )
+        const blobs = await Promise.all(imageDataPromises)
+        onSaved(blobs[0], blobs[1], croppedCanvas)
+      } catch (error) {
+        onError(error as Error)
+      }
+    })
+  }
+
+  const saveHtmlAsImageWithDesiredSizeOldVersion = async (
     htmlContainer: HTMLDivElement,
     desiredOutputWidth: number,
     desiredOutputHeight: number,
@@ -169,5 +273,10 @@ export const useHtmlToCanvas = (): TUseHtlmToCanvasReturn => {
     }
   }
 
-  return { saveHtmlAsImage, saveHtmlAsImageWithDesiredSize, saveHtmlAsImageCropped }
+  return {
+    saveHtmlAsImage,
+    saveHtmlAsImageWithDesiredSizeOldVersion,
+    saveHtmlAsImageCropped,
+    saveHtmlAsImageWithDesiredSize,
+  }
 }

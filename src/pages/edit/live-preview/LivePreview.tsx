@@ -60,7 +60,7 @@ const ZoomButtons = ({
   }
 
   return (
-    <div className="smd:bottom-2 smd:right-2 absolute z-52 bottom-1 right-1 flex flex-col p-1 items-center gap-2 bg-white rounded-lg shadow-lg border border-gray-200">
+    <div className="smd:bottom-2 smd:right-2 absolute z-52 bottom-1 right-1 flex flex-col p-1 w-10 items-center gap-2 bg-white rounded-lg shadow-lg border border-gray-200">
       <button
         onClick={() => handleZoom('out')}
         disabled={scale <= minZoom}
