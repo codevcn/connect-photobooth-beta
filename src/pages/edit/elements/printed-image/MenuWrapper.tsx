@@ -9,17 +9,17 @@ export const PrintedImageMenuWrapper = () => {
   const cancelSelectingElement = useEditedElementStore((state) => state.cancelSelectingElement)
 
   const scrollToSelectedElement = () => {
-    if (elementType !== 'printed-image') return
-    cancelSelectingZoomingImages()
-    if (window.innerWidth < 662) {
-      document.body
-        .querySelector('.NAME-print-area-container')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    } else {
-      document.body
-        .querySelector('.NAME-menu-printed-image-element')
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
+    // if (elementType !== 'printed-image') return
+    // cancelSelectingZoomingImages()
+    // if (window.innerWidth < 662) {
+    //   document.body
+    //     .querySelector('.NAME-print-area-container')
+    //     ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // } else {
+    //   document.body
+    //     .querySelector('.NAME-menu-printed-image-element')
+    //     ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    // }
   }
 
   useEffect(() => {

@@ -185,6 +185,19 @@ export const LivePreview = ({
     }
   }
 
+  const listenPointerDownCapture = (e: React.PointerEvent<HTMLElement>) => {
+    const target = e.target as HTMLElement
+    if (
+      !(
+        target.closest('.NAME-element-interactive-buttons') ||
+        target.closest('.NAME-zoom-placed-image-btn-wrapper')
+      )
+    ) {
+      cancelSelectingZoomingImages()
+      useEditedElementStore.getState().cancelSelectingElement()
+    }
+  }
+
   useEffect(() => {
     displayProductChangingModal()
     setTimeout(() => {
@@ -205,10 +218,7 @@ export const LivePreview = ({
       ref={(node) => {
         refForZoom.current = node
       }}
-      onPointerDownCapture={(e) => {
-        cancelSelectingZoomingImages()
-        useEditedElementStore.getState().cancelSelectingElement()
-      }}
+      onPointerDownCapture={listenPointerDownCapture}
       onDragStart={(e) => e.preventDefault()}
       className="NAME-print-area-container-wrapper smd:w-full overflow-hidden w-full min-h-full h-full relative flex items-center justify-center"
     >

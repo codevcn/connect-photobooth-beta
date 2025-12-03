@@ -239,7 +239,7 @@ export const PrintedImageElement = ({
 
       {createPortal(
         <div
-          className="NAME-element-interactive-buttons fixed z-90 bg-transparent shadow-[0_0_0_2px_#f54900]"
+          className="NAME-element-interactive-buttons fixed z-90 bg-transparent shadow-[0_0_0_2px_#f54900] touch-none"
           style={{
             display: isSelected && interactiveBtns.isShown ? 'block' : 'none',
             top: interactiveBtns.buttonsContainerStyle.top,

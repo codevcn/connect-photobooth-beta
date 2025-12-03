@@ -28,6 +28,8 @@ type TInitialContentsType =
   | 'SCENT_DEFAULT_TITLE'
   | 'COLOR_DEFAULT_TITLE'
   | 'SIZE_DEFAULT_TITLE'
+  | 'ELEMENT_ROTATION_SNAP_THRESHOLD'
+  | 'ELEMENT_ROTATION_SNAP_BREAK_THRESHOLD'
 
 export const createInitialConstants = <R>(type: TInitialContentsType): R => {
   switch (type) {
@@ -89,6 +91,10 @@ export const createInitialConstants = <R>(type: TInitialContentsType): R => {
       return 'Màu sắc' as R
     case 'SIZE_DEFAULT_TITLE':
       return 'Kích thước' as R
+    case 'ELEMENT_ROTATION_SNAP_THRESHOLD':
+      return 10 as R
+    case 'ELEMENT_ROTATION_SNAP_BREAK_THRESHOLD':
+      return 15 as R
     default:
       return null as R
   }

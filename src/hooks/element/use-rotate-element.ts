@@ -1,13 +1,13 @@
 import { useRef, useCallback, useState, useEffect } from 'react'
 
-interface UseElementRotationOptions {
+type UseElementRotationOptions = {
   currentRotation: number
   setCurrentRotation: React.Dispatch<React.SetStateAction<number>>
   onRotationStart?: () => void // Callback khi bắt đầu xoay
   onRotationEnd?: () => void // Callback khi kết thúc xoay
 }
 
-interface UseElementRotationReturn {
+type UseElementRotationReturn = {
   rotateButtonRef: React.RefObject<HTMLButtonElement | null>
   containerRef: React.RefObject<HTMLElement | null>
   resetRotation: () => void
@@ -44,7 +44,7 @@ export const useRotateElement = (options: UseElementRotationOptions): UseElement
 
   // Xử lý khi bắt đầu nhấn vào nút xoay
   const handleStart = useCallback(
-    (e: MouseEvent | TouchEvent) => {
+    (e: PointerEvent) => {
       e.preventDefault()
       e.stopPropagation()
 
@@ -55,14 +55,8 @@ export const useRotateElement = (options: UseElementRotationOptions): UseElement
       onRotationStart?.()
 
       // Lấy vị trí X và Y ban đầu
-      let clientX: number, clientY: number
-      if (e instanceof MouseEvent) {
-        clientX = e.clientX
-        clientY = e.clientY
-      } else {
-        clientX = e.touches[0].clientX
-        clientY = e.touches[0].clientY
-      }
+      const clientX = e.clientX
+      const clientY = e.clientY
 
       startAngleRef.current = getAngleFromCenter(clientX, clientY)
       startRotationRef.current = currentRotation
@@ -74,39 +68,30 @@ export const useRotateElement = (options: UseElementRotationOptions): UseElement
   )
 
   // Xử lý khi di chuyển
-  const handleMove = useCallback(
-    (e: MouseEvent | TouchEvent) => {
-      if (!isRotatingRef.current) return
+  const handleMove = useCallback((e: PointerEvent) => {
+    if (!isRotatingRef.current) return
 
-      e.preventDefault()
-      e.stopPropagation()
+    e.preventDefault()
+    e.stopPropagation()
 
-      // Lấy vị trí X và Y hiện tại
-      let currentX: number, currentY: number
-      if (e instanceof MouseEvent) {
-        currentX = e.clientX
-        currentY = e.clientY
-      } else {
-        currentX = e.touches[0].clientX
-        currentY = e.touches[0].clientY
-      }
+    // Lấy vị trí X và Y hiện tại
+    const currentX = e.clientX
+    const currentY = e.clientY
 
-      // Tính góc hiện tại
-      const currentAngle = getAngleFromCenter(currentX, currentY)
+    // Tính góc hiện tại
+    const currentAngle = getAngleFromCenter(currentX, currentY)
 
-      // Tính độ chênh lệch góc
-      let angleDelta = currentAngle - startAngleRef.current
+    // Tính độ chênh lệch góc
+    let angleDelta = currentAngle - startAngleRef.current
 
-      // Xử lý trường hợp góc vượt qua -180/180 độ
-      if (angleDelta > 180) angleDelta -= 360
-      if (angleDelta < -180) angleDelta += 360
+    // Xử lý trường hợp góc vượt qua -180/180 độ
+    if (angleDelta > 180) angleDelta -= 360
+    if (angleDelta < -180) angleDelta += 360
 
-      // Cập nhật góc xoay mới
-      const newRotation = startRotationRef.current + angleDelta
-      setCurrentRotation(newRotation)
-    },
-    [getAngleFromCenter]
-  )
+    // Cập nhật góc xoay mới
+    const newRotation = startRotationRef.current + angleDelta
+    setCurrentRotation(newRotation)
+  }, [])
 
   // Xử lý khi thả chuột/tay
   const handleEnd = useCallback(() => {
@@ -130,26 +115,20 @@ export const useRotateElement = (options: UseElementRotationOptions): UseElement
     if (!button) return
 
     // Đăng ký sự kiện chỉ trên nút xoay
-    button.addEventListener('mousedown', handleStart)
-    button.addEventListener('touchstart', handleStart, { passive: false })
+    button.addEventListener('pointerdown', handleStart)
 
     // Sự kiện move và end trên document để xử lý khi kéo ra ngoài
-    document.body.addEventListener('mousemove', handleMove)
-    document.body.addEventListener('touchmove', handleMove, { passive: false })
-
-    document.body.addEventListener('mouseup', handleEnd)
-    document.body.addEventListener('touchend', handleEnd)
+    document.body.addEventListener('pointermove', handleMove)
+    document.body.addEventListener('pointerup', handleEnd)
+    document.body.addEventListener('pointercancel', handleEnd)
 
     // Cleanup
     return () => {
-      button.removeEventListener('mousedown', handleStart)
-      button.removeEventListener('touchstart', handleStart)
+      button.removeEventListener('pointerdown', handleStart)
 
-      document.body.removeEventListener('mousemove', handleMove)
-      document.body.removeEventListener('touchmove', handleMove)
-
-      document.body.removeEventListener('mouseup', handleEnd)
-      document.body.removeEventListener('touchend', handleEnd)
+      document.body.removeEventListener('pointermove', handleMove)
+      document.body.removeEventListener('pointerup', handleEnd)
+      document.body.removeEventListener('pointercancel', handleEnd)
 
       document.body.style.cursor = 'default'
       document.body.style.userSelect = 'auto'

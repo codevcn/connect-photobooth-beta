@@ -7,6 +7,7 @@ import { TElementMountType, TElementVisualBaseState, TPosition } from '@/utils/t
 import { useElementLayerStore } from '@/stores/ui/element-layer.store'
 import { EInternalEvents, eventEmitter } from '@/utils/events'
 import { useEditAreaStore } from '@/stores/ui/edit-area.store'
+import { useSnapThresholdRotateElement } from './use-snap-threshold-rotate-element'
 
 type TElementPreviousRelativeProps = {
   relativeOffsetLeft: number
@@ -156,9 +157,11 @@ export const useElementControl = (
     rotateButtonRef,
     containerRef: refForRotate,
     isRotating,
-  } = useRotateElement({
+  } = useSnapThresholdRotateElement({
     currentRotation: angle,
     setCurrentRotation: setAngle,
+    snapBreakThreshold: createInitialConstants<number>('ELEMENT_ROTATION_SNAP_BREAK_THRESHOLD'),
+    snapThreshold: createInitialConstants<number>('ELEMENT_ROTATION_SNAP_THRESHOLD'),
   })
   const {
     zoomButtonRef,
