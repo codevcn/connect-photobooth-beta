@@ -149,7 +149,7 @@ export const TemplatesPicker = ({ printedImages }: TTemplatePickerProps) => {
             <path d="m15 9-6 6" />
             <path d="m9 9 6 6" />
           </svg>
-          <p className="5xl:text-[1.3em] 3xl:p-1 3xl:font-bold text-gray-500 text-[1.5em] mt-1 text-center w-fit font-medium">
+          <p className="5xl:text-[1.3em] 3xl:p-1 3xl:font-bold text-gray-500 text-[1em] mt-1 text-center w-fit font-medium">
             Không <span className="smd:inline hidden">sử dụng</span> mẫu
           </p>
         </div>

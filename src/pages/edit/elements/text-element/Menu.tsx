@@ -6,6 +6,7 @@ import { TextFontPicker } from './FontPicker'
 import { createInitialConstants } from '@/utils/contants'
 import { createPortal } from 'react-dom'
 import { getContrastColor } from '@/utils/helpers'
+import { ETextFieldNameForKeyBoard } from '@/providers/GlobalKeyboardProvider'
 
 type TPropertyType = 'font-size' | 'angle' | 'posXY' | 'zindex-up' | 'zindex-down'
 
@@ -260,7 +261,7 @@ export const TextElementMenu = ({ elementId, onClose }: TPrintedImageMenuProps) 
           </div>
           <div className="flex gap-1 ml-1 grow">
             <input
-              className="3xl:text-[1.3em] text-black bg-white rounded px-1 py-0.5 text-[1em] outline-none w-full"
+              className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[1.3em] text-black bg-white rounded px-1 py-0.5 text-[1em] outline-none w-full`}
               placeholder="Nhập nội dung..."
               onKeyDown={(e) => catchEnter(e, 'font-size')}
               onChange={onContentFieldChange}

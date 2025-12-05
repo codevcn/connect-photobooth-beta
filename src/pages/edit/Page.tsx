@@ -25,6 +25,7 @@ import { TextElementMenu } from './elements/text-element/Menu'
 import { PrintedImageElementMenu } from './elements/printed-image/Menu'
 import { cancelSelectingZoomingImages } from './helpers'
 import { toast } from 'react-toastify'
+import { useKeyboardStore } from '@/stores/keyboard/keyboard.store'
 
 const TemplateFrameMenuResponsive = () => {
   const selectedElement = useEditedElementStore((s) => s.selectedElement)
@@ -189,6 +190,9 @@ export default function EditPage({ products, printedImages }: TEditPageProps) {
         }
         if (!target.closest('.NAME-zoom-placed-image-btn-wrapper')) {
           cancelSelectingZoomingImages()
+        }
+        if (!target.closest('.NAME-vietnamese-virtual-keyboard')) {
+          useKeyboardStore.getState().hideKeyboard()
         }
       }
     }

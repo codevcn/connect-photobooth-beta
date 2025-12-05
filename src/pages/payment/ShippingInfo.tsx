@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useState } from 'react'
 import { addressService } from '@/services/address.service'
 import { TClientDistrict, TClientProvince, TClientWard } from '@/services/adapter/address.adapter'
+import { ETextFieldNameForKeyBoard } from '@/providers/GlobalKeyboardProvider'
 
 type TFormErrors = {
   fullName?: string
@@ -146,7 +147,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
               name="fullName"
               type="text"
               placeholder="Nguyễn Văn A"
-              className="3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all"
+              className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all`}
             />
             {errors.fullName && (
               <p className="3xl:text-[0.6em] text-red-600 text-sm mt-0.5 pl-1">{errors.fullName}</p>
@@ -297,7 +298,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
               name="address"
               type="text"
               placeholder="Số nhà, tên đường, phường/xã..."
-              className="3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all"
+              className="NAME-virltual-keyboard-textfield 3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all"
             />
             {errors.address && (
               <p className="3xl:text-[0.6em] text-red-600 text-sm mt-0.5 pl-1">{errors.address}</p>
@@ -316,7 +317,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
               name="message"
               placeholder="Nhập lời nhắn của bạn..."
               rows={2}
-              className="3xl:text-[0.7em] py-2 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all"
+              className="NAME-virltual-keyboard-textfield 3xl:text-[0.7em] py-2 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all"
             ></textarea>
           </div>
         </div>

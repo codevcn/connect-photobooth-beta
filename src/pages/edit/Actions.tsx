@@ -5,6 +5,7 @@ import { MockupPreview } from './MockupPreview'
 import { useEffect, useRef, useState } from 'react'
 import { LocalStorageHelper } from '@/utils/localstorage'
 import { toast } from 'react-toastify'
+import { ETextFieldNameForKeyBoard } from '@/providers/GlobalKeyboardProvider'
 
 export const Actions = () => {
   const cartCount = useProductUIDataStore((s) => s.cartCount)
@@ -25,7 +26,6 @@ export const Actions = () => {
     const pickedProduct = useProductUIDataStore.getState().pickedProduct
     if (pickedProduct) {
       const productNote = productNoteRef.current?.value
-      console.log('>>> [note] product note:', productNote)
       if (productNote) {
         useProductUIDataStore.getState().addProductNote(pickedProduct.id, productNote)
       } else {
@@ -89,7 +89,7 @@ export const Actions = () => {
           name="product-note"
           id="product-note-textfield"
           placeholder="Bạn có yêu cầu gì với đơn hàng của mình không?"
-          className="3xl:text-[1em] md:text-base text-sm w-full mt-1 rounded-md border-border p-2 outline-main-cl outline-0 focus:outline-2 resize-y"
+          className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[1em] md:text-base text-sm w-full mt-1 rounded-md border-border p-2 outline-main-cl outline-0 focus:outline-2 resize-y`}
         ></textarea>
       </div>
 

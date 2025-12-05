@@ -1,4 +1,5 @@
 import { useDebouncedCallback } from '@/hooks/use-debounce'
+import { ETextFieldNameForKeyBoard } from '@/providers/GlobalKeyboardProvider'
 import { useEditedElementStore } from '@/stores/element/element.store'
 import { detectColorFormat, getContrastColor, rgbStringToHex } from '@/utils/helpers'
 import { TTextVisualState } from '@/utils/types/global'
@@ -139,7 +140,7 @@ export const ColorPickerModal = ({
             value={currentColor}
             onChange={handleInputChange}
             placeholder="Nhập tên màu (red / pink / ...) hoặc mã màu hex (#fe6e87)"
-            className="3xl:text-[0.9em] w-full px-3 text-gray-800 py-2 border-gray-300 border-2 rounded-lg outline-none transition-all"
+            className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[0.9em] w-full px-3 text-gray-800 py-2 border-gray-300 border-2 rounded-lg outline-none transition-all`}
           />
         </div>
 

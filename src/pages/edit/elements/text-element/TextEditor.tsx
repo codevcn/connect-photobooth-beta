@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { TextElementMenu } from './Menu'
 import { generateUniqueId } from '@/utils/helpers'
 import { cancelSelectingZoomingImages } from '../../helpers'
+import { ETextFieldNameForKeyBoard } from '@/providers/GlobalKeyboardProvider'
 
 type TEditorModalProps = {
   onClose: () => void
@@ -51,9 +52,9 @@ const EditorModal = ({ onClose }: TEditorModalProps) => {
   }
 
   return (
-    <div className="3xl:text-3xl fixed inset-0 flex items-center justify-center z-99 animate-pop-in p-2">
+    <div className="3xl:text-3xl fixed inset-0 flex justify-center z-99 animate-pop-in p-2">
       <div onClick={onClose} className="bg-black/50 absolute inset-0 z-10"></div>
-      <div className="bg-white w-full rounded-xl p-3 shadow-2xl relative z-20">
+      <div className="bg-white w-full rounded-xl p-3 shadow-2xl relative z-20 h-fit">
         <div className="flex items-center justify-between mb-2">
           <h3 className="3xl:text-3xl text-xl font-bold text-gray-800">Thêm chữ</h3>
           <button onClick={onClose} className="p-2 active:bg-gray-100 rounded-full touch-target">
@@ -79,7 +80,7 @@ const EditorModal = ({ onClose }: TEditorModalProps) => {
             onChange={handleEdit}
             onKeyDown={catchEnterKey}
             placeholder="Nhập chữ tại đây..."
-            className="3xl:text-[1em] w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-lg"
+            className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[1em] w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-lg`}
             autoFocus
           />
 

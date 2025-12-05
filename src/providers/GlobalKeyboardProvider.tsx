@@ -1,0 +1,199 @@
+import { useEffect, useCallback, useRef, useState } from 'react'
+import { VietnameseKeyboard } from '@/components/custom/virtual-keyboard/VietnameseKeyboard'
+import { createPortal } from 'react-dom'
+import { useKeyboardStore } from '@/stores/keyboard/keyboard.store'
+
+export enum ETextFieldNameForKeyBoard {
+  VIRLTUAL_KEYBOARD_TEXTFIELD = 'NAME-virltual-keyboard-textfield',
+}
+
+export const GlobalKeyboardProvider = () => {
+  const isVisible = useKeyboardStore((s) => s.visible)
+  const setIsVisible = useKeyboardStore((s) => s.setIsVisible)
+  const currentInputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null)
+  const keyboardRef = useRef<any>(null)
+  const keyboardName: string = 'NAME-vietnamese-virtual-keyboard'
+  const textDisplayerRef = useRef<HTMLInputElement | null>(null)
+  const [initialInputValue, setInitialInputValue] = useState('')
+
+  const showKeyboard = useCallback((input: HTMLInputElement | HTMLTextAreaElement) => {
+    if (input.classList.contains(ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD)) {
+      setIsVisible(true)
+      currentInputRef.current = input
+    }
+  }, [])
+
+  const hideKeyboard = useCallback(() => {
+    setIsVisible(false)
+    currentInputRef.current = null
+  }, [])
+
+  // Xử lý khi input được focus
+  const handleFocus = useCallback(
+    (e: FocusEvent) => {
+      const target = e.target as HTMLElement
+
+      // Kiểm tra xem element có phải là input/textarea không
+      if (target.tagName === 'INPUT') {
+        showKeyboard(target as HTMLInputElement)
+        setInitialInputValue((target as HTMLInputElement).value)
+      } else if (target.tagName === 'TEXTAREA') {
+        showKeyboard(target as HTMLTextAreaElement)
+        setInitialInputValue((target as HTMLTextAreaElement).value)
+      }
+    },
+    [showKeyboard]
+  )
+
+  // Xử lý khi input bị blur
+  // const handleBlur = useCallback(
+  //   (e: FocusEvent) => {
+  //     const target = e.target as HTMLElement
+  //     const relatedTarget = e.relatedTarget as HTMLElement
+
+  //     // Chỉ xử lý nếu blur từ input ĐANG được bàn phím phục vụ
+  //     if (target !== currentInputRef.current) {
+  //       return
+  //     }
+
+  //     // Không ẩn bàn phím nếu click vào bàn phím
+  //     if (relatedTarget && relatedTarget.closest(`.${keyboardName}`)) {
+  //       return
+  //     }
+
+  //     // Delay để xử lý click vào button trên bàn phím
+  //     setTimeout(() => {
+  //       const latestCurrentInput = currentInputRef.current
+  //       if (
+  //         (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') &&
+  //         document.activeElement !== target &&
+  //         target === latestCurrentInput
+  //       ) {
+  //         hideKeyboard()
+  //       }
+  //     }, 100)
+  //   },
+  //   [hideKeyboard]
+  // )
+
+  // Đăng ký event listeners
+  useEffect(() => {
+    document.addEventListener('focusin', handleFocus as EventListener)
+    // document.addEventListener('focusout', handleBlur as EventListener)
+
+    return () => {
+      document.removeEventListener('focusin', handleFocus as EventListener)
+      // document.removeEventListener('focusout', handleBlur as EventListener)
+    }
+  }, [handleFocus])
+
+  useEffect(() => {
+    if (isVisible && textDisplayerRef.current) {
+      textDisplayerRef.current.focus()
+    }
+  }, [isVisible])
+
+  // Xử lý khi bàn phím đang được nhập
+  const handleKeyboardEditing = useCallback((inputValue: string) => {
+    const currentInput = currentInputRef.current
+    if (!currentInput) return
+
+    // Cập nhật giá trị của input
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+      currentInput.constructor.prototype,
+      'value'
+    )?.set
+
+    if (nativeInputValueSetter) {
+      nativeInputValueSetter.call(currentInput, inputValue)
+
+      // Trigger input event để React nhận biết thay đổi
+      const event = new Event('input', { bubbles: true })
+      currentInput.dispatchEvent(event)
+    }
+  }, [])
+
+  const handleSubmitEditing = useCallback((finalValue: string) => {
+    const currentInput = currentInputRef.current
+    if (currentInput) {
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+        currentInput.constructor.prototype,
+        'value'
+      )?.set
+
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(currentInput, finalValue)
+        const event = new Event('input', { bubbles: true })
+        currentInput.dispatchEvent(event)
+      }
+    }
+    hideKeyboard()
+  }, [])
+
+  const handleCloseKeyboard = useCallback(() => {
+    const currentInput = currentInputRef.current
+    if (currentInput && keyboardRef.current) {
+      const value = keyboardRef.current.getInput()
+      // Set value cho input
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+        currentInput.constructor.prototype,
+        'value'
+      )?.set
+
+      if (nativeInputValueSetter) {
+        nativeInputValueSetter.call(currentInput, value)
+        const event = new Event('input', { bubbles: true })
+        currentInput.dispatchEvent(event)
+      }
+    }
+    hideKeyboard()
+  }, [hideKeyboard])
+
+  // Đồng bộ giá trị khi input thay đổi từ keyboard thật
+  useEffect(() => {
+    const currentInput = currentInputRef.current
+    if (!currentInput) return
+    const keyboard = keyboardRef.current
+    if (!keyboard) return
+
+    const handleInputChange = () => {
+      if (keyboard) {
+        keyboard.setInput(currentInput.value)
+      }
+    }
+
+    currentInput.addEventListener('input', handleInputChange)
+    return () => {
+      currentInput.removeEventListener('input', handleInputChange)
+    }
+  }, [isVisible])
+
+  // Set giá trị ban đầu khi focus vào input có sẵn nội dung
+  useEffect(() => {
+    const currentInput = currentInputRef.current
+    if (currentInput && keyboardRef.current) {
+      keyboardRef.current.setInput(currentInput.value || '')
+    }
+  }, [isVisible])
+
+  return (
+    <>
+      {isVisible &&
+        createPortal(
+          <div className="animate-fade-in fixed left-0 bottom-0 w-full h-fit z-9999">
+            <div className="bg-white border-t border-gray-200 shadow-2xl">
+              <VietnameseKeyboard
+                onChange={handleKeyboardEditing}
+                onSubmit={handleSubmitEditing}
+                keyboardRef={keyboardRef}
+                keyboardName={keyboardName}
+                textDisplayerRef={textDisplayerRef}
+                inputValue={initialInputValue}
+              />
+            </div>
+          </div>,
+          document.body
+        )}
+    </>
+  )
+}

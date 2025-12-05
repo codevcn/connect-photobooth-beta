@@ -32,7 +32,9 @@ import PaymentPage from './pages/payment/Page'
 import { usePrintedImageStore } from './stores/printed-image/printed-image.store'
 import MaintainPage from './pages/maintain/Page'
 import { AppTempContainer } from './components/custom/TempContainer'
-import DemoComponent from './dev/pages/Dev'
+import { Dev } from './dev/pages/Dev'
+import VietnameseKeyboardDemo from './components/custom/virtual-keyboard/VietnameseKeyboardDemo'
+import { GlobalKeyboardProvider } from './providers/GlobalKeyboardProvider'
 
 // const IdleCountdown = () => {
 //   const navigate = useNavigate()
@@ -77,7 +79,6 @@ function AppContent() {
   return (
     <>
       <AppTempContainer />
-
       <ToastContainer
         position="top-center"
         autoClose={3000}
@@ -94,9 +95,12 @@ function AppContent() {
         <Route path="/qr" element={<ScanQRPage />} />
         <Route path="/edit" element={<EditPage />} />
         <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/dev" element={<DemoComponent />} />
+        <Route path="/dev" element={<Dev />} />
+        <Route path="/keyboard-demo" element={<VietnameseKeyboardDemo />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+
+      <GlobalKeyboardProvider />
 
       {/* <IdleCountdown /> */}
     </>

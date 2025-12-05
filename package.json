@@ -22,7 +22,9 @@
     "react-dom": "^19.2.0",
     "react-image-crop": "^11.0.10",
     "react-router-dom": "^7.9.6",
+    "react-simple-keyboard": "^3.8.139",
     "react-toastify": "^11.0.5",
+    "simple-keyboard": "^3.8.92",
     "tailwind-merge": "^3.4.0",
     "zustand": "^5.0.8"
   },

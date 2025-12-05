@@ -1,0 +1,111 @@
+.vietnamese-keyboard-drawer .hg-button {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.15s;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  color: #2d3748;
+}
+
+.vietnamese-keyboard-drawer .hg-button:active {
+  transform: scale(0.95);
+}
+
+.vietnamese-keyboard-drawer .hg-button-clear {
+  background-color: #e7000b;
+  color: white;
+  border: none;
+  font-weight: 700;
+}
+
+.vietnamese-keyboard-drawer .hg-button-clear:active {
+  transform: scale(0.95);
+}
+
+.vietnamese-keyboard-drawer .hg-button-bksp {
+  background: #e7000b;
+  color: white;
+  border: none;
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.vietnamese-keyboard-drawer .hg-button-bksp:active {
+  transform: scale(0.95);
+}
+
+.vietnamese-keyboard-drawer .hg-button-enter {
+  background: #dbeafe;
+  border: none;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.vietnamese-keyboard-drawer .hg-button-enter:active {
+  transform: scale(0.95);
+}
+
+.vietnamese-keyboard-drawer .hg-button-shift {
+  background: #dbeafe;
+  border: none;
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.vietnamese-keyboard-drawer .hg-button-shift:active {
+  transform: scale(0.95);
+}
+
+.vietnamese-keyboard-drawer .hg-button-space {
+  color: #374151;
+  border: none;
+  width: 70%;
+}
+
+.vietnamese-keyboard-drawer .hg-button-done {
+  background: rgb(167, 255, 167);
+}
+
+.vietnamese-keyboard-drawer .hg-button-space:active {
+  transform: scale(0.95);
+}
+
+.vietnamese-keyboard-drawer .hg-row {
+  margin-bottom: 6px;
+}
+
+.vietnamese-keyboard-drawer .hg-row:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vietnamese-keyboard-drawer .hg-button {
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .vietnamese-keyboard-drawer .hg-button-space {
+    min-width: 180px;
+  }
+
+  .vietnamese-keyboard-drawer .hg-button-shift {
+    min-width: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .vietnamese-keyboard-drawer .hg-button {
+    height: 38px;
+    font-size: 13px;
+  }
+
+  .vietnamese-keyboard-drawer .hg-button-space {
+    min-width: 140px;
+  }
+}

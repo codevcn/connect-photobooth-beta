@@ -1,5 +1,6 @@
 import { useDebouncedCallback } from '@/hooks/use-debounce'
 import { useFontLoader } from '@/hooks/use-font'
+import { ETextFieldNameForKeyBoard } from '@/providers/GlobalKeyboardProvider'
 import { useEditedElementStore } from '@/stores/element/element.store'
 import { detectColorFormat, rgbStringToHex } from '@/utils/helpers'
 import { TTextVisualState } from '@/utils/types/global'
@@ -108,7 +109,7 @@ export const TextFontPicker = ({ onHideShow, onSelectFont }: TextFontPickerProps
               type="text"
               onChange={onSearchFont}
               placeholder="Tìm kiếm font chữ..."
-              className="text-[1em] flex-1 px-2.5 py-1.5 text-black bg-white/95 rounded outline-none text-sm placeholder:text-gray-400"
+              className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} text-[1em] flex-1 px-2.5 py-1.5 text-black bg-white/95 rounded outline-none text-sm placeholder:text-gray-400`}
               disabled={isLoading}
             />
           </div>
