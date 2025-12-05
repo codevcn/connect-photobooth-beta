@@ -167,7 +167,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
                 name="phone"
                 type="tel"
                 placeholder="09xx xxx xxx"
-                className="3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all"
+                className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all`}
               />
               {errors.phone && (
                 <p className="3xl:text-[0.6em] text-red-600 text-sm mt-0.5 pl-1">{errors.phone}</p>
@@ -186,7 +186,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
                 name="email"
                 type="email"
                 placeholder="email@domain.com"
-                className="3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all"
+                className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all`}
               />
               {errors.email && (
                 <p className="3xl:text-[0.6em] text-red-600 text-sm mt-0.5 pl-1">{errors.email}</p>
@@ -206,7 +206,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
                 id="province-input"
                 name="province"
                 onChange={handleProvinceChange}
-                className="3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all bg-white"
+                className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all bg-white`}
                 disabled={isLoadingProvinces}
               >
                 <option value="">
@@ -298,7 +298,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
               name="address"
               type="text"
               placeholder="Số nhà, tên đường, phường/xã..."
-              className="NAME-virltual-keyboard-textfield 3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all"
+              className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[0.7em] md:h-11 h-9 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all`}
             />
             {errors.address && (
               <p className="3xl:text-[0.6em] text-red-600 text-sm mt-0.5 pl-1">{errors.address}</p>
@@ -317,7 +317,7 @@ export const ShippingInfoForm = forwardRef<HTMLFormElement, ShippingInfoFormProp
               name="message"
               placeholder="Nhập lời nhắn của bạn..."
               rows={2}
-              className="NAME-virltual-keyboard-textfield 3xl:text-[0.7em] py-2 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all"
+              className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 3xl:text-[0.7em] py-2 w-full px-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-main-cl focus:border-transparent transition-all`}
             ></textarea>
           </div>
         </div>
