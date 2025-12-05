@@ -200,7 +200,7 @@ const StickersModal = ({ onClose }: TStickersModalProps) => {
               <p className="text-gray-600 font-medium">Đang tải nhãn dán...</p>
             </div>
           ) : selectedGroup && selectedGroup.loaded ? (
-            <div className="5xl:grid-cols-6 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
+            <div className="5xl:grid-cols-7 grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 gap-3">
               {selectedGroup.stickers.map((path, index) => (
                 <button
                   key={index}

@@ -63,25 +63,6 @@ const ZoomButtons = ({
   return (
     <div className="5xl:text-xl 5xl:w-16 smd:bottom-4 smd:right-4 absolute z-52 bottom-1 right-1 flex flex-col p-1 w-10 items-center gap-2 bg-white rounded-lg shadow-lg border border-gray-200">
       <button
-        onClick={() => handleZoom('out')}
-        disabled={scale <= minZoom}
-        className="smd:p-1 flex items-center justify-center rounded hover:bg-gray-100 active:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-        aria-label="Zoom out"
-      >
-        <svg
-          className="w-4 h-4 text-gray-700 5xl:w-8 5xl:h-8"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          strokeWidth={3}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-        </svg>
-      </button>
-      <span className="5xl:text-[1em] text-xs font-medium text-gray-700 text-center leading-none">
-        {Math.round(scale * 100)}%
-      </span>
-      <button
         onClick={() => handleZoom('in')}
         disabled={scale >= maxZoom}
         className="smd:p-1 flex items-center justify-center rounded hover:bg-gray-100 active:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
@@ -95,6 +76,25 @@ const ZoomButtons = ({
           strokeWidth={3}
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+        </svg>
+      </button>
+      <span className="5xl:text-[1em] text-xs font-medium text-gray-700 text-center leading-none">
+        {Math.round(scale * 100)}%
+      </span>
+      <button
+        onClick={() => handleZoom('out')}
+        disabled={scale <= minZoom}
+        className="smd:p-1 flex items-center justify-center rounded hover:bg-gray-100 active:bg-gray-200 transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+        aria-label="Zoom out"
+      >
+        <svg
+          className="w-4 h-4 text-gray-700 5xl:w-8 5xl:h-8"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          strokeWidth={3}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
         </svg>
       </button>
     </div>
@@ -215,9 +215,7 @@ export const LivePreview = ({
   useEffect(() => {
     useEditAreaStore.getState().setEditAreaScaleValue(scale)
   }, [scale])
-  console.log('>>> [mov] pos:', {
-    translate,
-  })
+  
   return (
     <div
       ref={(node) => {

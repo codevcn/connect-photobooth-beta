@@ -14,7 +14,7 @@ export const GlobalKeyboardProvider = () => {
   const currentInputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null)
   const keyboardRef = useRef<any>(null)
   const keyboardName: string = 'NAME-vietnamese-virtual-keyboard'
-  const textDisplayerRef = useRef<HTMLInputElement | null>(null)
+  const textDisplayerRef = useRef<HTMLTextAreaElement | null>(null)
   const [initialInputValue, setInitialInputValue] = useState('')
 
   const showKeyboard = useCallback((input: HTMLInputElement | HTMLTextAreaElement) => {

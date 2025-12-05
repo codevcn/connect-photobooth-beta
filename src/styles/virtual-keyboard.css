@@ -87,6 +87,7 @@
 @media (min-width: 1590px) {
   .vietnamese-keyboard-drawer .hg-button {
     font-size: 28px;
+    height: 50px;
   }
 
   .vietnamese-keyboard-drawer .hg-button-bksp {

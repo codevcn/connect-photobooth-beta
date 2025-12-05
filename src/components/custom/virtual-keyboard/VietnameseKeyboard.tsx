@@ -3,8 +3,11 @@ import Keyboard from 'react-simple-keyboard'
 import 'simple-keyboard/build/css/index.css'
 import { useVietnameseKeyboard } from '@/hooks/use-vietnamese-keyboard'
 import '@/styles/virtual-keyboard.css'
+import { AutoSizeTextField } from '../AutoSizeTextField'
 
-type TVietnameseKeyboardProps = Partial<{
+type TVietnameseKeyboardProps = {
+  textDisplayerRef: React.RefObject<HTMLTextAreaElement | null>
+} & Partial<{
   onKeyPress: (button: string) => void
   onChange: (inputValue: string) => void
   onClose: () => void
@@ -16,7 +19,6 @@ type TVietnameseKeyboardProps = Partial<{
   autoFocus: boolean
   keyboardRef: React.RefObject<any>
   keyboardName: string
-  textDisplayerRef: React.RefObject<HTMLInputElement | null>
 }>
 
 export const VietnameseKeyboard = ({
@@ -236,7 +238,7 @@ export const VietnameseKeyboard = ({
     },
   ]
 
-  const catchEnterKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const catchEnterKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter') {
       submitInputValue()
     }
@@ -246,7 +248,7 @@ export const VietnameseKeyboard = ({
     <div className={`${keyboardName} 5xl:text-[26px] w-full shadow-[0_3px_10px_rgba(0,0,0,0.8)]`}>
       {/* Display area - hiển thị nội dung đang nhập */}
       <div className="px-3 py-2 bg-white border-b border-gray-200">
-        <input
+        {/* <input
           type="text"
           value={input}
           placeholder={placeholder}
@@ -254,6 +256,12 @@ export const VietnameseKeyboard = ({
           onChange={(e) => setInput(e.target.value)}
           ref={textDisplayerRef}
           onKeyDown={catchEnterKey}
+        /> */}
+        <AutoSizeTextField
+          onChange={(e) => setInput(e.target.value)}
+          onEnter={catchEnterKey}
+          textfieldRef={textDisplayerRef}
+          className="w-full outline-transparent focus:outline-main-cl overflow-y-auto px-2 py-1.5 text-[1em] border border-gray-200 rounded-lg bg-gray-50 whitespace-pre-wrap wrap-break-word"
         />
       </div>
 

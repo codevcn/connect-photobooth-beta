@@ -1,0 +1,57 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body
+    style="
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 50px;
+    "
+  >
+    <main
+      style="
+        width: 300px;
+        height: 100px;
+        background-color: red;
+        overflow: visible;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        style="
+          width: 50px;
+          height: 50px;
+          background-color: blue;
+          transform: translate(0px, 0px) scale(2.2);
+          transform-origin: center;
+        "
+      ></div>
+    </main>
+    <button style="margin-top: 100px">Click me</button>
+    <p></p>
+    <script>
+      document.querySelector('button').addEventListener('click', () => {
+        const p = document.querySelector('p')
+        p.innerText = `
+          main rect: ${JSON.stringify(
+            document.querySelector('main').getBoundingClientRect(),
+            null,
+            2
+          )}
+          blue div rect: ${JSON.stringify(
+            document.querySelector('div').getBoundingClientRect(),
+            null,
+            2
+          )}
+        `
+      })
+    </script>
+  </body>
+</html>

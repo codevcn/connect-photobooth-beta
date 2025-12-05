@@ -72,15 +72,11 @@ const GrayscaleControl = ({}: TGrayscaleControlProps) => {
       {showPopover && (
         <div
           ref={popoverRef}
-          className="absolute -right-1 top-[calc(100%+4px)] bg-white border-2 border-main-cl rounded-lg shadow-xl p-3 z-999"
-          style={{
-            minWidth: '200px',
-            maxWidth: '280px',
-          }}
+          className="5xl:text-2xl min-w-[280px] max-w-[480px] absolute -right-1 top-[calc(100%+4px)] bg-white border-2 border-main-cl rounded-lg shadow-xl p-3 z-999"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex flex-row items-center gap-3">
-            <span className="text-xs font-semibold text-main-cl whitespace-nowrap">0%</span>
+            <span className="text-[1em] font-semibold text-main-cl whitespace-nowrap">0%</span>
 
             <div className="relative flex-1 flex items-center">
               <input
@@ -100,7 +96,7 @@ const GrayscaleControl = ({}: TGrayscaleControlProps) => {
               />
             </div>
 
-            <span className="text-xs font-semibold text-main-cl whitespace-nowrap">100%</span>
+            <span className="text-[1em] font-semibold text-main-cl whitespace-nowrap">100%</span>
           </div>
         </div>
       )}

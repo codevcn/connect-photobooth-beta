@@ -100,7 +100,7 @@ export const MockupPreview = ({ onClose }: TMockupPreviewProps) => {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="lucide lucide-eye 5xl:w-12 5xl:h-12"
+              className="lucide lucide-eye 5xl:w-12 5xl:h-12 w-8 h-8"
             >
               <path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
               <circle cx="12" cy="12" r="3" />
@@ -109,7 +109,7 @@ export const MockupPreview = ({ onClose }: TMockupPreviewProps) => {
           </h2>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-white/20 active:scale-95 transition-all text-white cursor-pointer"
+            className="p-1 rounded-lg hover:bg-white/20 active:scale-95 transition-all text-white cursor-pointer"
             aria-label="Đóng"
           >
             <svg
@@ -120,7 +120,7 @@ export const MockupPreview = ({ onClose }: TMockupPreviewProps) => {
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="lucide lucide-x 5xl:w-12 5xl:h-12"
+              className="lucide lucide-x 5xl:w-12 5xl:h-12 w-7 h-7"
             >
               <path d="M18 6 6 18" />
               <path d="m6 6 12 12" />

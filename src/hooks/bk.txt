@@ -42,6 +42,7 @@ export const useZoomEditBackground = (
 
   // Zoom in/out bằng button - zoom về trung tâm
   const zoomIn = () => {
+    console.log('>>> [mov] zoom in')
     const allowedPrintArea = allowedPrintAreaRef.current
     if (!allowedPrintArea) return
     const wrapper = printAreaContainerWrapperRef.current
@@ -55,6 +56,7 @@ export const useZoomEditBackground = (
   }
 
   const zoomOut = () => {
+    console.log('>>> [mov] zoom out')
     setScale((prev) => Math.max(prev * zoomOutCoefficient, minZoom))
   }
 
@@ -63,7 +65,31 @@ export const useZoomEditBackground = (
     if (!allowedPrintArea) return
     const wrapper = printAreaContainerWrapperRef.current
     if (!wrapper) return
+    console.log('>>> [cen] ele:', { allowedPrintArea, wrapper })
+    const allowedPrintAreaRatio = allowedPrintArea.offsetWidth / allowedPrintArea.offsetHeight
+    const wrapperRatio = wrapper.offsetWidth / wrapper.offsetHeight
+    console.log('>>> [cen] ratios:', {
+      allowedPrintAreaRatio,
+      wrapperRatio,
+      allowedWidth: allowedPrintArea.offsetWidth,
+      allowedHeight: allowedPrintArea.offsetHeight,
+      wrapperWidth: wrapper.offsetWidth,
+      wrapperHeight: wrapper.offsetHeight,
+    })
     setScale(calculateMaxScaleForAllowedPrintArea(allowedPrintArea, wrapper))
+    // if (allowedPrintAreaRatio > wrapperRatio) {
+    //   const offsetWidth = allowedPrintArea.offsetWidth
+    //   const newWidth = wrapper.offsetWidth - edgesMargin * 2
+    //   const newScaleByWidth = newWidth / offsetWidth
+    //   console.log('>>> [cen] new zoom 1:', newScaleByWidth)
+    //   setScale(newScaleByWidth)
+    // } else {
+    //   const offsetHeight = allowedPrintArea.offsetHeight
+    //   const newHeight = wrapper.offsetHeight - edgesMargin * 2
+    //   const newScaleByHeight = newHeight / offsetHeight
+    //   console.log('>>> [cen] new zoom 2:', { newScaleByHeight, offsetHeight, newHeight })
+    //   setScale(newScaleByHeight)
+    // }
   }
 
   const detectCollisionByAllowedPrintArea = () => {
@@ -77,25 +103,43 @@ export const useZoomEditBackground = (
     const allowedPrintAreaRect = allowedPrintArea.getBoundingClientRect()
     const wrapperRect = printAreaContainerWrapper.getBoundingClientRect()
 
+    console.log('>>> [mov] collision detection:', {
+      currentTranslate: translate,
+      scale,
+      allowedPrintAreaRect,
+      wrapperRect,
+    })
+
     let newX: number | null = null
     let newY: number | null = null
 
     // Phát hiện va chạm và tính OFFSET cần điều chỉnh
     if (allowedPrintAreaRect.left < wrapperRect.left) {
+      console.log('>>> [mov] left collision')
       const offset = wrapperRect.left - allowedPrintAreaRect.left + edgesMargin
       newX = translate.x + offset
     }
     if (allowedPrintAreaRect.right > wrapperRect.right) {
+      console.log('>>> [mov] right collision')
       const offset = allowedPrintAreaRect.right - wrapperRect.right + edgesMargin
       newX = translate.x - offset
     }
     if (allowedPrintAreaRect.top < wrapperRect.top) {
+      console.log('>>> [mov] top collision')
       const offset = wrapperRect.top - allowedPrintAreaRect.top + edgesMargin
       newY = translate.y + offset
     }
     if (allowedPrintAreaRect.bottom > wrapperRect.bottom) {
+      console.log('>>> [mov] bottom collision')
       const offset = allowedPrintAreaRect.bottom - wrapperRect.bottom + edgesMargin
       newY = translate.y - offset
+      console.log('>>> [mov] bottom detail:', {
+        allowedBottom: allowedPrintAreaRect.bottom,
+        wrapperBottom: wrapperRect.bottom,
+        offset: offset,
+        currentTranslateY: translate.y,
+        newTranslateY: newY,
+      })
     }
 
     // Nếu không va chạm, cố gắng đưa về vị trí trung tâm (translate = 0)
@@ -104,11 +148,11 @@ export const useZoomEditBackground = (
       // Kiểm tra xem có thể về 0 không
       if (translate.x < 0 && allowedPrintAreaRect.right - translate.x > wrapperRect.right) {
         // Nếu về 0 thì right sẽ vượt quá → giữ lại một phần translate
-        newX = translate.x + Math.abs(wrapperRect.right - allowedPrintAreaRect.right) - edgesMargin
+        newX = translate.x + Math.abs(wrapperRect.right - allowedPrintAreaRect.right)
       }
       if (translate.x > 0 && allowedPrintAreaRect.left - translate.x < wrapperRect.left) {
         // Nếu về 0 thì left sẽ vượt quá → giữ lại một phần translate
-        newX = translate.x - Math.abs(allowedPrintAreaRect.left - wrapperRect.left) + edgesMargin
+        newX = translate.x - Math.abs(allowedPrintAreaRect.left - wrapperRect.left)
       }
     }
     if (newY === null) {
@@ -116,14 +160,20 @@ export const useZoomEditBackground = (
       // Kiểm tra xem có thể về 0 không
       if (translate.y < 0 && allowedPrintAreaRect.bottom - translate.y > wrapperRect.bottom) {
         // Nếu về 0 thì bottom sẽ vượt quá → giữ lại một phần translate
-        newY =
-          translate.y + Math.abs(wrapperRect.bottom - allowedPrintAreaRect.bottom) - edgesMargin
+        newY = translate.y + Math.abs(wrapperRect.bottom - allowedPrintAreaRect.bottom)
       }
       if (translate.y > 0 && allowedPrintAreaRect.top - translate.y < wrapperRect.top) {
         // Nếu về 0 thì top sẽ vượt quá → giữ lại một phần translate
-        newY = translate.y - Math.abs(allowedPrintAreaRect.top - wrapperRect.top) + -edgesMargin
+        newY = translate.y - Math.abs(allowedPrintAreaRect.top - wrapperRect.top)
       }
     }
+
+    console.log('>>> [mov] final translate:', {
+      oldX: translate.x,
+      oldY: translate.y,
+      newX,
+      newY,
+    })
 
     setTranslate({
       x: newX !== null ? newX : translate.x,
