@@ -191,7 +191,12 @@ export default function EditPage({ products, printedImages }: TEditPageProps) {
         if (!target.closest('.NAME-zoom-placed-image-btn-wrapper')) {
           cancelSelectingZoomingImages()
         }
-        if (!target.closest('.NAME-vietnamese-virtual-keyboard')) {
+        console.log('>>> [keyb]1:', target.closest('.NAME-vietnamese-virtual-keyboard'))
+        console.log('>>> [keyb]2:', target)
+        if (
+          !target.closest('.NAME-vietnamese-virtual-keyboard') &&
+          !target.classList.contains('hg-button')
+        ) {
           useKeyboardStore.getState().hideKeyboard()
         }
       }

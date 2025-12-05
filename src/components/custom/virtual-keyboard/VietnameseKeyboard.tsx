@@ -281,7 +281,9 @@ export const VietnameseKeyboard = ({
       {/* Keyboard */}
       <div className="px-2 py-2 bg-white">
         <Keyboard
-          keyboardRef={(r) => (keyboardRef.current = r)}
+          keyboardRef={(r) => {
+            keyboardRef.current = r
+          }}
           layoutName={layoutName}
           layout={vietnameseLayout}
           display={display}
