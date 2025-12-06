@@ -1,45 +1,117 @@
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Custom Mobile Scrollbar</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #f3f3f3;
+        font-family: sans-serif;
+      }
+
+      .wrapper {
+        position: relative;
+        width: 300px;
+        height: 400px;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+      }
+
+      .content {
+        height: 100%;
+        overflow-y: scroll;
+        padding-right: 20px; /* chừa chỗ cho scrollbar custom */
+        box-sizing: content-box;
+      }
+
+      /* Custom Scrollbar Track */
+      .scrollbar {
+        position: absolute;
+        top: 0;
+        right: 5px;
+        width: 6px;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 6px;
+      }
+
+      /* Thumb */
+      .thumb {
+        position: absolute;
+        top: 0;
+        width: 100%;
+        height: 40px;
+        background: #888;
+        border-radius: 6px;
+      }
+    </style>
   </head>
   <body>
-    <main
-      style="
-        position: relative;
-        width: 400px;
-        height: 400px;
-        background-color: gray;
-        transform: scale(1.3);
-        margin: 100px 200px;
-      "
-    >
-      <div
-        style="
-          width: 50px;
-          height: 50px;
-          background-color: red;
-          border: 25px solid black;
-          position: absolute;
-          left: 50px;
-        "
-      ></div>
-      <section
-        style="height: 50px; width: 50px; background-color: yellow; position: absolute; left: 0px"
-      ></section>
-    </main>
-    <p style="margin-top: 500px"></p>
+    <div class="wrapper">
+      <div class="content" id="content">
+        <!-- Fake long text -->
+        <p>Lorem ipsum dolor sit amet...</p>
+        <p>Line 2 lorem ipsum dolor sit amet...</p>
+        <p>Line 3 lorem ipsum dolor sit amet...</p>
+        <p>Line 4 lorem ipsum dolor sit amet...</p>
+        <p>Line 5 lorem ipsum dolor sit amet...</p>
+        <p>Line 6 lorem ipsum dolor sit amet...</p>
+        <p>Line 7 lorem ipsum dolor sit amet...</p>
+        <p>Line 8 lorem ipsum dolor sit amet...</p>
+        <p>Line 9 lorem ipsum dolor sit amet...</p>
+        <p>Line 10 lorem ipsum dolor sit amet...</p>
+        <p>Line 11 lorem ipsum dolor sit amet...</p>
+        <p>Line 12 lorem ipsum dolor sit amet...</p>
+        <p>Line 13 lorem ipsum dolor sit amet...</p>
+        <p>Line 14 lorem ipsum dolor sit amet...</p>
+        <p>Line 15 lorem ipsum dolor sit amet...</p>
+        <p>Line 16 lorem ipsum dolor sit amet...</p>
+        <p>Line 17 lorem ipsum dolor sit amet...</p>
+        <p>Line 18 lorem ipsum dolor sit amet...</p>
+        <p>Line 19 lorem ipsum dolor sit amet...</p>
+        <p>Line 20 lorem ipsum dolor sit amet...</p>
+      </div>
+
+      <div class="scrollbar">
+        <div class="thumb" id="thumb"></div>
+      </div>
+    </div>
+
     <script>
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          document.querySelector('p').textContent = JSON.stringify(
-            document.querySelector('div').offsetLeft,
-            null,
-            2
-          )
-        })
-      })
+      const content = document.getElementById('content')
+      const thumb = document.getElementById('thumb')
+
+      function updateThumb() {
+        const contentHeight = content.scrollHeight
+        const visibleHeight = content.clientHeight
+
+        // Tỉ lệ phần trăm nội dung nhìn thấy
+        const ratio = visibleHeight / contentHeight
+
+        // Chiều cao thumb
+        thumb.style.height = Math.max(40, visibleHeight * ratio) + 'px'
+
+        // Vị trí của thumb
+        const scrollRatio = content.scrollTop / (contentHeight - visibleHeight)
+        const maxThumbTop = visibleHeight - thumb.clientHeight
+
+        thumb.style.top = scrollRatio * maxThumbTop + 'px'
+      }
+
+      // Khi scroll thì cập nhật thumb
+      content.addEventListener('scroll', updateThumb)
+
+      // Cập nhật khi load
+      window.addEventListener('load', updateThumb)
     </script>
   </body>
 </html>

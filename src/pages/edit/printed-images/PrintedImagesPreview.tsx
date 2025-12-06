@@ -231,7 +231,7 @@ type TPrintedImagesPreviewProps = {
 
 export const PrintedImagesPreview = ({ printedImages }: TPrintedImagesPreviewProps) => {
   return (
-    <div className="smd:mt-6 col-span-2 mt-2 flex-1 flex gap-2 justify-between">
+    <div className="col-span-2 mt-2 flex-1 flex gap-2 justify-between">
       <PrintedImagesForTemplate printedImages={printedImages} />
       <PrintedImagesModal printedImages={printedImages} />
     </div>

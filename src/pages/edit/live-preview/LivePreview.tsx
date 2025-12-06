@@ -154,7 +154,7 @@ export const LivePreview = ({
       .getState()
       .initBuiltPrintedImageElements(
         reAssignElementsByLayoutData(
-          pickedLayout,
+          structuredClone(pickedLayout),
           allowedPrintAreaRef.current!,
           createInitialConstants('LAYOUT_PADDING')
         )

@@ -1,10 +1,10 @@
 import { getContrastColor, sortSizes } from '@/utils/helpers'
-import { TProductVariantAttributesJson } from '@/utils/types/api'
 import { TBaseProduct, TClientProductVariant } from '@/utils/types/global'
 import { PrintSurface } from '../print-surface/PrintSurface'
 import { Modal } from '@/components/custom/common/Modal'
 import { useEffect, useMemo, useState } from 'react'
 import { useProductUIDataStore } from '@/stores/ui/product-ui-data.store'
+import { CustomScrollbar } from '@/components/custom/CustomScrollbar'
 
 type TProductImagePreviewProps = {
   imageURL: string
@@ -312,10 +312,11 @@ export const VariantInfo = ({ pickedProduct, pickedVariant }: TVariantInfoProps)
           <h3 className="5xl:text-[0.5em] text-sm text-slate-800 font-bold mb-2">
             {mergedAttributes.uniqueColorTitles[0]}
           </h3>
-          <div
-            className={`${
-              colorsCount > 0 ? '' : ''
-            } 5xl:text-[0.4em] font-bold grid grid-cols-4 gap-3 text-sm`}
+          <CustomScrollbar
+            classNames={{
+              container: '5xl:text-[0.4em] font-bold py-2 text-sm w-full overflow-x-hidden',
+              content: 'flex flex-nowrap gap-3 overflow-x-auto no-scrollbar py-1 pb-2',
+            }}
           >
             {Object.keys(mergedAttributes.uniqueColors).map((color) => {
               const isSelected = selectedAttributes.color === color
@@ -366,7 +367,7 @@ export const VariantInfo = ({ pickedProduct, pickedVariant }: TVariantInfoProps)
                       )}
                     </div>
                     <div
-                      className={`rounded-md py-0.5 px-1.5 mt-2 inline-block ${
+                      className={`rounded-md py-0.5 px-1.5 mt-2 inline-block w-max ${
                         isDisabled ? 'grayscale' : ''
                       }`}
                       style={{
@@ -398,7 +399,7 @@ export const VariantInfo = ({ pickedProduct, pickedVariant }: TVariantInfoProps)
                 )
               }
             })}
-          </div>
+          </CustomScrollbar>
         </div>
       )}
 

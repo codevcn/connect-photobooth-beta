@@ -33,7 +33,6 @@ import { usePrintedImageStore } from './stores/printed-image/printed-image.store
 import MaintainPage from './pages/maintain/Page'
 import { AppTempContainer } from './components/custom/TempContainer'
 import { Dev } from './dev/pages/Dev'
-import VietnameseKeyboardDemo from './components/custom/virtual-keyboard/VietnameseKeyboardDemo'
 import { GlobalKeyboardProvider } from './providers/GlobalKeyboardProvider'
 
 // const IdleCountdown = () => {
@@ -96,7 +95,6 @@ function AppContent() {
         <Route path="/edit" element={<EditPage />} />
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/dev" element={<Dev />} />
-        <Route path="/keyboard-demo" element={<VietnameseKeyboardDemo />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 

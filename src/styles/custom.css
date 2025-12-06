@@ -1,13 +1,3 @@
-/* Custom scrollbar for gallery */
-.gallery-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.gallery-scroll {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
 .animate-pop-in {
   animation: pop-in 0.2s ease-out;
 }
