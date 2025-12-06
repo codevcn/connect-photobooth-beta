@@ -30,6 +30,7 @@ type TInitialContentsType =
   | 'SIZE_DEFAULT_TITLE'
   | 'ELEMENT_ROTATION_SNAP_THRESHOLD'
   | 'ELEMENT_ROTATION_SNAP_BREAK_THRESHOLD'
+  | 'LAYOUT_PADDING'
 
 export const createInitialConstants = <R>(type: TInitialContentsType): R => {
   switch (type) {
@@ -95,6 +96,8 @@ export const createInitialConstants = <R>(type: TInitialContentsType): R => {
       return 10 as R
     case 'ELEMENT_ROTATION_SNAP_BREAK_THRESHOLD':
       return 15 as R
+    case 'LAYOUT_PADDING':
+      return 4 as R
     default:
       return null as R
   }

@@ -7,11 +7,13 @@ import {
   TSizeInfo,
 } from '@/utils/types/global'
 import { createInitialConstants } from '@/utils/contants'
+import { TPrintLayout } from '@/utils/types/print-layout'
 
 export const usePrintAreaPreview = (
   setPrintAreaBounds?: React.Dispatch<React.SetStateAction<TBoxBoundingInfo | null>>,
   callbackOnEndCalculate?: () => void,
-  productId?: TBaseProduct['id']
+  productId?: TBaseProduct['id'],
+  pickedLayoutId?: TPrintLayout['id']
 ) => {
   const printAreaRef = useRef<HTMLDivElement | null>(null)
   const containerSizeRef = useRef<TSizeInfo | null>(null)
@@ -19,7 +21,6 @@ export const usePrintAreaPreview = (
 
   const calculatePrintAreaFromContainer = useCallback(
     (productPrintArea: TPrintAreaInfo['area'], containerElement: HTMLElement) => {
-      console.log('>>> [fff] pri:', productId)
       if (
         typeof productPrintArea.printX === 'number' &&
         typeof productPrintArea.printY === 'number' &&
@@ -111,7 +112,7 @@ export const usePrintAreaPreview = (
         return null
       }
     },
-    [productId]
+    [productId, pickedLayoutId]
   )
 
   return { printAreaRef, printAreaContainerRef, containerSizeRef, calculatePrintAreaFromContainer }
@@ -142,13 +143,14 @@ export const usePrintArea = (
   printAreaInfo: TPrintAreaInfo,
   callbackOnEndCalculate?: () => void,
   containerScale: number = createInitialConstants<number>('ELEMENT_ZOOM'),
-  productId?: TBaseProduct['id']
+  productId?: TBaseProduct['id'],
+  pickedLayoutId?: TPrintLayout['id']
 ): TUsePrintAreaReturn => {
   const warningOverlayRef = useRef<HTMLDivElement | null>(null)
   const [isOutOfBounds, setIsOutOfBounds] = useState(false)
   const [printAreaBounds, setPrintAreaBounds] = useState<TPrintAreaBounds | null>(null)
   const { printAreaRef, printAreaContainerRef, calculatePrintAreaFromContainer } =
-    usePrintAreaPreview(setPrintAreaBounds, callbackOnEndCalculate, productId)
+    usePrintAreaPreview(setPrintAreaBounds, callbackOnEndCalculate, productId, pickedLayoutId)
 
   const checkElementBounds = useCallback(
     (elementRect: DOMRect | TPlacementDirection): boolean => {
@@ -300,7 +302,7 @@ export const usePrintArea = (
         return () => imageElement.removeEventListener('load', updatePrintAreaWhenImageLoaded)
       }
     }
-  }, [calculatePrintAreaFromContainer, printAreaInfo, productId])
+  }, [calculatePrintAreaFromContainer, printAreaInfo, productId, pickedLayoutId])
 
   // Theo dõi resize của container
   useEffect(() => {

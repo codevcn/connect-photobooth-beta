@@ -14,34 +14,8 @@ import { buildDefaultLayout } from './customize/print-layout/builder'
 import { TPrintLayout } from '@/utils/types/print-layout'
 import { hardCodedLayoutData } from '@/configs/print-layout/print-layout-data'
 import { useLayoutStore } from '@/stores/ui/print-layout.store'
-
-type TPrintedImageProps = {
-  printedImageVisualState: TPrintedImageVisualState
-}
-
-const PrintedImage = ({ printedImageVisualState }: TPrintedImageProps) => {
-  const { position, height, width } = printedImageVisualState
-  return (
-    <div
-      style={{
-        top: position.y,
-        left: position.x,
-        width,
-        height,
-      }}
-      className="absolute pointer-events-none overflow-hidden select-none"
-    >
-      <img
-        src={printedImageVisualState.path}
-        alt="Ảnh photobooth"
-        style={{
-          height,
-          aspectRatio: width! / height!,
-        }}
-      />
-    </div>
-  )
-}
+import { PreviewImage } from './customize/print-layout/PreviewImage'
+import { createInitialConstants } from '@/utils/contants'
 
 type TProductProps = {
   product: TBaseProduct
@@ -77,7 +51,8 @@ const Product = ({
         const { layout } = buildDefaultLayout(
           printAreaContainerRef.current,
           printAreaRef.current,
-          printedImages
+          printedImages,
+          createInitialConstants('LAYOUT_PADDING')
         )
         setInitialLayout({
           ...hardCodedLayoutData(layout.type)[0],
@@ -119,7 +94,7 @@ const Product = ({
       />
       <PrintAreaOverlayPreview printAreaRef={printAreaRef} />
       {initialLayout?.printedImageElements.map((printedImageVisualState) => (
-        <PrintedImage
+        <PreviewImage
           key={printedImageVisualState.id}
           printedImageVisualState={printedImageVisualState}
         />

@@ -7,14 +7,15 @@ import { AddToCartHandler } from './AddToCartHandler'
 import { adjustNearF3F4F6, getFinalColorValue } from '@/utils/helpers'
 import { SectionLoading } from '@/components/custom/Loading'
 import { EInternalEvents, eventEmitter } from '@/utils/events'
-import { createCommonConstants } from '@/utils/contants'
+import { createCommonConstants, createInitialConstants } from '@/utils/contants'
 import { useZoomEditBackground } from '@/hooks/use-zoom-edit-background'
-import { adjustSizeOfPlacedImageOnPlaced, cancelSelectingZoomingImages } from '../helpers'
+import { cancelSelectingZoomingImages } from '../helpers'
 import { useEditAreaStore } from '@/stores/ui/edit-area.store'
 import { useEditedElementStore } from '@/stores/element/element.store'
 import { MyDevComponent } from '@/dev/components/Preview'
-import { buildDefaultLayout } from '../customize/print-layout/builder'
 import { useLayoutStore } from '@/stores/ui/print-layout.store'
+import { reAssignElementsByLayoutData } from '../customize/print-layout/builder'
+import { TPrintLayout } from '@/utils/types/print-layout'
 
 type TZoomButtonsProps = {
   scale: number
@@ -141,31 +142,48 @@ export const LivePreview = ({
     allowedPrintAreaRef,
   } = useZoomEditBackground(minZoom, maxZoom)
 
+  const resetZoomWhenProductChange = () => {
+    printAreaContainerWrapperRef.current
+      ?.querySelector<HTMLElement>('.NAME-print-area-container')
+      ?.style.setProperty('transform', 'translate(0px, 0px) scale(1)')
+    zoomEditAreaController.reset()
+  }
+
+  const handlePutPrintedImagesInLayout = (pickedLayout: TPrintLayout) => {
+    useEditedElementStore
+      .getState()
+      .initBuiltPrintedImageElements(
+        reAssignElementsByLayoutData(
+          pickedLayout,
+          allowedPrintAreaRef.current!,
+          createInitialConstants('LAYOUT_PADDING')
+        )
+      )
+  }
+
   const handlePrintAreaUpdated = () => {
     const currentProductId = pickedProduct.id
     const isProductChanged = prevProductIdRef.current !== currentProductId
     prevProductIdRef.current = currentProductId
     setTimeout(() => {
-      if (isProductChanged) {
+      if (isProductChanged && pickedLayout) {
         // nếu print area thay đổi do đổi sản phẩm
-        printAreaContainerWrapperRef.current
-          ?.querySelector<HTMLElement>('.NAME-print-area-container')
-          ?.style.setProperty('transform', 'translate(0px, 0px) scale(1)')
-        zoomEditAreaController.reset()
+        resetZoomWhenProductChange()
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
-            useEditedElementStore.getState().initBuiltPrintedImageElements(pickedLayout!.elements)
-            eventEmitter.emit(EInternalEvents.ELEMENTS_OUT_OF_BOUNDS_CHANGED)
+            handlePutPrintedImagesInLayout(pickedLayout)
+            useEditedElementStore.getState().resetPrintedImagesBuildId()
+            eventEmitter.emit(EInternalEvents.EDITED_PRINT_AREA_CHANGED)
           })
         })
       } else {
-        eventEmitter.emit(EInternalEvents.ELEMENTS_OUT_OF_BOUNDS_CHANGED)
+        eventEmitter.emit(EInternalEvents.EDITED_PRINT_AREA_CHANGED)
       }
     }, createCommonConstants<number>('ANIMATION_DURATION_PRINT_AREA_BOUNDS_CHANGE') + 50)
   }
 
   const { printAreaRef, printAreaContainerRef, checkIfAnyElementOutOfBounds, isOutOfBounds } =
-    usePrintArea(printAreaInfo, handlePrintAreaUpdated, scale, pickedProduct.id)
+    usePrintArea(printAreaInfo, handlePrintAreaUpdated, scale, pickedProduct.id, pickedLayout?.id)
 
   const displayedImage = useMemo<TDisplayedImage>(() => {
     const variantSurface = pickedProduct.printAreaList.find(
@@ -224,12 +242,13 @@ export const LivePreview = ({
   }, [displayedImage.imageURL])
 
   useEffect(() => {
-    adjustSizeOfPlacedImageOnPlaced()
-  }, [])
-
-  useEffect(() => {
     useEditAreaStore.getState().setEditAreaScaleValue(scale)
   }, [scale])
+
+  useEffect(() => {
+    if (!pickedLayout || pickedProduct.id !== prevProductIdRef.current) return
+    handlePutPrintedImagesInLayout(pickedLayout)
+  }, [pickedLayout?.id, pickedProduct.id])
 
   return (
     <div

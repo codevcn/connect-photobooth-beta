@@ -3,14 +3,13 @@ import { cn } from '@/configs/ui/tailwind-utils'
 import { useTemplateStore } from '@/stores/ui/template.store'
 import { EInternalEvents, eventEmitter } from '@/utils/events'
 import { useEditedElementStore } from '@/stores/element/element.store'
-
-import type React from 'react'
 import { styleToFramesDisplayerByTemplateType } from '@/configs/print-template/templates-helpers'
 import { TemplateFrame } from '../customize/template/TemplateFrame'
 import { FramesDisplayer } from '../customize/template/FrameDisplayer'
 import { createCommonConstants } from '@/utils/contants'
 import { useEditModeStore } from '@/stores/ui/edit-mode.store'
 import { useEditAreaStore } from '@/stores/ui/edit-area.store'
+import { useLayoutStore } from '@/stores/ui/print-layout.store'
 
 type TFramesDisplayerProps = {
   template: TPrintTemplate
@@ -136,25 +135,25 @@ export const PrintAreaOverlay = ({
   frameDisplayerOptions,
   registerRef,
 }: TPrintAreaOverlayProps) => {
-  const pickedTemplate = useTemplateStore((s) => s.pickedTemplate)
-  const editMode = useEditModeStore((s) => s.editMode)
+  // const pickedLayout = useLayoutStore((s) => s.pickedLayout)
+  // const editMode = useLayoutStore((s) => s.editMode)
 
-  const handleClickFrame = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    frameId: TTemplateFrame['id']
-  ) => {
-    const image = e.currentTarget.querySelector<HTMLImageElement>('.NAME-frame-placed-image')
-    if (image) {
-      let elementURL: string | undefined = undefined
-      const pickedFrame = useTemplateStore.getState().getFrameById(frameId)
-      if (pickedFrame) {
-        elementURL = pickedFrame.placedImage?.imgURL
-      }
-      useEditedElementStore.getState().selectElement(frameId, 'template-frame', elementURL)
-    } else {
-      eventEmitter.emit(EInternalEvents.HIDE_SHOW_PRINTED_IMAGES_MODAL, true, frameId)
-    }
-  }
+  // const handleClickFrame = (
+  //   e: React.MouseEvent<HTMLDivElement, MouseEvent>,
+  //   frameId: TTemplateFrame['id']
+  // ) => {
+  //   const image = e.currentTarget.querySelector<HTMLImageElement>('.NAME-frame-placed-image')
+  //   if (image) {
+  //     let elementURL: string | undefined = undefined
+  //     const pickedFrame = useTemplateStore.getState().getFrameById(frameId)
+  //     if (pickedFrame) {
+  //       elementURL = pickedFrame.placedImage?.imgURL
+  //     }
+  //     useEditedElementStore.getState().selectElement(frameId, 'template-frame', elementURL)
+  //   } else {
+  //     eventEmitter.emit(EInternalEvents.HIDE_SHOW_PRINTED_IMAGES_MODAL, true, frameId)
+  //   }
+  // }
 
   return (
     <div

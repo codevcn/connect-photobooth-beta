@@ -107,6 +107,7 @@ export const PrintedImageElement = ({
     allowedPrintArea: HTMLElement,
     printAreaContainer: HTMLElement
   ) => {
+    if (mountType === 'from-layout') return
     const allowedPrintAreaRect = allowedPrintArea.getBoundingClientRect()
     const rootRect = root.getBoundingClientRect()
     const printAreaContainerRect = printAreaContainer.getBoundingClientRect()
@@ -127,6 +128,7 @@ export const PrintedImageElement = ({
     allowedPrintArea: HTMLElement,
     moveToCenter?: boolean
   ) => {
+    if (mountType === 'from-layout') return
     const display = root.querySelector<HTMLImageElement>('.NAME-element-display')
     if (!display) return
     display.onload = () => {

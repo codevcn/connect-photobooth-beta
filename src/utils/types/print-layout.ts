@@ -12,9 +12,15 @@ export type TLayoutType =
   | '4-horizon'
   | '4-vertical'
 
+export type TLayoutSlotConfig = {
+  containerWidth: number // Tỷ lệ width của slot so với print area (0-1)
+  containerHeight: number // Tỷ lệ height của slot so với print area (0-1)
+}
+
 export type TPrintLayout = {
   id: string
   name: string
   layoutType: TLayoutType
   printedImageElements: TPrintedImageVisualState[]
+  slotConfigs: TLayoutSlotConfig[]
 }

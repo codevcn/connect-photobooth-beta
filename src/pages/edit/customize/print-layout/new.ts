@@ -47,7 +47,7 @@ const createPrintedImageElement = (
   angle: createInitialConstants<number>('ELEMENT_ROTATION'),
   scale: createInitialConstants<number>('ELEMENT_ZOOM'),
   zindex: createInitialConstants<number>('ELEMENT_ZINDEX'),
-  mountType: 'from-layout',
+  mountType: 'from-template',
   width: size.width,
   height: size.height,
   matchOrientation: size.matchOrientation,
@@ -60,8 +60,9 @@ const getPrintAreaDimensions = (
   allowedPrintArea: HTMLElement,
   printAreaPadding: number = 0
 ): TPrintAreaDimensions => {
-  const paddedWidth: number = allowedPrintArea.offsetWidth - printAreaPadding * 2 // cho padding để tránh tràn ra ngoài
-  const paddedHeight: number = allowedPrintArea.offsetHeight - printAreaPadding * 2 // cho padding để tránh tràn ra ngoài
+  const rect = allowedPrintArea.getBoundingClientRect()
+  const paddedWidth: number = rect.width - printAreaPadding * 2 // cho padding để tránh tràn ra ngoài
+  const paddedHeight: number = rect.height - printAreaPadding * 2 // cho padding để tránh tràn ra ngoài
   return {
     width: paddedWidth,
     height: paddedHeight,
@@ -692,11 +693,22 @@ export const buildDefaultLayout = (
   printAreaPadding: number = 0,
   isLog: boolean = false
 ): TBuildLayoutResult => {
+  console.log('>>> [bui-] params:', {
+    allowedPrintArea,
+    allowedPrintAreaRect: allowedPrintArea.getBoundingClientRect(),
+  })
   const printArea = getPrintAreaDimensions(allowedPrintArea, printAreaPadding)
   const optimalLayout = findOptimalLayout(printedImages, printArea)
 
   // Gán position cho các elements
   assignPositionsToElements(optimalLayout, printArea)
+
+  console.log('>>> [bui-] Selected layout:', {
+    type: optimalLayout.type,
+    imageCount: optimalLayout.imageCount,
+    wastedArea: optimalLayout.wastedArea.toFixed(2),
+    elements: optimalLayout.elements,
+  })
 
   return {
     layout: optimalLayout,
@@ -725,29 +737,48 @@ const calculateSlotWastedArea = (
 
 /**
  * Tìm ảnh tốt nhất cho slot (ảnh có wasted area nhỏ nhất)
- * Không quan tâm ảnh đã được sử dụng cho slot khác hay chưa
  */
 const findBestImageForSlot = (
   images: TPrintedImage[],
   slotWidth: number,
-  slotHeight: number
-): { image: TPrintedImage; wastedArea: number } | null => {
-  if (images.length === 0) return null
+  slotHeight: number,
+  usedImageIndices: Set<number>
+): { image: TPrintedImage; index: number; wastedArea: number } | null => {
+  let bestImage: TPrintedImage | null = null
+  let bestIndex = -1
+  let minWastedArea = Infinity
 
-  let bestImage: TPrintedImage = images[0]
-  let minWastedArea = calculateSlotWastedArea(images[0], slotWidth, slotHeight)
+  for (let i = 0; i < images.length; i++) {
+    // Bỏ qua ảnh đã được sử dụng (nếu có đủ ảnh)
+    if (usedImageIndices.has(i) && images.length > usedImageIndices.size) {
+      continue
+    }
 
-  for (let i = 1; i < images.length; i++) {
     const img = images[i]
     const wastedArea = calculateSlotWastedArea(img, slotWidth, slotHeight)
 
     if (wastedArea < minWastedArea) {
       minWastedArea = wastedArea
       bestImage = img
+      bestIndex = i
     }
   }
 
-  return { image: bestImage, wastedArea: minWastedArea }
+  if (!bestImage) {
+    // Nếu không còn ảnh chưa dùng, chọn ảnh tốt nhất từ tất cả
+    for (let i = 0; i < images.length; i++) {
+      const img = images[i]
+      const wastedArea = calculateSlotWastedArea(img, slotWidth, slotHeight)
+
+      if (wastedArea < minWastedArea) {
+        minWastedArea = wastedArea
+        bestImage = img
+        bestIndex = i
+      }
+    }
+  }
+
+  return bestImage ? { image: bestImage, index: bestIndex, wastedArea: minWastedArea } : null
 }
 
 export type TBuildLayoutByTypeResult = {
@@ -758,7 +789,7 @@ export type TBuildLayoutByTypeResult = {
 
 /**
  * Build layout theo layout type được chỉ định
- * Với mỗi slot, tìm ảnh có wasted area nhỏ nhất (không quan tâm ảnh đã dùng hay chưa)
+ * Tìm ảnh phù hợp nhất cho mỗi slot dựa trên tiêu chí wasted area nhỏ nhất
  *
  * @param layoutType - Layout type muốn sử dụng
  * @param allowedPrintArea - Element chứa vùng in
@@ -780,19 +811,22 @@ export const buildLayoutByLayoutType = (
   const slotConfigs = getSlotConfigs(layoutType)
 
   const elements: TPrintedImageVisualState[] = []
+  const usedImageIndices = new Set<number>()
   let totalWastedArea = 0
 
-  // Với mỗi slot, tìm ảnh có wasted area nhỏ nhất
+  // Với mỗi slot, tìm ảnh phù hợp nhất
   for (const slotConfig of slotConfigs) {
     const slotWidth = printArea.width * slotConfig.containerWidth
     const slotHeight = printArea.height * slotConfig.containerHeight
 
-    const bestMatch = findBestImageForSlot(printedImages, slotWidth, slotHeight)
+    const bestMatch = findBestImageForSlot(printedImages, slotWidth, slotHeight, usedImageIndices)
 
     if (!bestMatch) {
       throw new Error('Không tìm được ảnh phù hợp cho slot.')
     }
 
+    // Đánh dấu ảnh đã sử dụng
+    usedImageIndices.add(bestMatch.index)
     totalWastedArea += bestMatch.wastedArea
 
     // Tạo element cho slot
@@ -814,6 +848,13 @@ export const buildLayoutByLayoutType = (
   // Gán position cho các elements
   assignPositionsToElements(layoutCandidate, printArea)
 
+  console.log('>>> [bui] buildLayoutByLayoutType:', {
+    layoutType,
+    imageCount: elements.length,
+    totalWastedArea: totalWastedArea.toFixed(2),
+    elements,
+  })
+
   return {
     layoutType,
     elements,
@@ -827,7 +868,8 @@ export const reAssignElementsByLayoutData = (
   printAreaPadding: number = 0
 ): TPrintedImageVisualState[] => {
   const printAreaDimensions = getPrintAreaDimensions(allowedPrintArea, printAreaPadding)
-  const elements: TPrintedImageVisualState[] = [...layout.printedImageElements]
+  const elements: TPrintedImageVisualState[] = structuredClone(layout.printedImageElements)
+  console.log('>>> [rea] re-assign:', { elements })
 
   const halfWidth = printAreaDimensions.width / 2
   const halfHeight = printAreaDimensions.height / 2
@@ -925,15 +967,21 @@ export const reAssignElementsByLayoutData = (
       break
   }
 
-  const layoutCandidate: TLayoutCandidate = {
-    type: layout.layoutType,
-    elements,
-    wastedArea: 0,
-    imageCount: elements.length,
-  }
-
   // Gán lại position cho các elements
-  assignPositionsToElements(layoutCandidate, printAreaDimensions)
+  assignPositionsToElements(
+    {
+      type: layout.layoutType,
+      elements: elements,
+      wastedArea: 0,
+      imageCount: elements.length,
+    },
+    printAreaDimensions
+  )
 
-  return layoutCandidate.elements
+  console.log('>>> [rea] re ass return:', {
+    elements,
+    layoutType: layout.layoutType,
+  })
+
+  return elements
 }

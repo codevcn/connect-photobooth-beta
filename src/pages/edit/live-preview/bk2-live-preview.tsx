@@ -141,7 +141,7 @@ export const LivePreview = ({
 
   const handlePrintAreaUpdated = () => {
     setTimeout(() => {
-      eventEmitter.emit(EInternalEvents.ELEMENTS_OUT_OF_BOUNDS_CHANGED)
+      eventEmitter.emit(EInternalEvents.EDITED_PRINT_AREA_CHANGED)
       controls.reset()
       const now = performance.now()
       const defaultTemplate = buildDefaultLayout(

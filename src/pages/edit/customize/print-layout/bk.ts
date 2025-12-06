@@ -1,8 +1,7 @@
 import { createInitialConstants } from '@/utils/contants'
 import { generateUniqueId } from '@/utils/helpers'
-import { TLayoutSlotConfig, TLayoutType, TPrintLayout } from '@/utils/types/print-layout'
+import { TLayoutType } from '@/utils/types/print-layout'
 import { TPrintedImage, TPrintedImageVisualState, TSizeInfo } from '@/utils/types/global'
-import { getSlotConfigs } from '@/configs/print-layout/print-layout-data'
 
 // ============================================================================
 // Types
@@ -47,7 +46,7 @@ const createPrintedImageElement = (
   angle: createInitialConstants<number>('ELEMENT_ROTATION'),
   scale: createInitialConstants<number>('ELEMENT_ZOOM'),
   zindex: createInitialConstants<number>('ELEMENT_ZINDEX'),
-  mountType: 'from-layout',
+  mountType: 'from-template',
   width: size.width,
   height: size.height,
   matchOrientation: size.matchOrientation,
@@ -60,8 +59,9 @@ const getPrintAreaDimensions = (
   allowedPrintArea: HTMLElement,
   printAreaPadding: number = 0
 ): TPrintAreaDimensions => {
-  const paddedWidth: number = allowedPrintArea.offsetWidth - printAreaPadding * 2 // cho padding để tránh tràn ra ngoài
-  const paddedHeight: number = allowedPrintArea.offsetHeight - printAreaPadding * 2 // cho padding để tránh tràn ra ngoài
+  const rect = allowedPrintArea.getBoundingClientRect()
+  const paddedWidth: number = rect.width - printAreaPadding * 2 // cho padding để tránh tràn ra ngoài
+  const paddedHeight: number = rect.height - printAreaPadding * 2 // cho padding để tránh tràn ra ngoài
   return {
     width: paddedWidth,
     height: paddedHeight,
@@ -689,14 +689,24 @@ export const buildDefaultLayout = (
   _printAreaContainer: HTMLElement, // Reserved for future use (e.g., constraints, boundaries)
   allowedPrintArea: HTMLElement,
   printedImages: TPrintedImage[],
-  printAreaPadding: number = 0,
-  isLog: boolean = false
+  printAreaPadding: number = 0
 ): TBuildLayoutResult => {
+  console.log('>>> [bui] params:', {
+    allowedPrintArea,
+    allowedPrintAreaRect: allowedPrintArea.getBoundingClientRect(),
+  })
   const printArea = getPrintAreaDimensions(allowedPrintArea, printAreaPadding)
   const optimalLayout = findOptimalLayout(printedImages, printArea)
 
   // Gán position cho các elements
   assignPositionsToElements(optimalLayout, printArea)
+
+  console.log('>>> [bui] Selected layout:', {
+    type: optimalLayout.type,
+    imageCount: optimalLayout.imageCount,
+    wastedArea: optimalLayout.wastedArea.toFixed(2),
+    elements: optimalLayout.elements,
+  })
 
   return {
     layout: optimalLayout,
@@ -704,236 +714,6 @@ export const buildDefaultLayout = (
   }
 }
 
-// ============================================================================
-// Slot Configuration for each Layout Type
-// ============================================================================
-
-/**
- * Tính wasted area khi đặt ảnh vào slot
- */
-const calculateSlotWastedArea = (
-  img: TPrintedImage,
-  slotWidth: number,
-  slotHeight: number
-): number => {
-  const imgRatio = img.width / img.height
-  const scaledSize = calculateScaledSize(imgRatio, slotWidth, slotHeight)
-  const slotArea = slotWidth * slotHeight
-  const usedArea = scaledSize.width * scaledSize.height
-  return slotArea - usedArea
-}
-
-/**
- * Tìm ảnh tốt nhất cho slot (ảnh có wasted area nhỏ nhất)
- * Không quan tâm ảnh đã được sử dụng cho slot khác hay chưa
- */
-const findBestImageForSlot = (
-  images: TPrintedImage[],
-  slotWidth: number,
-  slotHeight: number
-): { image: TPrintedImage; wastedArea: number } | null => {
-  if (images.length === 0) return null
-
-  let bestImage: TPrintedImage = images[0]
-  let minWastedArea = calculateSlotWastedArea(images[0], slotWidth, slotHeight)
-
-  for (let i = 1; i < images.length; i++) {
-    const img = images[i]
-    const wastedArea = calculateSlotWastedArea(img, slotWidth, slotHeight)
-
-    if (wastedArea < minWastedArea) {
-      minWastedArea = wastedArea
-      bestImage = img
-    }
-  }
-
-  return { image: bestImage, wastedArea: minWastedArea }
-}
-
-export type TBuildLayoutByTypeResult = {
-  layoutType: TLayoutType
-  elements: TPrintedImageVisualState[]
-  totalWastedArea: number
-}
-
-/**
- * Build layout theo layout type được chỉ định
- * Với mỗi slot, tìm ảnh có wasted area nhỏ nhất (không quan tâm ảnh đã dùng hay chưa)
- *
- * @param layoutType - Layout type muốn sử dụng
- * @param allowedPrintArea - Element chứa vùng in
- * @param printedImages - Danh sách ảnh có thể sử dụng
- * @param printAreaPadding - Padding của vùng in
- * @returns Layout với các elements đã được gán position
- */
-export const buildLayoutByLayoutType = (
-  layoutType: TLayoutType,
-  allowedPrintArea: HTMLElement,
-  printedImages: TPrintedImage[],
-  printAreaPadding: number = 0
-): TBuildLayoutByTypeResult => {
-  if (printedImages.length === 0) {
-    throw new Error('Không có ảnh để tạo layout.')
-  }
-
-  const printArea = getPrintAreaDimensions(allowedPrintArea, printAreaPadding)
-  const slotConfigs = getSlotConfigs(layoutType)
-
-  const elements: TPrintedImageVisualState[] = []
-  let totalWastedArea = 0
-
-  // Với mỗi slot, tìm ảnh có wasted area nhỏ nhất
-  for (const slotConfig of slotConfigs) {
-    const slotWidth = printArea.width * slotConfig.containerWidth
-    const slotHeight = printArea.height * slotConfig.containerHeight
-
-    const bestMatch = findBestImageForSlot(printedImages, slotWidth, slotHeight)
-
-    if (!bestMatch) {
-      throw new Error('Không tìm được ảnh phù hợp cho slot.')
-    }
-
-    totalWastedArea += bestMatch.wastedArea
-
-    // Tạo element cho slot
-    const imgRatio = bestMatch.image.width / bestMatch.image.height
-    const scaledSize = calculateScaledSize(imgRatio, slotWidth, slotHeight)
-    const element = createPrintedImageElement(bestMatch.image, scaledSize)
-
-    elements.push(element)
-  }
-
-  // Tạo layout candidate để gán position
-  const layoutCandidate: TLayoutCandidate = {
-    type: layoutType,
-    elements,
-    wastedArea: totalWastedArea,
-    imageCount: elements.length,
-  }
-
-  // Gán position cho các elements
-  assignPositionsToElements(layoutCandidate, printArea)
-
-  return {
-    layoutType,
-    elements,
-    totalWastedArea,
-  }
-}
-
-export const reAssignElementsByLayoutData = (
-  layout: TPrintLayout,
-  allowedPrintArea: HTMLElement,
-  printAreaPadding: number = 0
-): TPrintedImageVisualState[] => {
-  const printAreaDimensions = getPrintAreaDimensions(allowedPrintArea, printAreaPadding)
-  const elements: TPrintedImageVisualState[] = [...layout.printedImageElements]
-
-  const halfWidth = printAreaDimensions.width / 2
-  const halfHeight = printAreaDimensions.height / 2
-  const quarterWidth = printAreaDimensions.width / 4
-  const quarterHeight = printAreaDimensions.height / 4
-
-  // Helper function để tính lại kích thước cho element
-  const recalculateElementSize = (
-    element: TPrintedImageVisualState,
-    containerWidth: number,
-    containerHeight: number
-  ) => {
-    const imgRatio = element.width! / element.height!
-    const scaledSize = calculateScaledSize(imgRatio, containerWidth, containerHeight)
-    element.width = scaledSize.width
-    element.height = scaledSize.height
-    element.matchOrientation = scaledSize.matchOrientation
-  }
-
-  // Tính lại kích thước cho mỗi element dựa trên print area mới
-  switch (layout.layoutType) {
-    case 'full':
-      for (const element of elements) {
-        recalculateElementSize(element, printAreaDimensions.width, printAreaDimensions.height)
-      }
-      break
-
-    case 'half-width':
-      for (const element of elements) {
-        recalculateElementSize(element, halfWidth, printAreaDimensions.height)
-      }
-      break
-
-    case 'half-height':
-      for (const element of elements) {
-        recalculateElementSize(element, printAreaDimensions.width, halfHeight)
-      }
-      break
-
-    case '3-left': {
-      // 2 ảnh nhỏ bên trái (1/4) + 1 ảnh lớn bên phải (1/2 width x full height)
-      const [small1, small2, large] = elements
-      recalculateElementSize(small1, halfWidth, halfHeight)
-      recalculateElementSize(small2, halfWidth, halfHeight)
-      recalculateElementSize(large, halfWidth, printAreaDimensions.height)
-      break
-    }
-
-    case '3-right': {
-      // 1 ảnh lớn bên trái (1/2 width x full height) + 2 ảnh nhỏ bên phải (1/4)
-      const [large, small1, small2] = elements
-      recalculateElementSize(large, halfWidth, printAreaDimensions.height)
-      recalculateElementSize(small1, halfWidth, halfHeight)
-      recalculateElementSize(small2, halfWidth, halfHeight)
-      break
-    }
-
-    case '3-top': {
-      // 2 ảnh nhỏ trên (1/4) + 1 ảnh lớn dưới (full width x 1/2 height)
-      const [small1, small2, large] = elements
-      recalculateElementSize(small1, halfWidth, halfHeight)
-      recalculateElementSize(small2, halfWidth, halfHeight)
-      recalculateElementSize(large, printAreaDimensions.width, halfHeight)
-      break
-    }
-
-    case '3-bottom': {
-      // 1 ảnh lớn trên (full width x 1/2 height) + 2 ảnh nhỏ dưới (1/4)
-      const [large, small1, small2] = elements
-      recalculateElementSize(large, printAreaDimensions.width, halfHeight)
-      recalculateElementSize(small1, halfWidth, halfHeight)
-      recalculateElementSize(small2, halfWidth, halfHeight)
-      break
-    }
-
-    case '4-square':
-      // 4 ảnh lưới 2x2 (mỗi ảnh 1/4)
-      for (const element of elements) {
-        recalculateElementSize(element, halfWidth, halfHeight)
-      }
-      break
-
-    case '4-horizon':
-      // 4 ảnh ngang chồng nhau (full width x 1/4 height)
-      for (const element of elements) {
-        recalculateElementSize(element, printAreaDimensions.width, quarterHeight)
-      }
-      break
-
-    case '4-vertical':
-      // 4 ảnh dọc cạnh nhau (1/4 width x full height)
-      for (const element of elements) {
-        recalculateElementSize(element, quarterWidth, printAreaDimensions.height)
-      }
-      break
-  }
-
-  const layoutCandidate: TLayoutCandidate = {
-    type: layout.layoutType,
-    elements,
-    wastedArea: 0,
-    imageCount: elements.length,
-  }
-
-  // Gán lại position cho các elements
-  assignPositionsToElements(layoutCandidate, printAreaDimensions)
-
-  return layoutCandidate.elements
-}
+// TODO: Các hàm public khác có thể cần
+// export const buildLayoutWithPreference = (preferredType: TLayoutType, ...) => { ... }
+// export const buildLayoutForMultipleImages = (images: TPrintedImage[], ...) => { ... }

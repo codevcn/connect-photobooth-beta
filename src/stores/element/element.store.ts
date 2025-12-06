@@ -35,6 +35,7 @@ type TUseElementStore = {
   addPrintedImageElements: (printedImages: TPrintedImageVisualState[]) => void
   removePrintedImageElement: (printedImageId: string) => void
   initBuiltPrintedImageElements: (printedImages: TPrintedImageVisualState[]) => void
+  resetPrintedImagesBuildId: () => void
 }
 
 export const useEditedElementStore = create<TUseElementStore>((set, get) => ({
@@ -47,6 +48,10 @@ export const useEditedElementStore = create<TUseElementStore>((set, get) => ({
   initBuiltPrintedImageElements: (printedImages) => {
     set({
       printedImages,
+    })
+  },
+  resetPrintedImagesBuildId: () => {
+    set({
       printedImagesBuildId: generateUniqueId(),
     })
   },

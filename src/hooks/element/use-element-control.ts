@@ -332,12 +332,12 @@ export const useElementControl = (
 
   useEffect(() => {
     eventEmitter.on(
-      EInternalEvents.ELEMENTS_OUT_OF_BOUNDS_CHANGED,
+      EInternalEvents.EDITED_PRINT_AREA_CHANGED,
       stayElementVisualOnAllowedPrintArea
     )
     return () => {
       eventEmitter.off(
-        EInternalEvents.ELEMENTS_OUT_OF_BOUNDS_CHANGED,
+        EInternalEvents.EDITED_PRINT_AREA_CHANGED,
         stayElementVisualOnAllowedPrintArea
       )
     }
