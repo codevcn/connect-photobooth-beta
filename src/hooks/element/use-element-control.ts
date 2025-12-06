@@ -104,7 +104,16 @@ export const useElementControl = (
           x: containerForElementAbsoluteToRect.width - rootElementRect.width - edgesMargin,
         }))
       }
-    }, 1000)
+      if (
+        rootElementRect.top + rootElementRect.height >
+        containerForElementAbsoluteToRect.top + containerForElementAbsoluteToRect.height
+      ) {
+        setPosition((prev) => ({
+          ...prev,
+          y: containerForElementAbsoluteToRect.height - rootElementRect.height - edgesMargin,
+        }))
+      }
+    }, 700)
   }
 
   const handleSetSinglePosition = (posX?: TPosition['x'], posY?: TPosition['y']) => {

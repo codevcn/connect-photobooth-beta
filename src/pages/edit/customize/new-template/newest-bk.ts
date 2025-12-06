@@ -59,15 +59,13 @@ const createPrintedImageElement = (
  */
 const getPrintAreaDimensions = (allowedPrintArea: HTMLElement): TPrintAreaDimensions => {
   const rect = allowedPrintArea.getBoundingClientRect()
-  const paddedWidth: number = rect.width - 8 // cho padding để tránh tràn ra ngoài
-  const paddedHeight: number = rect.height - 8 // cho padding để tránh tràn ra ngoài
   return {
-    width: paddedWidth,
-    height: paddedHeight,
-    area: paddedWidth * paddedHeight,
-    ratio: paddedWidth / paddedHeight,
-    offsetLeft: allowedPrintArea.offsetLeft + 4,
-    offsetTop: allowedPrintArea.offsetTop + 4,
+    width: rect.width,
+    height: rect.height,
+    area: rect.width * rect.height,
+    ratio: rect.width / rect.height,
+    offsetLeft: allowedPrintArea.offsetLeft,
+    offsetTop: allowedPrintArea.offsetTop,
   }
 }
 
@@ -199,73 +197,56 @@ const calculateCenteredPosition = (
 
 /**
  * Gán position cho các elements dựa trên layout type
- * Các ảnh sẽ nằm sát nhau (không có khoảng trống) và căn giữa trong print area
  */
 const assignPositionsToElements = (
   layout: TLayoutCandidate,
   printArea: TPrintAreaDimensions
 ): void => {
   const { type, elements } = layout
-  const { offsetLeft, offsetTop, width: areaWidth, height: areaHeight } = printArea
+  const containerOffset = { left: printArea.offsetLeft, top: printArea.offsetTop }
 
   switch (type) {
     case 'full': {
       const el = elements[0]
-      // Căn giữa 1 ảnh trong print area
-      el.position = {
-        x: offsetLeft + (areaWidth - el.width!) / 2,
-        y: offsetTop + (areaHeight - el.height!) / 2,
-      }
+      el.position = calculateCenteredPosition(
+        { width: el.width!, height: el.height! },
+        containerOffset,
+        { width: printArea.width, height: printArea.height }
+      )
       break
     }
 
     case 'half-width': {
-      // 2 ảnh nằm cạnh nhau (sát nhau theo chiều ngang)
-      const totalWidth = elements.reduce((sum, el) => sum + el.width!, 0)
-      const totalHeight = Math.max(...elements.map((el) => el.height!))
-
-      // Tính điểm bắt đầu để căn giữa cả nhóm ảnh
-      const startX = offsetLeft + (areaWidth - totalWidth) / 2
-      const startY = offsetTop + (areaHeight - totalHeight) / 2
-
-      let currentX = startX
+      const halfWidth = printArea.width / 2
+      let index = 0
       for (const el of elements) {
-        // Căn giữa theo chiều dọc cho từng ảnh (nếu chiều cao khác nhau)
-        const verticalOffset = (totalHeight - el.height!) / 2
-        el.position = {
-          x: currentX,
-          y: startY + verticalOffset,
-        }
-        currentX += el.width! // Ảnh tiếp theo nằm sát ngay sau
+        const offsetX = index * halfWidth
+        el.position = calculateCenteredPosition(
+          { width: el.width!, height: el.height! },
+          { left: containerOffset.left + offsetX, top: containerOffset.top },
+          { width: halfWidth, height: printArea.height }
+        )
+        index += 1
       }
       break
     }
 
     case 'half-height': {
-      // 2 ảnh chồng lên nhau (sát nhau theo chiều dọc)
-      const totalHeight = elements.reduce((sum, el) => sum + el.height!, 0)
-      const totalWidth = Math.max(...elements.map((el) => el.width!))
-
-      // Tính điểm bắt đầu để căn giữa cả nhóm ảnh
-      const startX = offsetLeft + (areaWidth - totalWidth) / 2
-      const startY = offsetTop + (areaHeight - totalHeight) / 2
-
-      let currentY = startY
-      for (const el of elements) {
-        // Căn giữa theo chiều ngang cho từng ảnh (nếu chiều rộng khác nhau)
-        const horizontalOffset = (totalWidth - el.width!) / 2
-        el.position = {
-          x: startX + horizontalOffset,
-          y: currentY,
-        }
-        currentY += el.height! // Ảnh tiếp theo nằm sát ngay dưới
-      }
+      const halfHeight = printArea.height / 2
+      elements.forEach((el, index) => {
+        const offsetY = index * halfHeight
+        el.position = calculateCenteredPosition(
+          { width: el.width!, height: el.height! },
+          { left: containerOffset.left, top: containerOffset.top + offsetY },
+          { width: printArea.width, height: halfHeight }
+        )
+      })
       break
     }
 
     // TODO: Thêm case cho các layout khác
-    // case 'quarter': 4 ảnh sát nhau thành lưới 2x2
-    // case 'three-left': 1 ảnh lớn bên trái + 2 ảnh nhỏ sát nhau bên phải
+    // case 'quarter': ...
+    // case 'three-left': ...
   }
 }
 
@@ -326,17 +307,13 @@ export const buildDefaultTemplateLayout = (
   allowedPrintArea: HTMLElement,
   printedImages: TPrintedImage[]
 ): TBuildLayoutResult => {
-  console.log('>>> [bui] params:', {
-    allowedPrintArea,
-    allowedPrintAreaRect: allowedPrintArea.getBoundingClientRect(),
-  })
   const printArea = getPrintAreaDimensions(allowedPrintArea)
   const optimalLayout = findOptimalLayout(printedImages, printArea)
 
   // Gán position cho các elements
   assignPositionsToElements(optimalLayout, printArea)
 
-  console.log('>>> [bui] Selected layout:', {
+  console.log('>>> [builder] Selected layout:', {
     type: optimalLayout.type,
     imageCount: optimalLayout.imageCount,
     wastedArea: optimalLayout.wastedArea.toFixed(2),

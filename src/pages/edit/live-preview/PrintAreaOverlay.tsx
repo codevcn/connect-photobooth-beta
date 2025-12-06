@@ -186,7 +186,7 @@ export const PrintAreaOverlay = ({
       }}
       data-is-out-of-bounds={isOutOfBounds}
     >
-      {editMode === 'with-template' && pickedTemplate && (
+      {/* {editMode === 'with-template' && pickedTemplate && (
         <FramesDisplayer
           template={pickedTemplate}
           onClickFrame={handleClickFrame}
@@ -201,7 +201,7 @@ export const PrintAreaOverlay = ({
           displayZoomButton={true}
           hint="from PrintAreaOverlay"
         />
-      )}
+      )} */}
     </div>
   )
 }

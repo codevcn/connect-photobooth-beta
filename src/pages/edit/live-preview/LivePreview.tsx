@@ -14,6 +14,7 @@ import { useEditAreaStore } from '@/stores/ui/edit-area.store'
 import { useDragEditBackground } from '@/hooks/use-drag-edit-background'
 import { useEditedElementStore } from '@/stores/element/element.store'
 import { MyDevComponent } from '@/dev/components/Preview'
+import { buildDefaultTemplateLayout } from '../customize/new-template/builder'
 
 type TZoomButtonsProps = {
   scale: number
@@ -138,19 +139,28 @@ export const LivePreview = ({
     maxZoomAllowedPrintAreaIntoView,
   } = useZoomEditBackground(minZoom, maxZoom)
 
+  const handlePrintAreaUpdated = () => {
+    setTimeout(() => {
+      eventEmitter.emit(EInternalEvents.ELEMENTS_OUT_OF_BOUNDS_CHANGED)
+      controls.reset()
+      // maxZoomAllowedPrintAreaIntoView()
+      const now = performance.now()
+      const defaultTemplate = buildDefaultTemplateLayout(
+        printAreaContainerRef.current!,
+        allowedPrintAreaRef.current!,
+        printedImages
+      )
+      useEditedElementStore.getState().setPrintedImageElements(defaultTemplate.elements)
+      const nowEnd = performance.now()
+      console.log('>>> [bui] du:', nowEnd - now)
+      console.log('>>> [bui] printed:', printedImages)
+      console.log('>>> [bui] def:', defaultTemplate)
+    }, createCommonConstants<number>('ANIMATION_DURATION_PRINT_AREA_BOUNDS_CHANGE') + 50)
+    adjustSizeOfPlacedImageOnPlaced()
+  }
+
   const { printAreaRef, printAreaContainerRef, checkIfAnyElementOutOfBounds, isOutOfBounds } =
-    usePrintArea(
-      printAreaInfo,
-      () => {
-        setTimeout(() => {
-          eventEmitter.emit(EInternalEvents.ELEMENTS_OUT_OF_BOUNDS_CHANGED)
-          controls.reset()
-          maxZoomAllowedPrintAreaIntoView()
-        }, createCommonConstants<number>('ANIMATION_DURATION_PRINT_AREA_BOUNDS_CHANGE') + 100)
-        adjustSizeOfPlacedImageOnPlaced()
-      },
-      scale
-    )
+    usePrintArea(printAreaInfo, handlePrintAreaUpdated, scale)
 
   const displayedImage = useMemo<TDisplayedImage>(() => {
     const variantSurface = pickedProduct.printAreaList.find(
@@ -215,7 +225,7 @@ export const LivePreview = ({
   useEffect(() => {
     useEditAreaStore.getState().setEditAreaScaleValue(scale)
   }, [scale])
-  
+
   return (
     <div
       ref={(node) => {

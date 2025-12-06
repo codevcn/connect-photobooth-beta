@@ -4,53 +4,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body
-    style="
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 50px;
-    "
-  >
+  <body>
     <main
       style="
-        width: 300px;
-        height: 100px;
-        background-color: red;
-        overflow: visible;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        position: relative;
+        width: 400px;
+        height: 400px;
+        background-color: gray;
+        transform: scale(1.3);
+        margin: 100px 200px;
       "
     >
       <div
         style="
           width: 50px;
           height: 50px;
-          background-color: blue;
-          transform: translate(0px, 0px) scale(2.2);
-          transform-origin: center;
+          background-color: red;
+          border: 25px solid black;
+          position: absolute;
+          left: 50px;
         "
       ></div>
+      <section
+        style="height: 50px; width: 50px; background-color: yellow; position: absolute; left: 0px"
+      ></section>
     </main>
-    <button style="margin-top: 100px">Click me</button>
-    <p></p>
+    <p style="margin-top: 500px"></p>
     <script>
-      document.querySelector('button').addEventListener('click', () => {
-        const p = document.querySelector('p')
-        p.innerText = `
-          main rect: ${JSON.stringify(
-            document.querySelector('main').getBoundingClientRect(),
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          document.querySelector('p').textContent = JSON.stringify(
+            document.querySelector('div').offsetLeft,
             null,
             2
-          )}
-          blue div rect: ${JSON.stringify(
-            document.querySelector('div').getBoundingClientRect(),
-            null,
-            2
-          )}
-        `
+          )
+        })
       })
     </script>
   </body>

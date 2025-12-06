@@ -35,6 +35,7 @@ export const PrintedImageElement = ({
   printAreaContainerRef,
 }: TPrintedImageElementProps) => {
   const { path, id, mountType, height, width } = element
+  console.log('>>> [bui] element:', element)
   const rootRef = useRef<HTMLElement | null>(null)
   const scaleFactor = useEditAreaStore((state) => state.editAreaScaleValue)
   const {
