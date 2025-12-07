@@ -3,86 +3,86 @@ import { useState, useCallback } from 'react'
 type TInputMethod = 'telex' | 'vni'
 
 // Vietnamese tone marks mapping
-const VIETNAMESE_TONES = {
+const VIETNAMESE_TONES: Record<string, Record<string, string>> = {
   // Acute (sắc)
   acute: {
-    a: 'á',
-    ă: 'ắ',
-    â: 'ấ',
-    e: 'é',
-    ê: 'ế',
-    i: 'í',
-    o: 'ó',
-    ô: 'ố',
-    ơ: 'ớ',
-    u: 'ú',
-    ư: 'ứ',
-    y: 'ý',
+    a: 'á', A: 'Á',
+    ă: 'ắ', Ă: 'Ắ',
+    â: 'ấ', Â: 'Ấ',
+    e: 'é', E: 'É',
+    ê: 'ế', Ê: 'Ế',
+    i: 'í', I: 'Í',
+    o: 'ó', O: 'Ó',
+    ô: 'ố', Ô: 'Ố',
+    ơ: 'ớ', Ơ: 'Ớ',
+    u: 'ú', U: 'Ú',
+    ư: 'ứ', Ư: 'Ứ',
+    y: 'ý', Y: 'Ý',
   },
   // Grave (huyền)
   grave: {
-    a: 'à',
-    ă: 'ằ',
-    â: 'ầ',
-    e: 'è',
-    ê: 'ề',
-    i: 'ì',
-    o: 'ò',
-    ô: 'ồ',
-    ơ: 'ờ',
-    u: 'ù',
-    ư: 'ừ',
-    y: 'ỳ',
+    a: 'à', A: 'À',
+    ă: 'ằ', Ă: 'Ằ',
+    â: 'ầ', Â: 'Ầ',
+    e: 'è', E: 'È',
+    ê: 'ề', Ê: 'Ề',
+    i: 'ì', I: 'Ì',
+    o: 'ò', O: 'Ò',
+    ô: 'ồ', Ô: 'Ồ',
+    ơ: 'ờ', Ơ: 'Ờ',
+    u: 'ù', U: 'Ù',
+    ư: 'ừ', Ư: 'Ừ',
+    y: 'ỳ', Y: 'Ỳ',
   },
   // Hook above (hỏi)
   hook: {
-    a: 'ả',
-    ă: 'ẳ',
-    â: 'ẩ',
-    e: 'ẻ',
-    ê: 'ể',
-    i: 'ỉ',
-    o: 'ỏ',
-    ô: 'ổ',
-    ơ: 'ở',
-    u: 'ủ',
-    ư: 'ử',
-    y: 'ỷ',
+    a: 'ả', A: 'Ả',
+    ă: 'ẳ', Ă: 'Ẳ',
+    â: 'ẩ', Â: 'Ẩ',
+    e: 'ẻ', E: 'Ẻ',
+    ê: 'ể', Ê: 'Ể',
+    i: 'ỉ', I: 'Ỉ',
+    o: 'ỏ', O: 'Ỏ',
+    ô: 'ổ', Ô: 'Ổ',
+    ơ: 'ở', Ơ: 'Ở',
+    u: 'ủ', U: 'Ủ',
+    ư: 'ử', Ư: 'Ử',
+    y: 'ỷ', Y: 'Ỷ',
   },
   // Tilde (ngã)
   tilde: {
-    a: 'ã',
-    ă: 'ẵ',
-    â: 'ẫ',
-    e: 'ẽ',
-    ê: 'ễ',
-    i: 'ĩ',
-    o: 'õ',
-    ô: 'ỗ',
-    ơ: 'ỡ',
-    u: 'ũ',
-    ư: 'ữ',
-    y: 'ỹ',
+    a: 'ã', A: 'Ã',
+    ă: 'ẵ', Ă: 'Ẵ',
+    â: 'ẫ', Â: 'Ẫ',
+    e: 'ẽ', E: 'Ẽ',
+    ê: 'ễ', Ê: 'Ễ',
+    i: 'ĩ', I: 'Ĩ',
+    o: 'õ', O: 'Õ',
+    ô: 'ỗ', Ô: 'Ỗ',
+    ơ: 'ỡ', Ơ: 'Ỡ',
+    u: 'ũ', U: 'Ũ',
+    ư: 'ữ', Ư: 'Ữ',
+    y: 'ỹ', Y: 'Ỹ',
   },
   // Dot below (nặng)
   dot: {
-    a: 'ạ',
-    ă: 'ặ',
-    â: 'ậ',
-    e: 'ẹ',
-    ê: 'ệ',
-    i: 'ị',
-    o: 'ọ',
-    ô: 'ộ',
-    ơ: 'ợ',
-    u: 'ụ',
-    ư: 'ự',
-    y: 'ỵ',
+    a: 'ạ', A: 'Ạ',
+    ă: 'ặ', Ă: 'Ặ',
+    â: 'ậ', Â: 'Ậ',
+    e: 'ẹ', E: 'Ẹ',
+    ê: 'ệ', Ê: 'Ệ',
+    i: 'ị', I: 'Ị',
+    o: 'ọ', O: 'Ọ',
+    ô: 'ộ', Ô: 'Ộ',
+    ơ: 'ợ', Ơ: 'Ợ',
+    u: 'ụ', U: 'Ụ',
+    ư: 'ự', Ư: 'Ự',
+    y: 'ỵ', Y: 'Ỵ',
   },
 }
 
-// Vowel modifications
-const VOWEL_MODS = {
+// Vowel modifications (lowercase only, we handle case separately)
+const VOWEL_MODS: Record<string, Record<string, string>> = {
   a: { breve: 'ă', circumflex: 'â' },
   e: { circumflex: 'ê' },
   o: { circumflex: 'ô', horn: 'ơ' },
@@ -90,24 +90,14 @@ const VOWEL_MODS = {
   d: { stroke: 'đ' },
 }
 
-type TVowelKey = 'a' | 'e' | 'o' | 'u' | 'd'
-type TBaseVowel = 'a' | 'ă' | 'â' | 'e' | 'ê' | 'i' | 'o' | 'ô' | 'ơ' | 'u' | 'ư' | 'y'
+// All vowels that can receive tones (including modified vowels)
+const VOWELS_FOR_TONE = new Set([
+  'a', 'ă', 'â', 'e', 'ê', 'i', 'o', 'ô', 'ơ', 'u', 'ư', 'y',
+  'A', 'Ă', 'Â', 'E', 'Ê', 'I', 'O', 'Ô', 'Ơ', 'U', 'Ư', 'Y',
+])
 
-// Telex mapping
-const TELEX_MAP: Record<
-  string,
-  { base: TVowelKey; type: 'breve' | 'circumflex' | 'horn' | 'stroke' }
-> = {
-  aw: { base: 'a', type: 'breve' },
-  aa: { base: 'a', type: 'circumflex' },
-  ee: { base: 'e', type: 'circumflex' },
-  oo: { base: 'o', type: 'circumflex' },
-  ow: { base: 'o', type: 'horn' },
-  uw: { base: 'u', type: 'horn' },
-  dd: { base: 'd', type: 'stroke' },
-}
-
-const TELEX_TONES: Record<string, keyof typeof VIETNAMESE_TONES> = {
+// Telex tone keys
+const TELEX_TONES: Record<string, string> = {
   s: 'acute',
   f: 'grave',
   r: 'hook',
@@ -115,26 +105,112 @@ const TELEX_TONES: Record<string, keyof typeof VIETNAMESE_TONES> = {
   j: 'dot',
 }
 
-// VNI mapping
-const VNI_MAP: Record<
-  string,
-  { base: TVowelKey; type: 'breve' | 'circumflex' | 'horn' | 'stroke' }
-> = {
-  a8: { base: 'a', type: 'breve' },
-  a6: { base: 'a', type: 'circumflex' },
-  e6: { base: 'e', type: 'circumflex' },
-  o6: { base: 'o', type: 'circumflex' },
-  o7: { base: 'o', type: 'horn' },
-  u7: { base: 'u', type: 'horn' },
-  d9: { base: 'd', type: 'stroke' },
-}
-
-const VNI_TONES: Record<string, keyof typeof VIETNAMESE_TONES> = {
+// VNI tone keys
+const VNI_TONES: Record<string, string> = {
   '1': 'acute',
   '2': 'grave',
   '3': 'hook',
   '4': 'tilde',
   '5': 'dot',
+}
+
+// Telex vowel modification keys
+const TELEX_VOWEL_MODS: Record<string, { targets: string[]; type: string }> = {
+  w: { targets: ['a', 'o', 'u'], type: 'w' }, // ă, ơ, ư
+  a: { targets: ['a'], type: 'circumflex' }, // aa -> â
+  e: { targets: ['e'], type: 'circumflex' }, // ee -> ê
+  o: { targets: ['o'], type: 'circumflex' }, // oo -> ô
+  d: { targets: ['d'], type: 'stroke' }, // dd -> đ
+}
+
+// VNI vowel modification keys
+const VNI_VOWEL_MODS: Record<string, { target: string; type: string }> = {
+  '6': { target: 'aeo', type: 'circumflex' }, // a6->â, e6->ê, o6->ô
+  '7': { target: 'ou', type: 'horn' }, // o7->ơ, u7->ư
+  '8': { target: 'a', type: 'breve' }, // a8->ă
+  '9': { target: 'd', type: 'stroke' }, // d9->đ
+}
+
+/**
+ * Extract the last word from a string (word = continuous letters)
+ */
+const getLastWord = (text: string): { word: string; startIndex: number } => {
+  const match = text.match(/[a-zA-ZàáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđÀÁẢÃẠĂẰẮẲẴẶÂẦẤẨẪẬÈÉẺẼẸÊỀẾỂỄỆÌÍỈĨỊÒÓỎÕỌÔỒỐỔỖỘƠỜỚỞỠỢÙÚỦŨỤƯỪỨỬỮỰỲÝỶỸỴĐ]+$/)
+  if (match) {
+    return { word: match[0], startIndex: text.length - match[0].length }
+  }
+  return { word: '', startIndex: text.length }
+}
+
+/**
+ * Find the best vowel position to apply tone in a Vietnamese word
+ * Rules: ưa/ươ -> second vowel, others -> first vowel in vowel cluster, or last vowel
+ */
+const findVowelForTone = (word: string): number => {
+  const vowelIndices: number[] = []
+  for (let i = 0; i < word.length; i++) {
+    if (VOWELS_FOR_TONE.has(word[i])) {
+      vowelIndices.push(i)
+    }
+  }
+  
+  if (vowelIndices.length === 0) return -1
+  if (vowelIndices.length === 1) return vowelIndices[0]
+  
+  // Special cases for Vietnamese diphthongs/triphthongs
+  const lowerWord = word.toLowerCase()
+  
+  // ươ, ưa -> tone on the second vowel
+  for (let i = 0; i < vowelIndices.length - 1; i++) {
+    const idx = vowelIndices[i]
+    const nextIdx = vowelIndices[i + 1]
+    if (nextIdx === idx + 1) {
+      const pair = lowerWord[idx] + lowerWord[nextIdx]
+      if (pair === 'ươ' || pair === 'ưa') {
+        return nextIdx
+      }
+    }
+  }
+  
+  // For other cases: find vowel cluster and return the main vowel
+  // oa, oe, uy -> second vowel
+  // ai, ao, au, ay, âu, ây, eo, êu, ia, iê, iu, oa, oă, oe, oi, oo, ôi, ơi, ua, uâ, ue, ui, uô, uơ, uy, ưi, ưu, ya, yê -> varies
+  
+  // Simple rule: if there's a vowel cluster, prefer the vowel that's not i/u/y at edges
+  for (let i = 0; i < vowelIndices.length; i++) {
+    const idx = vowelIndices[i]
+    const char = lowerWord[idx]
+    // Prefer ă, â, ê, ô, ơ, ư (modified vowels) first
+    if ('ăâêôơư'.includes(char)) {
+      return idx
+    }
+  }
+  
+  // Then prefer a, e, o over i, u, y
+  for (let i = 0; i < vowelIndices.length; i++) {
+    const idx = vowelIndices[i]
+    const char = lowerWord[idx]
+    if ('aeo'.includes(char)) {
+      return idx
+    }
+  }
+  
+  // Fallback to last vowel
+  return vowelIndices[vowelIndices.length - 1]
+}
+
+/**
+ * Find position of a character in the last word that can be modified
+ */
+const findCharToModify = (word: string, targetChars: string): number => {
+  const lowerWord = word.toLowerCase()
+  // Search from end to beginning
+  for (let i = word.length - 1; i >= 0; i--) {
+    if (targetChars.includes(lowerWord[i])) {
+      return i
+    }
+  }
+  return -1
 }
 
 export const useVietnameseKeyboard = () => {
@@ -149,76 +225,185 @@ export const useVietnameseKeyboard = () => {
   const processVietnameseInput = useCallback(
     (input: string, currentValue: string): string => {
       const lowerInput = input.toLowerCase()
-      let result = currentValue
+      const { word: lastWord, startIndex: wordStartIndex } = getLastWord(currentValue)
+      const beforeWord = currentValue.slice(0, wordStartIndex)
 
       if (inputMethod === 'telex') {
-        // Check for tone marks
-        if (TELEX_TONES[lowerInput]) {
+        // Check for tone marks (s, f, r, x, j)
+        if (TELEX_TONES[lowerInput] && lastWord.length > 0) {
           const tone = TELEX_TONES[lowerInput]
-          // Apply tone to the last valid vowel in buffer
-          const lastChar = buffer.slice(-1).toLowerCase() as TBaseVowel
-          if (VIETNAMESE_TONES[tone][lastChar]) {
-            const replacement = VIETNAMESE_TONES[tone][lastChar]
-            result =
-              currentValue.slice(0, -1) +
-              (input === input.toUpperCase() ? replacement.toUpperCase() : replacement)
-            setBuffer('')
-            return result
+          const vowelIdx = findVowelForTone(lastWord)
+          
+          if (vowelIdx !== -1) {
+            const charToModify = lastWord[vowelIdx]
+            const toneMap = VIETNAMESE_TONES[tone]
+            if (toneMap && toneMap[charToModify]) {
+              const modifiedWord = 
+                lastWord.slice(0, vowelIdx) + 
+                toneMap[charToModify] + 
+                lastWord.slice(vowelIdx + 1)
+              setBuffer('')
+              return beforeWord + modifiedWord
+            }
           }
         }
 
-        // Check for vowel modifications
-        const twoCharKey = buffer.toLowerCase() + lowerInput
-        if (TELEX_MAP[twoCharKey]) {
-          const { base, type } = TELEX_MAP[twoCharKey]
-          const modEntry = VOWEL_MODS[base]
-          if (modEntry && type in modEntry) {
-            const modified = modEntry[type as keyof typeof modEntry] as string
-            result =
-              currentValue.slice(0, -1) +
-              (input === input.toUpperCase() ? modified.toUpperCase() : modified)
-            setBuffer(modified)
-            return result
+        // Check for vowel modifications (w, aa, ee, oo, dd)
+        if (TELEX_VOWEL_MODS[lowerInput] && lastWord.length > 0) {
+          // Special case for 'w' - can modify a->ă, o->ơ, u->ư
+          // Find the target char in the word (not just last char)
+          if (lowerInput === 'w') {
+            // First check buffer for immediate aw, ow, uw pattern
+            const lastCharLower = buffer.toLowerCase()
+            if (lastCharLower === 'a') {
+              // aw -> ă
+              const isUpper = lastWord.slice(-1) === lastWord.slice(-1).toUpperCase() && lastWord.slice(-1).toLowerCase() === 'a'
+              const modified = isUpper ? 'Ă' : 'ă'
+              setBuffer(modified.toLowerCase())
+              return currentValue.slice(0, -1) + modified
+            } else if (lastCharLower === 'o') {
+              // ow -> ơ
+              const isUpper = lastWord.slice(-1) === lastWord.slice(-1).toUpperCase() && lastWord.slice(-1).toLowerCase() === 'o'
+              const modified = isUpper ? 'Ơ' : 'ơ'
+              setBuffer(modified.toLowerCase())
+              return currentValue.slice(0, -1) + modified
+            } else if (lastCharLower === 'u') {
+              // uw -> ư
+              const isUpper = lastWord.slice(-1) === lastWord.slice(-1).toUpperCase() && lastWord.slice(-1).toLowerCase() === 'u'
+              const modified = isUpper ? 'Ư' : 'ư'
+              setBuffer(modified.toLowerCase())
+              return currentValue.slice(0, -1) + modified
+            }
+            
+            // If not immediate, search in word for a, o, u to modify
+            const charIdx = findCharToModify(lastWord, 'aou')
+            if (charIdx !== -1) {
+              const charToModify = lastWord[charIdx]
+              const charLower = charToModify.toLowerCase()
+              const isUpper = charToModify === charToModify.toUpperCase() && charLower !== charToModify
+              
+              let modified: string | null = null
+              if (charLower === 'a') modified = isUpper ? 'Ă' : 'ă'
+              else if (charLower === 'o') modified = isUpper ? 'Ơ' : 'ơ'
+              else if (charLower === 'u') modified = isUpper ? 'Ư' : 'ư'
+              
+              if (modified) {
+                const modifiedWord = 
+                  lastWord.slice(0, charIdx) + 
+                  modified + 
+                  lastWord.slice(charIdx + 1)
+                setBuffer('')
+                return beforeWord + modifiedWord
+              }
+            }
+          }
+          
+          // Check for 'd' key - dd pattern or find d in word
+          if (lowerInput === 'd') {
+            // First check buffer for immediate dd pattern
+            if (buffer.toLowerCase() === 'd') {
+              const charToReplace = currentValue.slice(-1)
+              const isUpper = charToReplace === charToReplace.toUpperCase() && charToReplace.toLowerCase() === 'd'
+              const modified = isUpper ? 'Đ' : 'đ'
+              setBuffer(modified.toLowerCase())
+              return currentValue.slice(0, -1) + modified
+            }
+            // If not immediate, search in word for d to modify
+            const charIdx = findCharToModify(lastWord, 'd')
+            if (charIdx !== -1) {
+              const charToModify = lastWord[charIdx]
+              const isUpper = charToModify === charToModify.toUpperCase() && charToModify.toLowerCase() === 'd'
+              const modified = isUpper ? 'Đ' : 'đ'
+              const modifiedWord = 
+                lastWord.slice(0, charIdx) + 
+                modified + 
+                lastWord.slice(charIdx + 1)
+              setBuffer(lowerInput)
+              return beforeWord + modifiedWord
+            }
+          }
+          
+          // Check for double letter (aa, ee, oo)
+          if (buffer.toLowerCase() === lowerInput && ['a', 'e', 'o'].includes(lowerInput)) {
+            const charToReplace = currentValue.slice(-1)
+            const isUpper = charToReplace === charToReplace.toUpperCase() && charToReplace.toLowerCase() === lowerInput
+            
+            let modified: string | null = null
+            if (lowerInput === 'a') modified = isUpper ? 'Â' : 'â'
+            else if (lowerInput === 'e') modified = isUpper ? 'Ê' : 'ê'
+            else if (lowerInput === 'o') modified = isUpper ? 'Ô' : 'ô'
+            
+            if (modified) {
+              setBuffer(modified.toLowerCase())
+              return currentValue.slice(0, -1) + modified
+            }
           }
         }
       } else {
         // VNI mode
-        // Check for tone marks
-        if (VNI_TONES[lowerInput]) {
+        // Check for tone marks (1, 2, 3, 4, 5)
+        if (VNI_TONES[lowerInput] && lastWord.length > 0) {
           const tone = VNI_TONES[lowerInput]
-          const lastChar = buffer.slice(-1).toLowerCase() as TBaseVowel
-          if (VIETNAMESE_TONES[tone][lastChar]) {
-            const replacement = VIETNAMESE_TONES[tone][lastChar]
-            result =
-              currentValue.slice(0, -1) +
-              (buffer.slice(-1) === buffer.slice(-1).toUpperCase()
-                ? replacement.toUpperCase()
-                : replacement)
-            setBuffer('')
-            return result
+          const vowelIdx = findVowelForTone(lastWord)
+          
+          if (vowelIdx !== -1) {
+            const charToModify = lastWord[vowelIdx]
+            const toneMap = VIETNAMESE_TONES[tone]
+            if (toneMap && toneMap[charToModify]) {
+              const modifiedWord = 
+                lastWord.slice(0, vowelIdx) + 
+                toneMap[charToModify] + 
+                lastWord.slice(vowelIdx + 1)
+              setBuffer('')
+              return beforeWord + modifiedWord
+            }
           }
         }
 
-        // Check for vowel modifications
-        const twoCharKey = buffer.toLowerCase() + lowerInput
-        if (VNI_MAP[twoCharKey]) {
-          const { base, type } = VNI_MAP[twoCharKey]
-          const modEntry = VOWEL_MODS[base]
-          if (modEntry && type in modEntry) {
-            const modified = modEntry[type as keyof typeof modEntry] as string
-            result =
-              currentValue.slice(0, -1) +
-              (buffer === buffer.toUpperCase() ? modified.toUpperCase() : modified)
-            setBuffer(modified)
-            return result
+        // Check for vowel modifications (6, 7, 8, 9)
+        if (VNI_VOWEL_MODS[lowerInput] && lastWord.length > 0) {
+          const modConfig = VNI_VOWEL_MODS[lowerInput]
+          const charIdx = findCharToModify(lastWord, modConfig.target)
+          
+          if (charIdx !== -1) {
+            const charToModify = lastWord[charIdx]
+            const charLower = charToModify.toLowerCase()
+            const isUpper = charToModify === charToModify.toUpperCase() && charLower !== charToModify
+            
+            let modified: string | null = null
+            
+            if (modConfig.type === 'circumflex') {
+              // 6: a->â, e->ê, o->ô
+              if (charLower === 'a') modified = isUpper ? 'Â' : 'â'
+              else if (charLower === 'e') modified = isUpper ? 'Ê' : 'ê'
+              else if (charLower === 'o') modified = isUpper ? 'Ô' : 'ô'
+            } else if (modConfig.type === 'horn') {
+              // 7: o->ơ, u->ư
+              if (charLower === 'o') modified = isUpper ? 'Ơ' : 'ơ'
+              else if (charLower === 'u') modified = isUpper ? 'Ư' : 'ư'
+            } else if (modConfig.type === 'breve') {
+              // 8: a->ă
+              if (charLower === 'a') modified = isUpper ? 'Ă' : 'ă'
+            } else if (modConfig.type === 'stroke') {
+              // 9: d->đ
+              if (charLower === 'd') modified = isUpper ? 'Đ' : 'đ'
+            }
+            
+            if (modified) {
+              const modifiedWord = 
+                lastWord.slice(0, charIdx) + 
+                modified + 
+                lastWord.slice(charIdx + 1)
+              setBuffer('')
+              return beforeWord + modifiedWord
+            }
           }
         }
       }
 
-      // Regular character
+      // Regular character - just append
       setBuffer(lowerInput)
-      result = currentValue + input
-      return result
+      return currentValue + input
     },
     [inputMethod, buffer]
   )

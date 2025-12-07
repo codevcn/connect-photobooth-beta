@@ -6,6 +6,7 @@ import {
   TTextVisualState,
 } from '@/utils/types/global'
 import { create } from 'zustand'
+import { useElementLayerStore } from '../ui/element-layer.store'
 
 type TSelectedElement = {
   elementId: string
@@ -47,7 +48,10 @@ export const useEditedElementStore = create<TUseElementStore>((set, get) => ({
 
   initBuiltPrintedImageElements: (printedImages) => {
     set({
-      printedImages,
+      printedImages: [
+        ...get().printedImages.filter((img) => !img.isInitWithLayout),
+        ...printedImages,
+      ],
     })
   },
   resetPrintedImagesBuildId: () => {

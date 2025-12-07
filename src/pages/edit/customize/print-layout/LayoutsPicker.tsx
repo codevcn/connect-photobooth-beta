@@ -24,7 +24,6 @@ export const LayoutsPicker = ({ printedImages }: TLayoutsPickerProps) => {
 
   const handlePickTemplate = (layout: TPrintLayout) => {
     useEditedElementStore.getState().cancelSelectingElement()
-    console.log('>>> [sto] pick layout at picker:', layout)
     // handlePutPrintedImagesInLayout(layout)
     useLayoutStore.getState().pickLayout(layout)
   }

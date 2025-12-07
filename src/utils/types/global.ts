@@ -151,6 +151,9 @@ export type TElementType = 'text' | 'sticker' | 'printed-image' | 'template-fram
 export type TElementLayerState = {
   elementId: string
   index: number
+  elementType: TElementType
+  isLayoutImage?: boolean
+  printedImageId?: string
 }
 
 export type TPreSentMockupImageLink = {
@@ -235,7 +238,10 @@ export type TStickerVisualState = TElementVisualBaseState & {
     grayscale: number // 0-100 percentage
   }>
 
-export type TPrintedImageVisualState = TStickerVisualState
+export type TPrintedImageVisualState = TStickerVisualState &
+  Partial<{
+    isInitWithLayout: boolean
+  }>
 
 export type TStoredTemplate = TPrintTemplate
 

@@ -44,7 +44,7 @@ export const StickerElement = ({
     forDrag: { ref: refForDrag, dragButtonRef },
     state: { position, angle, scale, zindex },
     handleSetElementState,
-  } = useElementControl(id, rootRef, allowedPrintAreaRef, printAreaContainerRef, {
+  } = useElementControl(id, rootRef, allowedPrintAreaRef, printAreaContainerRef, 'sticker', {
     maxZoom: MAX_ZOOM,
     minZoom: MIN_ZOOM,
     angle: element.angle,
@@ -166,14 +166,11 @@ export const StickerElement = ({
     })
   }
 
-  const handleAddElementLayer = () => {
-    useElementLayerStore.getState().addToElementLayers({ elementId: id, index: zindex })
-  }
-
   const removeElement = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation()
     e.preventDefault()
     removeStickerElement(id)
+    useElementLayerStore.getState().removeElementLayers([id])
   }
 
   useEffect(() => {
@@ -183,7 +180,6 @@ export const StickerElement = ({
 
   useEffect(() => {
     initElement()
-    handleAddElementLayer()
     eventEmitter.on(EInternalEvents.SUBMIT_STICKER_ELE_PROPS, listenSubmitEleProps)
     return () => {
       eventEmitter.off(EInternalEvents.SUBMIT_STICKER_ELE_PROPS, listenSubmitEleProps)

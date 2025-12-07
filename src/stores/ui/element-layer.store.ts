@@ -2,65 +2,171 @@ import { createInitialConstants } from '@/utils/contants'
 import { TElementLayerState } from '@/utils/types/global'
 import { create } from 'zustand'
 
+const ELEMENT_ZINDEX_STEP = createInitialConstants<number>('ELEMENT_ZINDEX_STEP')
+
 type TUseElementLayerStore = {
   elementLayers: TElementLayerState[] // min index is ELEMENT_ZINDEX_STEP
 
-  setElementLayers: (elementLayers: TElementLayerState[]) => void
-  addToElementLayers: (elementLayer: TElementLayerState) => void
-  removeFromElementLayers: (elementId: string[]) => void
-  updateElementLayerIndex: (elementId: string, newIndex: number) => void
+  addElementLayers: (elementLayers: TElementLayerState[]) => void
+  removeElementLayers: (elementIds: string[]) => void
+  updateElementLayerIndex: (elementId: string, amount: number) => void
+  setupElementLayersIndex: (elementLayers: TElementLayerState[]) => void
+  initElementLayersWithIndex: (elementLayers: TElementLayerState[]) => void
   resetData: () => void
+  removeImageLayoutElements: () => void
 }
 
-export const useElementLayerStore = create<TUseElementLayerStore>((set) => ({
+export const useElementLayerStore = create<TUseElementLayerStore>((set, get) => ({
   elementLayers: [],
 
+  removeImageLayoutElements: () => {
+    set({
+      elementLayers: get().elementLayers.filter(
+        (el) => !(el.isLayoutImage && el.elementType === 'printed-image')
+      ),
+    })
+  },
   resetData: () => {
     set({ elementLayers: [] })
   },
-  setElementLayers: (elementLayers) => set({ elementLayers }),
-  addToElementLayers: (newElementLayer) =>
-    set(({ elementLayers }) => {
-      if (elementLayers.some((el) => el.elementId === newElementLayer.elementId)) {
-        return { elementLayers }
+  addElementLayers: (newElementLayers) => {
+    const { elementLayers } = get()
+    const layersToAdd = [...newElementLayers]
+
+    if (elementLayers.some((el) => layersToAdd.some((newEl) => newEl.elementId === el.elementId))) {
+      return
+    }
+
+    let updatedLayers: TElementLayerState[]
+
+    if (elementLayers.length > 0) {
+      const maxIndex = Math.max(...elementLayers.map((layer) => layer.index))
+      let index = 1
+      for (const layer of layersToAdd) {
+        layer.index = maxIndex + index * ELEMENT_ZINDEX_STEP
+        index++
       }
-      return { elementLayers: [...elementLayers, newElementLayer] }
-    }),
-  removeFromElementLayers: (elementIds) => {
-    set((state) => ({
-      elementLayers: state.elementLayers.filter((el) => !elementIds.includes(el.elementId)),
-    }))
+      console.log('>>> [idx] layersToAdd 1:', layersToAdd)
+      updatedLayers = [...elementLayers, ...layersToAdd]
+    } else {
+      let index = 1
+      for (const layer of layersToAdd) {
+        layer.index = index * ELEMENT_ZINDEX_STEP
+        index++
+      }
+      console.log('>>> [idx] layersToAdd 2:', layersToAdd)
+      updatedLayers = layersToAdd
+    }
+
+    // Sắp xếp: layoutImage ở dưới cùng (index thấp nhất)
+    const layoutImageLayers = updatedLayers.filter((layer) => layer.isLayoutImage)
+    const normalLayers = updatedLayers.filter((layer) => !layer.isLayoutImage)
+
+    // Gán lại index: layoutImage có index thấp hơn
+    let currentIndex = 1
+    for (const layer of layoutImageLayers) {
+      layer.index = currentIndex * ELEMENT_ZINDEX_STEP
+      currentIndex++
+    }
+    for (const layer of normalLayers) {
+      layer.index = currentIndex * ELEMENT_ZINDEX_STEP
+      currentIndex++
+    }
+
+    set({ elementLayers: [...layoutImageLayers, ...normalLayers] })
   },
-  updateElementLayerIndex: (elementId, newIndex) => {
-    return set((state) => {
-      const currentLayers = state.elementLayers
-      // Tìm index hiện tại của element
-      const currentIndex = currentLayers.findIndex((layer) => layer.elementId === elementId)
-      if (currentIndex === -1) return { elementLayers: currentLayers }
-
-      const isMovingUp = newIndex > 0
-
-      // Kiểm tra boundary
-      if (isMovingUp && currentIndex === currentLayers.length - 1)
-        return { elementLayers: currentLayers } // Đã ở trên cùng
-      if (!isMovingUp && currentIndex === 0) return { elementLayers: currentLayers } // Đã ở dưới cùng
-
-      // Tạo mảng mới và swap vị trí
-      const updatedLayers = [...currentLayers]
-      const targetIndex = currentIndex + (isMovingUp ? 1 : -1)
-
-      // Swap
-      const temp = updatedLayers[currentIndex]
-      updatedLayers[currentIndex] = updatedLayers[targetIndex]
-      updatedLayers[targetIndex] = temp
-
-      // Cập nhật lại index cho tất cả layers
-      return {
-        elementLayers: updatedLayers.map((layer, idx) => ({
-          ...layer,
-          index: (idx + 1) * createInitialConstants<number>('ELEMENT_ZINDEX_STEP') + 1,
-        })),
-      }
+  removeElementLayers: (elementIds) => {
+    set({
+      elementLayers: get().elementLayers.filter((el) => !elementIds.includes(el.elementId)),
     })
+  },
+  updateElementLayerIndex: (elementId, amount) => {
+    const currentLayers = get().elementLayers
+
+    const currentItem = currentLayers.find((item) => item.elementId === elementId)
+    if (!currentItem) {
+      console.warn(`Item with id ${elementId} not found`)
+      return
+    }
+
+    // Sắp xếp items theo index để tìm vị trí
+    const sortedItems = [...currentLayers].sort((a, b) => a.index - b.index)
+    const currentPosition = sortedItems.findIndex((item) => item.elementId === elementId)
+
+    let updatedLayers: TElementLayerState[]
+
+    if (amount > 0) {
+      // Swap với object tiếp theo (đưa lên trên)
+      const nextPosition = currentPosition + 1
+      if (nextPosition >= sortedItems.length) {
+        console.warn('>>> Already at the top position')
+        return
+      }
+
+      const nextItem = sortedItems[nextPosition]
+
+      // Swap index giữa 2 items
+      updatedLayers = currentLayers.map((item) => {
+        if (item.elementId === elementId) {
+          return { ...item, index: nextItem.index }
+        }
+        if (item.elementId === nextItem.elementId) {
+          return { ...item, index: currentItem.index }
+        }
+        return item
+      })
+    } else if (amount < 0) {
+      // Swap với object trước đó (đưa xuống dưới)
+      const prevPosition = currentPosition - 1
+      if (prevPosition < 0) {
+        console.warn('>>> Already at the bottom position')
+        return
+      }
+
+      const prevItem = sortedItems[prevPosition]
+
+      // Swap index giữa 2 items
+      updatedLayers = currentLayers.map((item) => {
+        if (item.elementId === elementId) {
+          return { ...item, index: prevItem.index }
+        }
+        if (item.elementId === prevItem.elementId) {
+          return { ...item, index: currentItem.index }
+        }
+        return item
+      })
+    } else {
+      // amount === 0, không làm gì
+      return
+    }
+
+    console.log('>>> [idx] updatedLayers:', updatedLayers)
+    set({ elementLayers: updatedLayers })
+  },
+  // Hàm này khởi tạo/chuẩn hóa index cho các element layers
+  // Đảm bảo mỗi layer có index cách nhau ELEMENT_ZINDEX_STEP
+  setupElementLayersIndex: (elementLayers) => {
+    if (elementLayers.length === 0) {
+      return
+    }
+
+    // Sort theo index hiện tại để giữ nguyên thứ tự
+    const sortedLayers = [...elementLayers].sort((a, b) => a.index - b.index)
+
+    // Gán lại index với khoảng cách đều nhau
+    const normalizedLayers = sortedLayers.map((layer, idx) => ({
+      ...layer,
+      index: (idx + 1) * ELEMENT_ZINDEX_STEP,
+    }))
+
+    console.log('>>> [idx] setupElementLayersIndex:', normalizedLayers)
+    set({ elementLayers: normalizedLayers })
+  },
+  initElementLayersWithIndex: (elementLayers) => {
+    const { elementLayers: existingLayers } = get()
+    const newLayers = [...existingLayers, ...elementLayers]
+    newLayers.sort((a, b) => a.index - b.index)
+    console.log('>>> [idx] initElementLayersWithIndex:', newLayers)
+    set({ elementLayers: newLayers })
   },
 }))

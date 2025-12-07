@@ -18,7 +18,7 @@ export const useLayoutStore = create<TLayoutStore>((set, get) => ({
   allLayouts: hardCodedLayoutData() || [],
 
   resetData: () => {
-    set({ pickedLayout: null })
+    set({ pickedLayout: null, allLayouts: hardCodedLayoutData() || [] })
   },
   pickLayout: (layout: TPrintLayout) => set({ pickedLayout: layout }),
   setAllLayouts: (layouts: TPrintLayout[]) => set({ allLayouts: layouts }),

@@ -41,6 +41,9 @@ export const VietnameseKeyboard = ({
   const keyboardRef = externalKeyboardRef || internalKeyboardRef
   // Track caret position
   const caretPositionRef = useRef<{ start: number; end: number }>({ start: 0, end: 0 })
+  // Track double tap for done and enter buttons
+  const lastTapTimeRef = useRef<{ done: number; enter: number }>({ done: 0, enter: 0 })
+  const DOUBLE_TAP_DELAY = 400 // milliseconds
   const { inputMethod, toggleInputMethod, processVietnameseInput, resetBuffer } =
     useVietnameseKeyboard()
 
@@ -123,8 +126,15 @@ export const VietnameseKeyboard = ({
       onChange?.(newInput)
       resetBuffer()
     } else if (button === '{enter}') {
-      onSubmit?.(input)
-      onClose?.()
+      // Require double tap for enter
+      const now = Date.now()
+      if (now - lastTapTimeRef.current.enter < DOUBLE_TAP_DELAY) {
+        onSubmit?.(input)
+        onClose?.()
+        lastTapTimeRef.current.enter = 0 // Reset after successful double tap
+      } else {
+        lastTapTimeRef.current.enter = now
+      }
     } else if (button === '{toggle}') {
       toggleInputMethod()
     } else if (button === '{clear}') {
@@ -133,7 +143,14 @@ export const VietnameseKeyboard = ({
       resetBuffer()
       setCaretPosition(0)
     } else if (button === '{done}') {
-      submitInputValue()
+      // Require double tap for done
+      const now = Date.now()
+      if (now - lastTapTimeRef.current.done < DOUBLE_TAP_DELAY) {
+        submitInputValue()
+        lastTapTimeRef.current.done = 0 // Reset after successful double tap
+      } else {
+        lastTapTimeRef.current.done = now
+      }
     } else {
       if (maxLength && input.length >= maxLength) {
         return
@@ -141,7 +158,6 @@ export const VietnameseKeyboard = ({
 
       // Process Vietnamese input with caret position
       const { start, end } = getCaretPosition()
-      const hasSelection = start !== end
       
       // Get the text before caret for Vietnamese processing
       const textBeforeCaret = input.slice(0, start)
@@ -150,11 +166,9 @@ export const VietnameseKeyboard = ({
       // Process Vietnamese input on the text before caret
       const processedBeforeCaret = processVietnameseInput(button, textBeforeCaret)
       
-      // Calculate how many chars were added/modified
-      const lengthDiff = processedBeforeCaret.length - textBeforeCaret.length
-      
       const newInput = processedBeforeCaret + textAfterCaret
-      const newCaretPos = start + lengthDiff + (hasSelection ? 0 : (lengthDiff === 0 ? 1 : 0))
+      // New caret position is at the end of the processed text before caret
+      const newCaretPos = processedBeforeCaret.length
       
       setInput(newInput)
       onChange?.(newInput)

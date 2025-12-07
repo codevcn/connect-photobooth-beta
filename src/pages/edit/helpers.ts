@@ -17,7 +17,8 @@ import {
 import { generateUniqueId } from '@/utils/helpers'
 import { useEditedElementStore } from '@/stores/element/element.store'
 import { TPrintLayout } from '@/utils/types/print-layout'
-import { reAssignElementsByLayoutData } from './customize/print-layout/new'
+import { useElementLayerStore } from '@/stores/ui/element-layer.store'
+import { reAssignElementsByLayoutData } from './customize/print-layout/builder'
 
 export const initFramePlacedImageByPrintedImage = (
   frameIndexProperty: TTemplateFrame['index'],
@@ -466,5 +467,19 @@ export const handlePutPrintedImagesInLayout = (
     allowedPrintArea,
     createInitialConstants('LAYOUT_PADDING')
   )
-  useEditedElementStore.getState().initBuiltPrintedImageElements(printedImages)
+  useEditedElementStore.getState().initBuiltPrintedImageElements(
+    printedImages.map((img) => {
+      return { ...img, isInitWithLayout: true }
+    })
+  )
+  useElementLayerStore.getState().removeImageLayoutElements()
+  useElementLayerStore.getState().addElementLayers(
+    printedImages.map((printedImage) => ({
+      elementId: generateUniqueId(),
+      index: printedImage.zindex,
+      elementType: 'printed-image',
+      isLayoutImage: true,
+      printedImageId: printedImage.id,
+    }))
+  )
 }

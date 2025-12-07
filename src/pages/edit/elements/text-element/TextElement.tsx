@@ -178,14 +178,11 @@ export const TextElement = ({
     })
   }
 
-  const handleAddElementLayer = () => {
-    useElementLayerStore.getState().addToElementLayers({ elementId: id, index: zindex })
-  }
-
   const removeElement = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation()
     e.preventDefault()
     removeTextElement(id)
+    useElementLayerStore.getState().removeElementLayers([id])
   }
 
   useEffect(() => {
@@ -195,7 +192,6 @@ export const TextElement = ({
 
   useEffect(() => {
     initElement()
-    handleAddElementLayer()
     eventEmitter.on(EInternalEvents.SUBMIT_TEXT_ELE_PROPS, listenSubmitEleProps)
     return () => {
       eventEmitter.off(EInternalEvents.SUBMIT_TEXT_ELE_PROPS, listenSubmitEleProps)

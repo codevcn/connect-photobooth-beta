@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { StickerElementMenu } from './Menu'
 import { generateUniqueId } from '@/utils/helpers'
 import { cancelSelectingZoomingImages } from '../../helpers'
+import { useElementLayerStore } from '@/stores/ui/element-layer.store'
 
 type TStickerGroup = {
   name: string
@@ -102,6 +103,13 @@ const StickersModal = ({ onClose }: TStickersModalProps) => {
         scale: createInitialConstants<number>('ELEMENT_ZOOM'),
         zindex: createInitialConstants<number>('ELEMENT_ZINDEX'),
         mountType: 'from-new',
+      },
+    ])
+    useElementLayerStore.getState().addElementLayers([
+      {
+        elementId,
+        elementType: 'sticker',
+        index: createInitialConstants<number>('ELEMENT_ZINDEX'),
       },
     ])
     // useEditedElementStore.getState().selectElement(elementId, 'sticker', path)

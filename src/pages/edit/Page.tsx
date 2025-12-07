@@ -27,6 +27,7 @@ import { cancelSelectingZoomingImages } from './helpers'
 import { toast } from 'react-toastify'
 import { useKeyboardStore } from '@/stores/keyboard/keyboard.store'
 import { useLayoutStore } from '@/stores/ui/print-layout.store'
+import { generateUniqueId } from '@/utils/helpers'
 
 const TemplateFrameMenuResponsive = () => {
   const selectedElement = useEditedElementStore((s) => s.selectedElement)
@@ -111,6 +112,13 @@ const restoreMockupVisualStates = (mockupId: string) => {
       useEditedElementStore
         .getState()
         .setTextElements(restoredTextElements.map((text) => ({ ...text, isFromSaved: true })))
+      useElementLayerStore.getState().addElementLayers(
+        restoredTextElements.map((text) => ({
+          elementId: generateUniqueId(),
+          index: text.zindex,
+          elementType: 'text',
+        }))
+      )
     }
 
     // Restore printed image elements
@@ -121,6 +129,15 @@ const restoreMockupVisualStates = (mockupId: string) => {
         restoredPrintedImageElements.map((printedImage) => ({
           ...printedImage,
           isFromSaved: true,
+        }))
+      )
+      useElementLayerStore.getState().addElementLayers(
+        restoredPrintedImageElements.map((printedImage) => ({
+          elementId: generateUniqueId(),
+          index: printedImage.zindex,
+          elementType: 'printed-image',
+          isLayoutImage: printedImage.isInitWithLayout,
+          printedImageId: printedImage.id,
         }))
       )
     }
@@ -134,6 +151,13 @@ const restoreMockupVisualStates = (mockupId: string) => {
         .setStickerElements(
           restoredStickerElements.map((sticker) => ({ ...sticker, isFromSaved: true }))
         )
+      useElementLayerStore.getState().addElementLayers(
+        restoredStickerElements.map((sticker) => ({
+          elementId: generateUniqueId(),
+          index: sticker.zindex,
+          elementType: 'sticker',
+        }))
+      )
     }
 
     // Restore product, variant, surface, and template

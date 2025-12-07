@@ -5,6 +5,7 @@ import { TextElementMenu } from './Menu'
 import { generateUniqueId } from '@/utils/helpers'
 import { cancelSelectingZoomingImages } from '../../helpers'
 import { ETextFieldNameForKeyBoard } from '@/providers/GlobalKeyboardProvider'
+import { useElementLayerStore } from '@/stores/ui/element-layer.store'
 
 type TEditorModalProps = {
   onClose: () => void
@@ -32,6 +33,13 @@ const EditorModal = ({ onClose }: TEditorModalProps) => {
           zindex: createInitialConstants<number>('ELEMENT_ZINDEX'),
           mountType: 'from-new',
           scale: createInitialConstants<number>('ELEMENT_ZOOM'),
+        },
+      ])
+      useElementLayerStore.getState().addElementLayers([
+        {
+          elementId,
+          elementType: 'text',
+          index: createInitialConstants<number>('ELEMENT_ZINDEX'),
         },
       ])
       // useEditedElementStore.getState().selectElement(elementId, 'text')

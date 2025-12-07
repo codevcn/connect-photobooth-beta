@@ -20,6 +20,8 @@ export const EditedElementsArea = ({
   const selectedElement = useEditedElementStore((s) => s.selectedElement)
   const selectElement = useEditedElementStore((s) => s.selectElement)
   const mockupId = useSearchParams()[0].get('mockupId')
+  const layers = useElementLayerStore((s) => s.elementLayers)
+  console.log('>>> [idx] view layers:', layers)
 
   return (
     <>
@@ -33,7 +35,7 @@ export const EditedElementsArea = ({
             isSelected={selectedElement?.elementId === element.id}
             selectElement={selectElement}
             removeStickerElement={(elementId) => {
-              useElementLayerStore.getState().removeFromElementLayers([elementId])
+              useElementLayerStore.getState().removeElementLayers([elementId])
               useEditedElementStore.getState().removeStickerElement(elementId)
             }}
             printAreaContainerRef={printAreaContainerRef}
@@ -50,7 +52,7 @@ export const EditedElementsArea = ({
             isSelected={selectedElement?.elementId === element.id}
             selectElement={selectElement}
             removeTextElement={(elementId) => {
-              useElementLayerStore.getState().removeFromElementLayers([elementId])
+              useElementLayerStore.getState().removeElementLayers([elementId])
               useEditedElementStore.getState().removeTextElement(elementId)
             }}
             printAreaContainerRef={printAreaContainerRef}
@@ -67,7 +69,7 @@ export const EditedElementsArea = ({
             isSelected={selectedElement?.elementId === element.id}
             selectElement={selectElement}
             removePrintedImageElement={(elementId) => {
-              useElementLayerStore.getState().removeFromElementLayers([elementId])
+              useElementLayerStore.getState().removeElementLayers([elementId])
               useEditedElementStore.getState().removePrintedImageElement(elementId)
             }}
             printAreaContainerRef={printAreaContainerRef}

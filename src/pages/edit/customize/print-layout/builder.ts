@@ -827,7 +827,8 @@ export const reAssignElementsByLayoutData = (
   printAreaPadding: number = 0
 ): TPrintedImageVisualState[] => {
   const printAreaDimensions = getPrintAreaDimensions(allowedPrintArea, printAreaPadding)
-  const elements: TPrintedImageVisualState[] = [...layout.printedImageElements]
+  const elements: TPrintedImageVisualState[] = structuredClone(layout.printedImageElements)
+  console.log('>>> [rea] re-assign:', { elements })
 
   const halfWidth = printAreaDimensions.width / 2
   const halfHeight = printAreaDimensions.height / 2
@@ -925,15 +926,21 @@ export const reAssignElementsByLayoutData = (
       break
   }
 
-  const layoutCandidate: TLayoutCandidate = {
-    type: layout.layoutType,
-    elements,
-    wastedArea: 0,
-    imageCount: elements.length,
-  }
-
   // Gán lại position cho các elements
-  assignPositionsToElements(layoutCandidate, printAreaDimensions)
+  assignPositionsToElements(
+    {
+      type: layout.layoutType,
+      elements: elements,
+      wastedArea: 0,
+      imageCount: elements.length,
+    },
+    printAreaDimensions
+  )
 
-  return layoutCandidate.elements
+  console.log('>>> [rea] re ass return:', {
+    elements,
+    layoutType: layout.layoutType,
+  })
+
+  return elements
 }

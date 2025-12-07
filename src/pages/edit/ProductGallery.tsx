@@ -133,7 +133,6 @@ export const ProductGallery = ({ products }: TProductGalleryProps) => {
   const initFirstProduct = () => {
     if (!mockupId) {
       if (allLayouts.length > 0 && firstProduct && firstProduct.length === 3) {
-        console.log('>>> [gal] init first product:', firstProduct)
         useProductUIDataStore
           .getState()
           .handlePickFirstProduct(firstProduct[0], firstProduct[1], firstProduct[2])
@@ -147,7 +146,6 @@ export const ProductGallery = ({ products }: TProductGalleryProps) => {
     initialSurface: TPrintAreaInfo
   ) => {
     if (firstProductInList.id === products[0].id) {
-      console.log('>>> [gal] set first product:', firstProductInList, initialLayout, initialSurface)
       setFirstProduct([firstProductInList, initialLayout, initialSurface])
     }
   }

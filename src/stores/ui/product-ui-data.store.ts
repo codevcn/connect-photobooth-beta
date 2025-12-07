@@ -145,7 +145,6 @@ export const useProductUIDataStore = create<TProductUIDataStore>((set, get) => (
       pickedSurface: printArea,
     })
     // useTemplateStore.getState().pickTemplate(initialTemplate.id, printArea)
-    console.log('>>> [sto] handle pick layout at store:', initialLayout)
     useLayoutStore.getState().pickLayout(initialLayout)
   },
 

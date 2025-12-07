@@ -34,7 +34,7 @@ export const PrintedImageElement = ({
   removePrintedImageElement,
   printAreaContainerRef,
 }: TPrintedImageElementProps) => {
-  const { path, id, mountType, height, width, grayscale } = element
+  const { path, id, mountType, height, width, grayscale, isInitWithLayout } = element
   const rootRef = useRef<HTMLElement | null>(null)
   const scaleFactor = useEditAreaStore((state) => state.editAreaScaleValue)
   const {
@@ -44,7 +44,7 @@ export const PrintedImageElement = ({
     forDrag: { ref: refForDrag, dragButtonRef },
     state: { position, angle, scale, zindex },
     handleSetElementState,
-  } = useElementControl(id, rootRef, allowedPrintAreaRef, printAreaContainerRef, {
+  } = useElementControl(id, rootRef, allowedPrintAreaRef, printAreaContainerRef, 'printed-image', {
     maxZoom: MAX_ZOOM,
     minZoom: MIN_ZOOM,
     angle: element.angle,
@@ -167,14 +167,11 @@ export const PrintedImageElement = ({
     })
   }
 
-  const handleAddElementLayer = () => {
-    useElementLayerStore.getState().addToElementLayers({ elementId: id, index: zindex })
-  }
-
   const removeElement = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation()
     e.preventDefault()
     removePrintedImageElement(id)
+    useElementLayerStore.getState().removeElementLayers([id])
   }
 
   useEffect(() => {
@@ -184,7 +181,6 @@ export const PrintedImageElement = ({
 
   useEffect(() => {
     initElement()
-    handleAddElementLayer()
     eventEmitter.on(EInternalEvents.SUBMIT_PRINTED_IMAGE_ELE_PROPS, listenSubmitEleProps)
     return () => {
       eventEmitter.off(EInternalEvents.SUBMIT_PRINTED_IMAGE_ELE_PROPS, listenSubmitEleProps)
@@ -225,6 +221,7 @@ export const PrintedImageElement = ({
           height,
           grayscale: grayscale || 0,
           width,
+          isInitWithLayout,
         })
       )}
       onDragStart={(e) => e.preventDefault()}

@@ -156,24 +156,24 @@ export const GlobalKeyboardProvider = () => {
     hideKeyboard()
   }, [])
 
-  const handleCloseKeyboard = useCallback(() => {
-    const currentInput = currentInputRef.current
-    if (currentInput && keyboardRef.current) {
-      const value = keyboardRef.current.getInput()
-      // Set value cho input
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-        currentInput.constructor.prototype,
-        'value'
-      )?.set
+  // const handleCloseKeyboard = useCallback(() => {
+  //   const currentInput = currentInputRef.current
+  //   if (currentInput && keyboardRef.current) {
+  //     const value = keyboardRef.current.getInput()
+  //     // Set value cho input
+  //     const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+  //       currentInput.constructor.prototype,
+  //       'value'
+  //     )?.set
 
-      if (nativeInputValueSetter) {
-        nativeInputValueSetter.call(currentInput, value)
-        const event = new Event('input', { bubbles: true })
-        currentInput.dispatchEvent(event)
-      }
-    }
-    hideKeyboard()
-  }, [hideKeyboard])
+  //     if (nativeInputValueSetter) {
+  //       nativeInputValueSetter.call(currentInput, value)
+  //       const event = new Event('input', { bubbles: true })
+  //       currentInput.dispatchEvent(event)
+  //     }
+  //   }
+  //   hideKeyboard()
+  // }, [hideKeyboard])
 
   // Đồng bộ giá trị khi input thay đổi từ keyboard thật
   useEffect(() => {

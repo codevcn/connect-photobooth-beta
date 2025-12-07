@@ -3,7 +3,12 @@ import { useZoomElement } from '@/hooks/element/use-zoom-element'
 import { useDragElement } from '@/hooks/element/use-drag-element'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { createInitialConstants } from '@/utils/contants'
-import { TElementMountType, TElementVisualBaseState, TPosition } from '@/utils/types/global'
+import {
+  TElementMountType,
+  TElementType,
+  TElementVisualBaseState,
+  TPosition,
+} from '@/utils/types/global'
 import { useElementLayerStore } from '@/stores/ui/element-layer.store'
 import { EInternalEvents, eventEmitter } from '@/utils/events'
 import { useEditAreaStore } from '@/stores/ui/edit-area.store'
@@ -55,6 +60,7 @@ export const useElementControl = (
   elementRootRef: React.RefObject<HTMLElement | null>,
   printAreaAllowedRef: React.RefObject<HTMLDivElement | null>,
   containerForElementAbsoluteToRef: React.RefObject<HTMLDivElement | null>,
+  elementType: TElementType,
   initialParams?: TInitialParams
 ): TElementControlReturn => {
   const {
@@ -143,7 +149,6 @@ export const useElementControl = (
     }
   }
 
-  const elementLayers = useElementLayerStore((s) => s.elementLayers)
   const [scale, setScale] = useState<TElementVisualBaseState['scale']>(initialZoom)
   const [angle, setAngle] = useState<TElementVisualBaseState['angle']>(initialAngle)
   const [zindex, setZindex] = useState<TElementVisualBaseState['zindex']>(initialZindex)
@@ -182,6 +187,8 @@ export const useElementControl = (
     currentZoom: scale,
     setCurrentZoom: setScale,
   })
+  const elementLayers = useElementLayerStore((s) => s.elementLayers)
+
   const handleSetElementPositionCallback = useCallback((pos: TPosition) => {
     handleSetElementPosition(pos.x, pos.y)
   }, [])
@@ -260,13 +267,6 @@ export const useElementControl = (
     }
   }
 
-  const onElementLayersChange = () => {
-    const elementLayerIndex = elementLayers.findIndex((layer) => layer.elementId === elementId)
-    if (elementLayerIndex < 0) return
-    // element layer zindex starts from 11
-    setZindex((elementLayerIndex + 1) * createInitialConstants<number>('ELEMENT_ZINDEX_STEP') + 1)
-  }
-
   const setupVisualData = () => {
     if (mountType !== 'from-saved') return
     // Normalise saved scale: some saved data may store percentage (e.g. 100)
@@ -278,13 +278,16 @@ export const useElementControl = (
     if (minZoom && parsedScale < minZoom) parsedScale = minZoom
     if (maxZoom && parsedScale > maxZoom) parsedScale = maxZoom
     // debug
-    handleSetElementState(
-      initialPosition?.x,
-      initialPosition?.y,
-      parsedScale,
-      initialAngle,
-      initialZindex
-    )
+    handleSetElementState(initialPosition?.x, initialPosition?.y, parsedScale, initialAngle)
+    if (initialZindex) {
+      useElementLayerStore.getState().initElementLayersWithIndex([
+        {
+          elementId,
+          elementType,
+          index: initialZindex,
+        },
+      ])
+    }
   }
 
   const stayElementVisualOnAllowedPrintArea = () => {
@@ -331,10 +334,7 @@ export const useElementControl = (
   }, [position.x, position.y, angle, scale, zindex])
 
   useEffect(() => {
-    eventEmitter.on(
-      EInternalEvents.EDITED_PRINT_AREA_CHANGED,
-      stayElementVisualOnAllowedPrintArea
-    )
+    eventEmitter.on(EInternalEvents.EDITED_PRINT_AREA_CHANGED, stayElementVisualOnAllowedPrintArea)
     return () => {
       eventEmitter.off(
         EInternalEvents.EDITED_PRINT_AREA_CHANGED,
@@ -358,7 +358,10 @@ export const useElementControl = (
   }, [elementId])
 
   useEffect(() => {
-    onElementLayersChange()
+    const layer = elementLayers.find((l) => l.elementId === elementId)
+    if (layer) {
+      setZindex(layer.index)
+    }
   }, [elementLayers])
 
   useEffect(() => {

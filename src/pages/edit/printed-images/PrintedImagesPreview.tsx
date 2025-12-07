@@ -7,6 +7,7 @@ import { generateUniqueId, getNaturalSizeOfImage } from '@/utils/helpers'
 import { createInitialConstants } from '@/utils/contants'
 import { PrintedImagesModal } from './PrintedImagesModal'
 import { CustomScrollbar } from '@/components/custom/CustomScrollbar'
+import { useElementLayerStore } from '@/stores/ui/element-layer.store'
 
 type ImageProps = {
   img: TPrintedImage
@@ -73,6 +74,14 @@ const PrintedImagePreviewModal = ({ printedImage, onClose }: PrintedImageProps) 
         scale: createInitialConstants<number>('ELEMENT_ZOOM'),
         zindex: createInitialConstants<number>('ELEMENT_ZINDEX'),
         mountType: 'from-new',
+      },
+    ])
+    useElementLayerStore.getState().addElementLayers([
+      {
+        elementId,
+        elementType: 'printed-image',
+        index: createInitialConstants<number>('ELEMENT_ZINDEX'),
+        printedImageId: printedImg.id,
       },
     ])
     // useEditedElementStore.getState().selectElement(elementId, 'printed-image', printedImg.url)

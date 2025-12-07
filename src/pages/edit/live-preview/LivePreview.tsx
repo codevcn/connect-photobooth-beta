@@ -125,7 +125,6 @@ export const LivePreview = ({
 }: TLivePreviewProps) => {
   const prevProductIdRef = useRef<TBaseProduct['id'] | null>(null)
   const pickedLayout = useLayoutStore((s) => s.pickedLayout)
-  console.log('>>> [uuu] picked layou--t:', pickedLayout)
 
   const printAreaInfo = useMemo(() => {
     return pickedProduct.printAreaList.find(
@@ -149,20 +148,6 @@ export const LivePreview = ({
       ?.style.setProperty('transform', 'translate(0px, 0px) scale(1)')
     zoomEditAreaController.reset()
   }
-
-  // const handlePutPrintedImagesInLayout = (layout: TPrintLayout) => {
-  //   console.log('>>> [kkk] put put:', {
-  //     layout,
-  //     pickedLayout,
-  //   })
-  //   console.trace('>>> [kkk] vui vui vui:')
-  //   const printedImages = reAssignElementsByLayoutData(
-  //     structuredClone(layout),
-  //     allowedPrintAreaRef.current!,
-  //     createInitialConstants('LAYOUT_PADDING')
-  //   )
-  //   useEditedElementStore.getState().initBuiltPrintedImageElements(printedImages)
-  // }
 
   const handlePrintAreaUpdated = () => {
     const currentProductId = pickedProduct.id
