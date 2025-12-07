@@ -39,6 +39,8 @@ export const VietnameseKeyboard = ({
   const [layoutName, setLayoutName] = useState('default')
   const internalKeyboardRef = useRef<any>(null)
   const keyboardRef = externalKeyboardRef || internalKeyboardRef
+  // Track caret position
+  const caretPositionRef = useRef<{ start: number; end: number }>({ start: 0, end: 0 })
   const { inputMethod, toggleInputMethod, processVietnameseInput, resetBuffer } =
     useVietnameseKeyboard()
 
@@ -50,18 +52,73 @@ export const VietnameseKeyboard = ({
 
   useEffect(() => {
     setInput(inputValue)
+    // Reset caret to end when input value changes externally
+    caretPositionRef.current = { start: inputValue.length, end: inputValue.length }
   }, [inputValue])
+
+  // Helper to get current caret position from textarea
+  const getCaretPosition = () => {
+    const textarea = textDisplayerRef?.current
+    if (textarea) {
+      return {
+        start: textarea.selectionStart ?? input.length,
+        end: textarea.selectionEnd ?? input.length,
+      }
+    }
+    return caretPositionRef.current
+  }
+
+  // Helper to set caret position in textarea
+  const setCaretPosition = (pos: number) => {
+    caretPositionRef.current = { start: pos, end: pos }
+    // Use requestAnimationFrame to ensure DOM is updated
+    requestAnimationFrame(() => {
+      const textarea = textDisplayerRef?.current
+      if (textarea) {
+        textarea.setSelectionRange(pos, pos)
+        textarea.focus()
+      }
+    })
+  }
+
+  // Insert text at caret position
+  const insertAtCaret = (textToInsert: string, deleteCount: number = 0): string => {
+    const { start, end } = getCaretPosition()
+    const before = input.slice(0, start - deleteCount)
+    const after = input.slice(end)
+    const newInput = before + textToInsert + after
+    const newCaretPos = before.length + textToInsert.length
+    setCaretPosition(newCaretPos)
+    return newInput
+  }
+
+  // Delete at caret position (backspace)
+  const deleteAtCaret = (): string => {
+    const { start, end } = getCaretPosition()
+    if (start !== end) {
+      // Delete selection
+      const newInput = input.slice(0, start) + input.slice(end)
+      setCaretPosition(start)
+      return newInput
+    } else if (start > 0) {
+      // Delete one char before caret
+      const newInput = input.slice(0, start - 1) + input.slice(start)
+      setCaretPosition(start - 1)
+      return newInput
+    }
+    return input
+  }
 
   const handleKeyPress = (button: string) => {
     if (button === '{shift}' || button === '{lock}') {
       setLayoutName(layoutName === 'default' ? 'shift' : 'default')
     } else if (button === '{bksp}') {
-      const newInput = input.slice(0, -1)
+      const newInput = deleteAtCaret()
       setInput(newInput)
       onChange?.(newInput)
       resetBuffer()
     } else if (button === '{space}') {
-      const newInput = input + ' '
+      const newInput = insertAtCaret(' ')
       setInput(newInput)
       onChange?.(newInput)
       resetBuffer()
@@ -74,6 +131,7 @@ export const VietnameseKeyboard = ({
       setInput('')
       onChange?.('')
       resetBuffer()
+      setCaretPosition(0)
     } else if (button === '{done}') {
       submitInputValue()
     } else {
@@ -81,13 +139,40 @@ export const VietnameseKeyboard = ({
         return
       }
 
-      // Process Vietnamese input
-      const newInput = processVietnameseInput(button, input)
+      // Process Vietnamese input with caret position
+      const { start, end } = getCaretPosition()
+      const hasSelection = start !== end
+      
+      // Get the text before caret for Vietnamese processing
+      const textBeforeCaret = input.slice(0, start)
+      const textAfterCaret = input.slice(end)
+      
+      // Process Vietnamese input on the text before caret
+      const processedBeforeCaret = processVietnameseInput(button, textBeforeCaret)
+      
+      // Calculate how many chars were added/modified
+      const lengthDiff = processedBeforeCaret.length - textBeforeCaret.length
+      
+      const newInput = processedBeforeCaret + textAfterCaret
+      const newCaretPos = start + lengthDiff + (hasSelection ? 0 : (lengthDiff === 0 ? 1 : 0))
+      
       setInput(newInput)
       onChange?.(newInput)
+      setCaretPosition(newCaretPos)
     }
 
     onKeyPress?.(button)
+  }
+
+  // Track caret position when user clicks or uses arrow keys in textarea
+  const handleTextAreaSelect = () => {
+    const textarea = textDisplayerRef?.current
+    if (textarea) {
+      caretPositionRef.current = {
+        start: textarea.selectionStart ?? 0,
+        end: textarea.selectionEnd ?? 0,
+      }
+    }
   }
 
   const vietnameseLayout = {
@@ -244,6 +329,13 @@ export const VietnameseKeyboard = ({
     }
   }
 
+  // Handle keyboard input from textarea (when user types with real keyboard)
+  const handleTextAreaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Update caret position after key press
+    setTimeout(handleTextAreaSelect, 0)
+    catchEnterKey(e)
+  }
+
   return (
     <div className={`${keyboardName} 5xl:text-[26px] w-full shadow-[0_3px_10px_rgba(0,0,0,0.8)]`}>
       {/* Display area - hiển thị nội dung đang nhập */}
@@ -258,8 +350,16 @@ export const VietnameseKeyboard = ({
           onKeyDown={catchEnterKey}
         /> */}
         <AutoSizeTextField
-          onChange={(e) => setInput(e.target.value)}
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value)
+            // Update caret position after change
+            setTimeout(handleTextAreaSelect, 0)
+          }}
           onEnter={catchEnterKey}
+          onKeyDown={handleTextAreaKeyDown}
+          onSelect={handleTextAreaSelect}
+          onClick={handleTextAreaSelect}
           textfieldRef={textDisplayerRef}
           className="w-full outline-transparent focus:outline-main-cl overflow-y-auto px-2 py-1.5 text-[1em] border border-gray-200 rounded-lg bg-gray-50 whitespace-pre-wrap wrap-break-word"
         />

@@ -7,6 +7,8 @@ type AutosizeTextareaProps = {
   onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void
   onEnter: (e: KeyboardEvent<HTMLTextAreaElement>) => void
   onKeyDown: (e: KeyboardEvent<HTMLTextAreaElement>) => void
+  onSelect: () => void
+  onClick: () => void
   placeholder: string
   minHeight: number
   maxHeight: number
@@ -18,6 +20,8 @@ export const AutoSizeTextField = ({
   onChange,
   onEnter,
   onKeyDown,
+  onSelect,
+  onClick,
   placeholder = 'Nhập văn bản...',
   minHeight = 40,
   maxHeight = 300,
@@ -71,6 +75,8 @@ export const AutoSizeTextField = ({
       value={text}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
+      onSelect={onSelect}
+      onClick={onClick}
       placeholder={placeholder}
       className={className}
       style={{

@@ -120,6 +120,23 @@ export const GlobalKeyboardProvider = () => {
       const event = new Event('input', { bubbles: true })
       currentInput.dispatchEvent(event)
     }
+
+    const virtualKeyboardInput = textDisplayerRef.current
+    if (!virtualKeyboardInput) return
+
+    // Cập nhật giá trị của input
+    const virtualInputValueSetter = Object.getOwnPropertyDescriptor(
+      virtualKeyboardInput.constructor.prototype,
+      'value'
+    )?.set
+
+    if (virtualInputValueSetter) {
+      virtualInputValueSetter.call(virtualKeyboardInput, inputValue)
+
+      // Trigger input event để React nhận biết thay đổi
+      const event = new Event('input', { bubbles: true })
+      virtualKeyboardInput.dispatchEvent(event)
+    }
   }, [])
 
   const handleSubmitEditing = useCallback((finalValue: string) => {
