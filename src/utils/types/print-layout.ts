@@ -23,5 +23,4 @@ export type TPrintLayout = {
   layoutType: TLayoutType
   printedImageElements: TPrintedImageVisualState[]
   slotConfigs: TLayoutSlotConfig[]
-  wastedSpace: number
 }

@@ -187,7 +187,7 @@ export const LivePreview = ({
       } else {
         eventEmitter.emit(EInternalEvents.EDITED_PRINT_AREA_CHANGED)
       }
-    }, createCommonConstants<number>('ANIMATION_DURATION_PRINT_AREA_BOUNDS_CHANGE') + 50)
+    }, 100)
   }
 
   const { printAreaRef, printAreaContainerRef, checkIfAnyElementOutOfBounds, isOutOfBounds } =

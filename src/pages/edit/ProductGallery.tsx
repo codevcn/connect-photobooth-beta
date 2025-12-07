@@ -54,7 +54,6 @@ const Product = ({
         const initialLayout: TPrintLayout = {
           ...hardCodedLayoutData(layout.type)[0],
           printedImageElements: layout.elements,
-          wastedSpace: layout.wastedArea,
         }
         setInitialLayout(initialLayout)
         onInitFirstProduct(product, initialLayout, firstPrintAreaInProduct)
