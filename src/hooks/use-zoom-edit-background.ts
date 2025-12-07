@@ -1,4 +1,3 @@
-import { useEditedElementStore } from '@/stores/element/element.store'
 import { createInitialConstants } from '@/utils/contants'
 import { TPosition } from '@/utils/types/global'
 import { useState, useRef, useEffect } from 'react'
@@ -15,9 +14,6 @@ export const useZoomEditBackground = (
   const [translate, setTranslate] = useState<TPosition>({ x: 0, y: 0 })
   const allowedPrintAreaRef = useRef<HTMLDivElement>(null)
   const printAreaContainerWrapperRef = useRef<HTMLElement | null>(null)
-  const printedImagesBuildId = useEditedElementStore((s) => s.printedImagesBuildId)
-  const printedImages = useEditedElementStore((s) => s.printedImages)
-  const preBuildIdRef = useRef<string | null>(null)
 
   // Reset về mặc định
   const reset = () => {
