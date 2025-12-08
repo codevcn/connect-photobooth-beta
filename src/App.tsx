@@ -83,13 +83,16 @@ function AppRoutes() {
   // Routes cho Photoism
   if (queryFilter.isPhotoism) {
     return (
-      <Routes>
-        <Route path="/" element={<IntroPage />} />
-        <Route path="/qr" element={<ScanQRPage />} />
-        <Route path="/edit" element={<EditPagePTM />} />
-        <Route path="/payment" element={<PaymentPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <>
+        <Routes>
+          <Route path="/" element={<IntroPage />} />
+          <Route path="/qr" element={<ScanQRPage />} />
+          <Route path="/edit" element={<EditPagePTM />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <GlobalKeyboardProvider />
+      </>
     )
   }
 
@@ -107,12 +110,15 @@ function AppRoutes() {
   // Routes cho Dev mode
   if (queryFilter.dev) {
     return (
-      <Routes>
-        <Route path="/" element={<EditPageDev />} />
-        <Route path="/payment" element={<PaymentPage />} />
-        <Route path="/dev" element={<Dev />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <>
+        <Routes>
+          <Route path="/" element={<EditPageDev />} />
+          <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/dev" element={<Dev />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <GlobalKeyboardProvider />
+      </>
     )
   }
 
@@ -137,7 +143,6 @@ function App() {
       />
       <BrowserRouter>
         <AppRoutes />
-        <GlobalKeyboardProvider />
       </BrowserRouter>
     </AppRootProvider>
   )
