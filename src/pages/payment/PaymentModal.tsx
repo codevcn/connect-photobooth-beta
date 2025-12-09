@@ -163,6 +163,7 @@ export const PaymentModal = ({ onHideShow, voucherCode, cartItems }: PaymentModa
         '.NAME-virtual-keyboard-wrapper'
       )
       if (virtualKeyboardWrapper) {
+        console.log('>>> 111d:', )
         if (virtualKeyboardWrapper.getAttribute('data-virtual-keyboard-shown') === 'false') {
           onHideShow(false)
         }
