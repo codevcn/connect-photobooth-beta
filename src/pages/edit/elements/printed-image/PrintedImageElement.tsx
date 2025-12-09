@@ -2,7 +2,7 @@ import { TElementMountType, TPrintedImageVisualState } from '@/utils/types/globa
 import { useEffect, useRef, useState } from 'react'
 import { EInternalEvents, eventEmitter } from '@/utils/events'
 import { useElementControl } from '@/hooks/element/use-element-control'
-import { typeToObject } from '@/utils/helpers'
+import { checkIfMobileScreen, typeToObject } from '@/utils/helpers'
 import { useElementLayerStore } from '@/stores/ui/element-layer.store'
 import { useEditAreaStore } from '@/stores/ui/edit-area.store'
 import { createPortal } from 'react-dom'
@@ -10,7 +10,12 @@ import { persistElementPositionToPrintArea } from '../helpers'
 
 const MAX_ZOOM: number = 20
 const MIN_ZOOM: number = 0.5
-const DEFAULT_ELEMENT_DIMENSION_SIZE: number = 80
+const DEFAULT_ELEMENT_DIMENSION_SIZE = () => {
+  if (checkIfMobileScreen()) {
+    return 80
+  }
+  return 120
+}
 
 type TInteractiveButtonsState = {
   buttonsContainerStyle: { top: number; left: number; width: number; height: number }
@@ -137,11 +142,11 @@ export const PrintedImageElement = ({
     display.onload = () => {
       const { naturalWidth, naturalHeight } = display
       if (naturalWidth > naturalHeight) {
-        root.style.width = `${DEFAULT_ELEMENT_DIMENSION_SIZE}px`
+        root.style.width = `${DEFAULT_ELEMENT_DIMENSION_SIZE()}px`
         root.style.aspectRatio = `${naturalWidth} / ${naturalHeight}`
         root.style.height = 'auto'
       } else {
-        root.style.height = `${DEFAULT_ELEMENT_DIMENSION_SIZE}px`
+        root.style.height = `${DEFAULT_ELEMENT_DIMENSION_SIZE()}px`
         root.style.aspectRatio = `${naturalWidth} / ${naturalHeight}`
         root.style.width = 'auto'
       }
@@ -207,7 +212,7 @@ export const PrintedImageElement = ({
         transform: `scale(${scale}) rotate(${angle}deg)`,
         zIndex: zindex,
         ...(mountType === 'from-new'
-          ? { height: `${DEFAULT_ELEMENT_DIMENSION_SIZE}px` }
+          ? { height: `${DEFAULT_ELEMENT_DIMENSION_SIZE()}px` }
           : {
               height: `${height}px`,
               aspectRatio: `${width} / ${height}`,

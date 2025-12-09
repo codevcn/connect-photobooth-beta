@@ -2,7 +2,7 @@ import { TElementMountType, TStickerVisualState } from '@/utils/types/global'
 import { useEffect, useRef, useState } from 'react'
 import { EInternalEvents, eventEmitter } from '@/utils/events'
 import { useElementControl } from '@/hooks/element/use-element-control'
-import { typeToObject } from '@/utils/helpers'
+import { checkIfMobileScreen, typeToObject } from '@/utils/helpers'
 import { useElementLayerStore } from '@/stores/ui/element-layer.store'
 import { useEditAreaStore } from '@/stores/ui/edit-area.store'
 import { createPortal } from 'react-dom'
@@ -10,7 +10,12 @@ import { persistElementPositionToPrintArea } from '../helpers'
 
 const MAX_ZOOM: number = 20
 const MIN_ZOOM: number = 0.5
-const DEFAULT_ELEMENT_DIMENSION_SIZE: number = 80
+const DEFAULT_ELEMENT_DIMENSION_SIZE = () => {
+  if (checkIfMobileScreen()) {
+    return 80
+  }
+  return 120
+}
 
 type TInteractiveButtonsState = {
   buttonsContainerStyle: { top: number; left: number; width: number; height: number }
