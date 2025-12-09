@@ -190,24 +190,24 @@ const PrintedImagesForTemplate = ({ printedImages }: PrintedImageForTemplateProp
 
   return (
     <div className="5xl:text-[1.5em] w-full text-[1em]">
-      <h3 className="smd:text-[1em] text-xs mb-1 font-bold text-gray-800">Thêm ảnh vào vùng in</h3>
+      <h3 className="5xl:text-[1em] smd:text-sm text-xs font-bold text-gray-800">Thêm ảnh vào vùng in</h3>
       <CustomScrollbar
         classNames={{
           container: 'w-full pb-1',
-          content: 'flex flex-nowrap gap-1 items-center overflow-x-auto gallery-scroll w-full',
+          content: 'flex flex-nowrap gap-3 py-1.5 items-center overflow-x-auto gallery-scroll w-full',
         }}
       >
         {printedImages.length > 0 &&
           printedImages.map((printedImage, index) => (
             <div
-              className="shadow-lg"
+              className="shadow-[0_0_10px_rgba(0,0,0,0.3)] mobile-touch rounded-md"
               key={printedImage.id}
               onClick={() => setPickedImage(printedImage)}
             >
               <img
                 className={`${
                   index === 0 ? 'aspect-video' : 'aspect-square'
-                } 5xl:h-20 h-12 min-w-12 border-2 border-main-cl object-contain mobile-touch`}
+                } 5xl:h-20 h-12 min-w-12 object-contain mobile-touch`}
                 src={printedImage.url}
                 alt="Ảnh chụp photobooth"
               />

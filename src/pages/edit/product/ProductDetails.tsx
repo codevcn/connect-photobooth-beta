@@ -11,7 +11,7 @@ export const ProductDetails = ({ pickedProduct, pickedVariant }: TProductDetails
   return (
     <div className="smd:order-1 5xl:text-5xl order-2 w-full flex flex-col">
       <div className="smd:order-1 order-2 pl-1 pt-2">
-        <h1 className="sm:text-[2em] 5xl:text-[0.9em] smd:mt-0 mt-2 leading-tight text-[1.5em] font-bold text-slate-900 mb-2">
+        <h1 className="sm:text-[1.5em] 5xl:text-[0.7em] smd:mt-0 mt-2 leading-tight text-[1.5em] font-bold text-slate-900 mb-2">
           {pickedProduct.name}
         </h1>
       </div>

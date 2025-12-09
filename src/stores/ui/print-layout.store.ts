@@ -8,6 +8,7 @@ type TLayoutStore = {
   allLayouts: TPrintLayout[]
 
   pickLayout: (layout: TPrintLayout) => void
+  unpickLayout: () => void
   setAllLayouts: (layouts: TPrintLayout[]) => void
   updateLayoutElements: (layoutId: string, elements: TPrintedImageVisualState[]) => void
   resetData: () => void
@@ -20,6 +21,7 @@ export const useLayoutStore = create<TLayoutStore>((set, get) => ({
   resetData: () => {
     set({ pickedLayout: null, allLayouts: hardCodedLayoutData() || [] })
   },
+  unpickLayout: () => set({ pickedLayout: null }),
   pickLayout: (layout: TPrintLayout) => set({ pickedLayout: layout }),
   setAllLayouts: (layouts: TPrintLayout[]) => set({ allLayouts: layouts }),
   updateLayoutElements: (layoutId: string, elements: TPrintedImageVisualState[]) => {

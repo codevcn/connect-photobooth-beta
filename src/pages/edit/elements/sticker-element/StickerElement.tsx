@@ -218,7 +218,7 @@ export const StickerElement = ({
               aspectRatio: `${width} / ${height}`,
             }),
       }}
-      className={`NAME-root-element NAME-element-type-sticker absolute transition h-fit w-fit touch-none z-6`}
+      className={`NAME-root-element NAME-element-type-sticker absolute h-fit w-fit touch-none z-6`}
       onClick={pickElement}
       data-visual-state={JSON.stringify(
         typeToObject<TStickerVisualState>({

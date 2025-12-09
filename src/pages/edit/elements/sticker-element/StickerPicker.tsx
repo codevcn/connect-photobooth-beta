@@ -5,6 +5,8 @@ import { StickerElementMenu } from './Menu'
 import { generateUniqueId } from '@/utils/helpers'
 import { cancelSelectingZoomingImages } from '../../helpers'
 import { useElementLayerStore } from '@/stores/ui/element-layer.store'
+import { EditorModalWrapper } from '../text-element/TextEditor'
+import { createPortal } from 'react-dom'
 
 type TStickerGroup = {
   name: string
@@ -120,13 +122,22 @@ const StickersModal = ({ onClose }: TStickersModalProps) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-99 animate-pop-in p-4">
-      <div onClick={onClose} className="bg-black/50 absolute inset-0 z-10"></div>
+      <div
+        onClick={(e) => {
+          e.stopPropagation()
+          onClose()
+        }}
+        className="bg-black/50 absolute inset-0 z-10"
+      ></div>
       <div className="flex flex-col bg-white w-full rounded-xl shadow-2xl max-w-[90vw] max-h-[90vh] relative z-20 overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-1 border-b border-gray-200">
           <h3 className="5xl:text-4xl text-xl font-bold text-gray-800">Thêm nhãn dán</h3>
           <button
-            onClick={onClose}
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose()
+            }}
             className="p-2 hover:bg-white/80 rounded-full active:scale-95 transition cursor-pointer"
           >
             <svg
@@ -252,16 +263,19 @@ const initStickerGroupItems = (): TStickerGroupsConfig[] => [
   { name: 'ZapyCongSo', displayName: 'Zapy Cồng Sô', count: 20 },
 ]
 
-const PickerModalWrapper = () => {
-  const [showStickerPicker, setShowStickerPicker] = useState(false)
+type TPickerModalWrapperProps = {
+  showStickerPicker: boolean
+  setShowStickerPicker: (show: boolean) => void
+}
 
+const PickerModalWrapper = ({
+  showStickerPicker,
+  setShowStickerPicker,
+}: TPickerModalWrapperProps) => {
   return (
     <>
       <div className="w-fit">
-        <button
-          onClick={() => setShowStickerPicker(true)}
-          className="smd:p-3 p-2 flex flex-col items-center gap-2 cursor-pointer mobile-touch bg-white rounded-md active:bg-light-orange-cl touch-target transition"
-        >
+        <button className="p-2 flex flex-col items-center gap-2 mobile-touch bg-white rounded-md active:bg-light-orange-cl touch-target transition">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -270,7 +284,7 @@ const PickerModalWrapper = () => {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="lucide lucide-sticker-icon lucide-sticker text-main-cl -rotate-6 w-6 h-6 smd:w-8 smd:h-8 5xl:w-12 5xl:h-12"
+            className="lucide lucide-sticker-icon lucide-sticker text-main-cl -rotate-6 w-6 h-6 smd:w-7 smd:h-7 5xl:w-12 5xl:h-12"
           >
             <path d="M21 9a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 15 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z" />
             <path d="M15 3v5a1 1 0 0 0 1 1h5" />
@@ -281,7 +295,8 @@ const PickerModalWrapper = () => {
         </button>
       </div>
 
-      {showStickerPicker && <StickersModal onClose={() => setShowStickerPicker(false)} />}
+      {showStickerPicker &&
+        createPortal(<StickersModal onClose={() => setShowStickerPicker(false)} />, document.body)}
     </>
   )
 }
@@ -319,40 +334,20 @@ export const StickerMenuWrapper = () => {
 }
 
 export const StickerPicker = () => {
-  const handleSelectElement = () => {
-    // nếu không phải frame và màn hình đang có kích thước nhỏ hơn smd thì ẩn container
-    // if (elementType && elementType !== 'sticker' && window.innerWidth < 662) {
-    //   containerRef.current?.classList.add('hidden')
-    // } else {
-    //   containerRef.current?.classList.remove('hidden')
-    // }
-  }
-
-  // useEffect(() => {
-  //   handleSelectElement()
-  // }, [elementType])
-
-  // useEffect(() => {
-  //   const displayContainerOnResize = () => {
-  //     if (window.innerWidth >= 662) {
-  //       containerRef.current?.classList.remove('hidden')
-  //     } else {
-  //       handleSelectElement()
-  //     }
-  //   }
-  //   window.addEventListener('resize', displayContainerOnResize)
-  //   return () => {
-  //     window.removeEventListener('resize', displayContainerOnResize)
-  //   }
-  // }, [elementType])
+  const [showStickerPicker, setShowStickerPicker] = useState(false)
 
   return (
-    <div className="5xl:text-[1.5em] smd:mt-4 mt-2 flex-1 text-[1em]">
-      <h3 className="5xl:text-[1em] smd:text-[1em] text-xs mb-1 font-bold text-gray-800">
+    <div
+      onClick={() => setShowStickerPicker(true)}
+      className="5xl:text-[1.5em] cursor-pointer flex items-center justify-center mt-2 gap-1 bg-white flex-1 rounded-md px-1"
+    >
+      <PickerModalWrapper
+        showStickerPicker={showStickerPicker}
+        setShowStickerPicker={setShowStickerPicker}
+      />
+      <p className="5xl:text-[0.8em] smd:text-sm text-xs font-bold text-gray-800 leading-none">
         Thêm nhãn dán
-      </h3>
-      <PickerModalWrapper />
-      {/* <StickerMenuWrapper /> */}
+      </p>
     </div>
   )
 }

@@ -214,7 +214,7 @@ export const VariantInfo = ({ pickedProduct, pickedVariant }: TVariantInfoProps)
   const colorsCount = Object.keys(mergedAttributes.uniqueColors).length
 
   return (
-    <div className="smd:order-4 mt-2 order-1 bg-gray-100 border-border rounded-lg overflow-hidden p-3">
+    <div className="smd:order-4 mt-1 order-1 bg-gray-100 border-border rounded-lg overflow-hidden p-3">
       {/* <div className="smd:block hidden mb-4">
         <h3 className="5xl:text-[0.5em] block text-sm font-bold text-slate-900">
           Danh mục hình ảnh sản phẩm
@@ -407,7 +407,7 @@ export const VariantInfo = ({ pickedProduct, pickedVariant }: TVariantInfoProps)
 
       {/* Size Section */}
       {sortedSizes.length > 0 && sortedSizes[0] !== 'null' && (
-        <div className="mb-4">
+        <div className="">
           <div className="flex justify-between w-full mb-2">
             <label className="5xl:text-[0.5em] text-sm block font-bold text-slate-900">
               {mergedAttributes.uniqueSizeTitles[0]}
@@ -415,7 +415,7 @@ export const VariantInfo = ({ pickedProduct, pickedVariant }: TVariantInfoProps)
             {firstProductImageURL && firstProductImageURL !== hintForSizeChart && (
               <button
                 onClick={() => setShowSizeChart(true)}
-                className="5xl:text-[0.5em] text-sm cursor-pointer mobile-touch text-main-cl underline font-medium hover:text-secondary-cl"
+                className="5xl:text-[0.4em] text-sm cursor-pointer mobile-touch text-main-cl underline font-medium hover:text-secondary-cl"
               >
                 Bảng size
               </button>

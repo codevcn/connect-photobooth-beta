@@ -13,6 +13,7 @@ import { PreviewImage } from './customize/print-layout/PreviewImage'
 import { createInitialConstants } from '@/utils/contants'
 import { useElementLayerStore } from '@/stores/ui/element-layer.store'
 import { useEditedElementStore } from '@/stores/element/element.store'
+import { useVisualStatesCollector } from '@/hooks/use-visual-states-collector'
 
 type TProductProps = {
   product: TBaseProduct
@@ -119,18 +120,32 @@ export const ProductGallery = ({ products }: TProductGalleryProps) => {
   const allLayouts = useLayoutStore((s) => s.allLayouts)
   const mockupId = useSearchParams()[0].get('mockupId')
   const [firstProduct, setFirstProduct] = useState<[TBaseProduct, TPrintLayout, TPrintAreaInfo]>()
+  const { collectMockupVisualStates } = useVisualStatesCollector()
 
   const handlePickProduct = (
     product: TBaseProduct,
     initialLayout: TPrintLayout,
     firstPrintAreaInProduct: TPrintAreaInfo
   ) => {
-    if (pickedProduct && pickedProduct.id === product.id) return
-    useProductUIDataStore
-      .getState()
-      .handlePickProduct(product, initialLayout, firstPrintAreaInProduct)
-    useEditedElementStore.getState().resetData()
+    if (!pickedProduct) return
+    if (pickedProduct.id === product.id) return
+    const elementsVisualState = collectMockupVisualStates()
+    const { resetData, checkSavedElementsVisualStateExists, addSavedElementVisualState } =
+      useEditedElementStore.getState()
+    resetData()
     useElementLayerStore.getState().resetData()
+    addSavedElementVisualState({
+      productId: pickedProduct.id,
+      ...elementsVisualState,
+    })
+    if (checkSavedElementsVisualStateExists(product.id)) {
+      useProductUIDataStore.getState().handlePickProduct(product, firstPrintAreaInProduct)
+      useEditedElementStore.getState().recoverSavedElementsVisualStates(product.id)
+    } else {
+      useProductUIDataStore
+        .getState()
+        .handlePickProduct(product, firstPrintAreaInProduct, initialLayout)
+    }
   }
 
   const scrollToPickedProduct = () => {

@@ -275,7 +275,7 @@ export const LivePreview = ({
       </div>
       <div
         style={{ display: isOutOfBounds ? 'block' : 'none' }}
-        className="NAME-out-of-bounds-overlay-warning-top z-51 absolute top-0 left-0 text-sm text-white font-medium bg-red-600 px-3 py-1 rounded-br-md"
+        className="NAME-out-of-bounds-overlay-warning-top 5xl:text-2xl z-51 absolute top-0 left-0 text-sm text-white font-medium bg-red-600 px-3 py-1 rounded-br-md"
       >
         Ngoài phạm vi in cho phép
       </div>

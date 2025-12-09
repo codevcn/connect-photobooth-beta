@@ -28,8 +28,8 @@ type TProductUIDataStore = {
   getProductAttachedData: (productId: TBaseProduct['id']) => TProductAttatchedData | undefined
   handlePickProduct: (
     prod: TBaseProduct,
-    initialLayout: TPrintLayout,
-    printArea: TPrintAreaInfo
+    printArea: TPrintAreaInfo,
+    initialLayout?: TPrintLayout
   ) => void
   handlePickFirstProduct: (
     prod: TBaseProduct,
@@ -138,18 +138,19 @@ export const useProductUIDataStore = create<TProductUIDataStore>((set, get) => (
     })
   },
 
-  handlePickProduct: (product, initialLayout, printArea) => {
+  handlePickProduct: (product, printArea, initialLayout) => {
     set({
       pickedProduct: product,
       pickedVariant: product.variants[0],
       pickedSurface: printArea,
     })
     // useTemplateStore.getState().pickTemplate(initialTemplate.id, printArea)
-    useLayoutStore.getState().pickLayout(initialLayout)
+    if (initialLayout) useLayoutStore.getState().pickLayout(initialLayout)
+    else useLayoutStore.getState().unpickLayout()
   },
 
   handlePickFirstProduct: (product, initialLayout, printArea) => {
-    get().handlePickProduct(product, initialLayout, printArea)
+    get().handlePickProduct(product, printArea, initialLayout)
   },
 
   handlePickVariant: (variant) => {

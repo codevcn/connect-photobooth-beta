@@ -1,4 +1,3 @@
-import { tempObject } from '@/stores/temp/temp.store'
 import { useProductUIDataStore } from '@/stores/ui/product-ui-data.store'
 import { formatNumberWithCommas } from '@/utils/helpers'
 import {

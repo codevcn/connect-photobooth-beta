@@ -7,6 +7,7 @@ import { cancelSelectingZoomingImages } from '../../helpers'
 import { ETextFieldNameForKeyBoard } from '@/providers/GlobalKeyboardProvider'
 import { useElementLayerStore } from '@/stores/ui/element-layer.store'
 import { EInternalEvents, eventEmitter } from '@/utils/events'
+import { createPortal } from 'react-dom'
 
 type TEditorModalProps = {
   onClose: () => void
@@ -75,11 +76,23 @@ const EditorModal = ({ onClose }: TEditorModalProps) => {
 
   return (
     <div className="5xl:text-3xl fixed inset-0 flex justify-center z-99 animate-pop-in p-2">
-      <div onClick={handleClose} className="bg-black/50 absolute inset-0 z-10"></div>
+      <div
+        onClick={(e) => {
+          e.stopPropagation()
+          handleClose()
+        }}
+        className="bg-black/50 absolute inset-0 z-10"
+      ></div>
       <div className="bg-white w-full rounded-xl p-3 shadow-2xl relative z-20 h-fit">
         <div className="flex items-center justify-between mb-2">
           <h3 className="5xl:text-3xl text-xl font-bold text-gray-800">Thêm văn bản</h3>
-          <button onClick={onClose} className="p-2 active:bg-gray-100 rounded-full touch-target">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose()
+            }}
+            className="p-2 active:bg-gray-100 rounded-full touch-target"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -133,9 +146,15 @@ const EditorModal = ({ onClose }: TEditorModalProps) => {
   )
 }
 
-export const EditorModalWrapper = () => {
-  const [showEditorModal, setShowEditorModal] = useState(false)
+type TEditorModalWrapperProps = {
+  showEditorModal: boolean
+  setShowEditorModal: (show: boolean) => void
+}
 
+export const EditorModalWrapper = ({
+  showEditorModal,
+  setShowEditorModal,
+}: TEditorModalWrapperProps) => {
   useEffect(() => {
     const listenAddTextOnDoneKeyboard = (textContent: string) => {
       document.body.querySelector<HTMLElement>('#NAME-add-text-element-confirm-button')?.click()
@@ -148,10 +167,7 @@ export const EditorModalWrapper = () => {
 
   return (
     <>
-      <button
-        onClick={() => setShowEditorModal(true)}
-        className="smd:p-3 p-2 flex flex-col items-center -rotate-6 gap-2 cursor-pointer mobile-touch bg-white rounded-md active:bg-light-orange-cl touch-target transition"
-      >
+      <button className="p-2 flex flex-col items-center -rotate-6 gap-2 cursor-pointer mobile-touch bg-white rounded-md active:bg-light-orange-cl touch-target transition">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -160,7 +176,7 @@ export const EditorModalWrapper = () => {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="lucide lucide-type-icon lucide-type text-main-cl w-6 h-6 smd:w-8 smd:h-8 5xl:w-12 5xl:h-12"
+          className="lucide lucide-type-icon lucide-type text-main-cl w-6 h-6 smd:w-6 smd:h-6 5xl:w-12 5xl:h-12"
         >
           <path d="M12 4v16" />
           <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
@@ -168,7 +184,8 @@ export const EditorModalWrapper = () => {
         </svg>
       </button>
 
-      {showEditorModal && <EditorModal onClose={() => setShowEditorModal(false)} />}
+      {showEditorModal &&
+        createPortal(<EditorModal onClose={() => setShowEditorModal(false)} />, document.body)}
     </>
   )
 }
@@ -209,6 +226,7 @@ export const TextEditor = () => {
   const selectedElement = useEditedElementStore((state) => state.selectedElement)
   const { elementType } = selectedElement || {}
   const containerRef = useRef<HTMLDivElement>(null)
+  const [showEditorModal, setShowEditorModal] = useState(false)
 
   const handleSelectElement = () => {
     // nếu không phải frame và màn hình đang có kích thước nhỏ hơn smd thì ẩn container
@@ -238,11 +256,18 @@ export const TextEditor = () => {
   }, [elementType])
 
   return (
-    <div ref={containerRef} className="5xl:text-[1.5em] smd:mt-4 mt-2 flex-1">
-      <h3 className="5xl:text-[1em] smd:text-base text-xs mb-1 font-bold text-gray-800">
+    <div
+      ref={containerRef}
+      onClick={() => setShowEditorModal(true)}
+      className="5xl:text-[1.5em] cursor-pointer flex items-center justify-center mt-2 gap-1 bg-white flex-1 rounded-md px-1"
+    >
+      <EditorModalWrapper
+        showEditorModal={showEditorModal}
+        setShowEditorModal={setShowEditorModal}
+      />
+      <p className="5xl:text-[0.8em] smd:text-sm text-xs font-bold text-gray-800 leading-none">
         Thêm văn bản
-      </h3>
-      <EditorModalWrapper />
+      </p>
       {/* <TextMenuWrapper /> */}
     </div>
   )

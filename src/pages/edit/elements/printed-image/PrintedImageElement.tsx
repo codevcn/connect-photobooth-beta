@@ -218,7 +218,7 @@ export const PrintedImageElement = ({
               aspectRatio: `${width} / ${height}`,
             }),
       }}
-      className={`NAME-root-element NAME-element-type-printed-image absolute transition h-fit w-fit touch-none z-6`}
+      className={`NAME-root-element NAME-element-type-printed-image absolute h-fit w-fit touch-none z-6`}
       onClick={pickElement}
       data-visual-state={JSON.stringify(
         typeToObject<TPrintedImageVisualState>({
@@ -270,7 +270,7 @@ export const PrintedImageElement = ({
           ref={dragButtonRef}
         >
           <div
-            className={`NAME-rotate-box origin-center absolute -top-7 -left-7 md:-top-8 md:-left-8`}
+            className={`NAME-rotate-box origin-center absolute -top-7 -left-7 md:-top-8 md:-left-8 5xl:-top-10 5xl:-left-10`}
           >
             <button
               ref={rotateButtonRef}
@@ -285,14 +285,16 @@ export const PrintedImageElement = ({
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="lucide lucide-rotate-cw-icon lucide-rotate-cw h-[18px] w-[18px] md:w-5 md:h-5"
+                className="lucide lucide-rotate-cw-icon lucide-rotate-cw h-[18px] w-[18px] md:w-5 md:h-5 5xl:w-8 5xl:h-8"
               >
                 <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
                 <path d="M21 3v5h-5" />
               </svg>
             </button>
           </div>
-          <div className={`NAME-remove-box absolute -bottom-7 -right-7 md:-bottom-8 md:-right-8`}>
+          <div
+            className={`NAME-remove-box absolute -bottom-7 -right-7 md:-bottom-8 md:-right-8 5xl:-bottom-10 5xl:-right-10`}
+          >
             <button
               ref={zoomButtonRef}
               onPointerDownCapture={(e) => e.stopPropagation()}
@@ -309,7 +311,7 @@ export const PrintedImageElement = ({
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="lucide lucide-scaling-icon lucide-scaling h-[18px] w-[18px] md:w-5 md:h-5"
+                className="lucide lucide-scaling-icon lucide-scaling h-[18px] w-[18px] md:w-5 md:h-5 5xl:w-8 5xl:h-8"
               >
                 <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
                 <path d="M14 15H9v-5" />
@@ -318,7 +320,9 @@ export const PrintedImageElement = ({
               </svg>
             </button>
           </div>
-          <div className={`NAME-remove-box absolute -top-7 -right-7 md:-top-8 md:-right-8`}>
+          <div
+            className={`NAME-remove-box absolute -top-7 -right-7 md:-top-8 md:-right-8 5xl:-top-10 5xl:-right-10`}
+          >
             <button
               onClick={removeElement}
               onPointerDownCapture={(e) => e.stopPropagation()}
@@ -334,7 +338,7 @@ export const PrintedImageElement = ({
                 strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="lucide lucide-x-icon lucide-x h-[18px] w-[18px] md:w-5 md:h-5"
+                className="lucide lucide-x-icon lucide-x h-[18px] w-[18px] md:w-5 md:h-5 5xl:w-8 5xl:h-8"
               >
                 <path d="M18 6 6 18" />
                 <path d="m6 6 12 12" />
