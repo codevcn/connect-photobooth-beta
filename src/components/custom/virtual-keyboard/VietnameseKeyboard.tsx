@@ -4,6 +4,7 @@ import 'simple-keyboard/build/css/index.css'
 import { useVietnameseKeyboard } from '@/hooks/use-vietnamese-keyboard'
 import '@/styles/virtual-keyboard.css'
 import { AutoSizeTextField } from '../AutoSizeTextField'
+import { EInternalEvents, eventEmitter } from '@/utils/events'
 
 type TVietnameseKeyboardProps = {
   textDisplayerRef: React.RefObject<HTMLTextAreaElement | null>
@@ -147,6 +148,7 @@ export const VietnameseKeyboard = ({
       setCaretPosition(0)
     } else if (button === '{done}') {
       submitInputValue()
+      eventEmitter.emit(EInternalEvents.ADD_TEXT_ON_DONE_KEYBOARD, input)
     } else {
       if (maxLength && input.length >= maxLength) {
         return

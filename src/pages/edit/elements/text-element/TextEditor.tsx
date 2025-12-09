@@ -6,6 +6,7 @@ import { generateUniqueId } from '@/utils/helpers'
 import { cancelSelectingZoomingImages } from '../../helpers'
 import { ETextFieldNameForKeyBoard } from '@/providers/GlobalKeyboardProvider'
 import { useElementLayerStore } from '@/stores/ui/element-layer.store'
+import { EInternalEvents, eventEmitter } from '@/utils/events'
 
 type TEditorModalProps = {
   onClose: () => void
@@ -59,12 +60,25 @@ const EditorModal = ({ onClose }: TEditorModalProps) => {
     }
   }
 
+  const handleClose = () => {
+    const virtualKeyboardWrapper = document.body.querySelector<HTMLElement>(
+      '.NAME-virtual-keyboard-wrapper'
+    )
+    if (virtualKeyboardWrapper) {
+      if (virtualKeyboardWrapper.getAttribute('data-virtual-keyboard-shown') === 'false') {
+        onClose()
+      }
+    } else {
+      onClose()
+    }
+  }
+
   return (
     <div className="5xl:text-3xl fixed inset-0 flex justify-center z-99 animate-pop-in p-2">
-      <div onClick={onClose} className="bg-black/50 absolute inset-0 z-10"></div>
+      <div onClick={handleClose} className="bg-black/50 absolute inset-0 z-10"></div>
       <div className="bg-white w-full rounded-xl p-3 shadow-2xl relative z-20 h-fit">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="5xl:text-3xl text-xl font-bold text-gray-800">Thêm chữ</h3>
+          <h3 className="5xl:text-3xl text-xl font-bold text-gray-800">Thêm văn bản</h3>
           <button onClick={onClose} className="p-2 active:bg-gray-100 rounded-full touch-target">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -87,7 +101,7 @@ const EditorModal = ({ onClose }: TEditorModalProps) => {
             type="text"
             onChange={handleEdit}
             onKeyDown={catchEnterKey}
-            placeholder="Nhập chữ tại đây..."
+            placeholder="Nhập văn bản tại đây..."
             className={`${ETextFieldNameForKeyBoard.VIRLTUAL_KEYBOARD_TEXTFIELD} 5xl:text-[1em] w-full px-4 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary text-lg`}
             autoFocus
           />
@@ -96,6 +110,7 @@ const EditorModal = ({ onClose }: TEditorModalProps) => {
             onClick={handleAddText}
             disabled={!text.trim()}
             className="5xl:text-[1em] sm:text-base smd:text-lg text-sm w-full bg-primary active:scale-95 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-xl shadow-lg touch-target flex items-center justify-center gap-2 transition"
+            id="NAME-add-text-element-confirm-button"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -120,6 +135,16 @@ const EditorModal = ({ onClose }: TEditorModalProps) => {
 
 export const EditorModalWrapper = () => {
   const [showEditorModal, setShowEditorModal] = useState(false)
+
+  useEffect(() => {
+    const listenAddTextOnDoneKeyboard = (textContent: string) => {
+      document.body.querySelector<HTMLElement>('#NAME-add-text-element-confirm-button')?.click()
+    }
+    eventEmitter.on(EInternalEvents.ADD_TEXT_ON_DONE_KEYBOARD, listenAddTextOnDoneKeyboard)
+    return () => {
+      eventEmitter.off(EInternalEvents.ADD_TEXT_ON_DONE_KEYBOARD, listenAddTextOnDoneKeyboard)
+    }
+  }, [])
 
   return (
     <>
