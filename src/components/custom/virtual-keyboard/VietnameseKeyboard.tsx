@@ -47,6 +47,9 @@ export const VietnameseKeyboard = ({
   // Track double tap for done and enter buttons
   const lastTapTimeRef = useRef<{ done: number; enter: number }>({ done: 0, enter: 0 })
   const DOUBLE_TAP_DELAY = 400 // milliseconds
+  // Track enter key press state
+  const enterKeyPressedRef = useRef<boolean>(false)
+  const doneKeyPressedRef = useRef<boolean>(false)
   const { inputMethod, toggleInputMethod, processVietnameseInput, resetBuffer } =
     useVietnameseKeyboard()
 
@@ -131,14 +134,8 @@ export const VietnameseKeyboard = ({
       onChange?.(newInput)
       resetBuffer()
     } else if (button === '{enter}') {
-      if (currentInputRef.current?.tagName === 'INPUT') {
-        submitInputValue()
-      } else {
-        const newInput = insertAtCaret('\n')
-        setInput(newInput)
-        onChange?.(newInput)
-        resetBuffer()
-      }
+      // Mark that enter key is being pressed, wait for release
+      enterKeyPressedRef.current = true
     } else if (button === '{toggle}') {
       toggleInputMethod()
     } else if (button === '{clear}') {
@@ -147,8 +144,8 @@ export const VietnameseKeyboard = ({
       resetBuffer()
       setCaretPosition(0)
     } else if (button === '{done}') {
-      submitInputValue()
-      eventEmitter.emit(EInternalEvents.ADD_TEXT_ON_DONE_KEYBOARD, input)
+      // Mark that done key is being pressed, wait for release
+      doneKeyPressedRef.current = true
     } else {
       if (maxLength && input.length >= maxLength) {
         return
@@ -174,6 +171,25 @@ export const VietnameseKeyboard = ({
     }
 
     onKeyPress?.(button)
+  }
+
+  // Handle key release - especially for Enter key
+  const handleKeyReleased = (button: string) => {
+    if (button === '{enter}' && enterKeyPressedRef.current) {
+      enterKeyPressedRef.current = false
+      if (currentInputRef.current?.tagName === 'INPUT') {
+        submitInputValue()
+      } else {
+        const newInput = insertAtCaret('\n')
+        setInput(newInput)
+        onChange?.(newInput)
+        resetBuffer()
+      }
+    } else if (button === '{done}' && doneKeyPressedRef.current) {
+      doneKeyPressedRef.current = false
+      submitInputValue()
+      eventEmitter.emit(EInternalEvents.ADD_TEXT_ON_DONE_KEYBOARD, input)
+    }
   }
 
   // Track caret position when user clicks or uses arrow keys in textarea
@@ -407,6 +423,7 @@ export const VietnameseKeyboard = ({
           layout={vietnameseLayout}
           display={display}
           onKeyPress={handleKeyPress}
+          onKeyReleased={handleKeyReleased}
           buttonTheme={buttonTheme}
           theme="hg-theme-default vietnamese-keyboard-drawer"
           preventMouseDownDefault={true}
